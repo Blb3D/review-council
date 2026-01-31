@@ -1,0 +1,22 @@
+# Review Council .gitignore
+
+# Don't commit review outputs (they're project-specific)
+**/reviews/
+**/*-findings.md
+**/RELEASE-READINESS-REPORT.md
+
+# Local config overrides
+config.local.yaml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PowerShell
+*.psm1.bak
