@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  powershell-lint:
+    name: PowerShell Lint
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $results = @()
+          $files = Get-ChildItem -Path . -Recurse -Include *.ps1 -Exclude node_modules
+          foreach ($file in $files) {
+            $analysis = Invoke-ScriptAnalyzer -Path $file.FullName -Severity Warning,Error
+            if ($analysis) {
+              $results += $analysis
+            }
+          }
+          if ($results) {
+            $results | Format-Table -AutoSize
+            Write-Host ""
+            Write-Host "Found $($results.Count) issue(s)" -ForegroundColor Yellow
+            $errors = $results | Where-Object { $_.Severity -eq 'Error' }
+            if ($errors) {
+              Write-Error "PSScriptAnalyzer found $($errors.Count) error(s)"
+              exit 1
+            }
+          } else {
+            Write-Host "No issues found" -ForegroundColor Green
+          }
+
+  json-validate:
+    name: JSON Schema Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON files are well-formed
+        run: |
+          exit_code=0
+          for f in $(find core/schemas -name '*.json'); do
+            echo "Validating: $f"
+            if ! python3 -m json.tool "$f" > /dev/null 2>&1; then
+              echo "  INVALID JSON: $f"
+              exit_code=1
+            else
+              echo "  OK"
+            fi
+          done
+          exit $exit_code
+
+      - name: Validate schemas are valid JSON Schema draft-07
+        run: |
+          pip install jsonschema
+          python3 -c "
+          import json, sys, glob
+          from jsonschema import Draft7Validator
+
+          errors = 0
+          for path in glob.glob('core/schemas/*.schema.json'):
+              print(f'Checking: {path}')
+              with open(path) as f:
+                  schema = json.load(f)
+              try:
+                  Draft7Validator.check_schema(schema)
+                  print(f'  Valid JSON Schema')
+              except Exception as e:
+                  print(f'  INVALID: {e}')
+                  errors += 1
+
+          if errors:
+              sys.exit(1)
+          print('All schemas valid')
+          "
+
+  dashboard-check:
+    name: Dashboard Node.js Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dashboard
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for syntax errors
+        run: node --check server.js
