@@ -1,19 +1,20 @@
-# Review Council
+# Code Conclave
 
-> 🤖 AI-powered code review for any project. Six perspectives. One command.
+> AI-powered code review for any project. Six perspectives. One command.
 
 ```
-  ██████╗ ███████╗██╗   ██╗██╗███████╗██╗    ██╗
-  ██╔══██╗██╔════╝██║   ██║██║██╔════╝██║    ██║
-  ██████╔╝█████╗  ██║   ██║██║█████╗  ██║ █╗ ██║
-  ██╔══██╗██╔══╝  ╚██╗ ██╔╝██║██╔══╝  ██║███╗██║
-  ██║  ██║███████╗ ╚████╔╝ ██║███████╗╚███╔███╔╝
-  ╚═╝  ╚═╝╚══════╝  ╚═══╝  ╚═╝╚══════╝ ╚══╝╚══╝ 
-   ██████╗ ██████╗ ██╗   ██╗███╗   ██╗ ██████╗██╗██╗     
-  ██╔════╝██╔═══██╗██║   ██║████╗  ██║██╔════╝██║██║     
-  ██║     ██║   ██║██║   ██║██╔██╗ ██║██║     ██║██║     
-  ╚██████╗╚██████╔╝╚██████╔╝██║ ╚████║╚██████╗██║███████╗
-   ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝╚══════╝
+   ██████╗ ██████╗ ██████╗ ███████╗
+  ██╔════╝██╔═══██╗██╔══██╗██╔════╝
+  ██║     ██║   ██║██║  ██║█████╗
+  ██║     ██║   ██║██║  ██║██╔══╝
+  ╚██████╗╚██████╔╝██████╔╝███████╗
+   ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝
+   ██████╗ ██████╗ ███╗   ██╗ ██████╗██╗      █████╗ ██╗   ██╗███████╗
+  ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║     ██╔══██╗██║   ██║██╔════╝
+  ██║     ██║   ██║██╔██╗ ██║██║     ██║     ███████║██║   ██║█████╗
+  ██║     ██║   ██║██║╚██╗██║██║     ██║     ██╔══██║╚██╗ ██╔╝██╔══╝
+  ╚██████╗╚██████╔╝██║ ╚████║╚██████╗███████╗██║  ██║ ╚████╔╝ ███████╗
+   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚══════╝╚═╝  ╚═╝  ╚═══╝ ╚══════╝
 ```
 
 ## What It Does
@@ -22,27 +23,27 @@ Deploys 6 specialized AI agents to review your codebase from different perspecti
 
 | Agent | Focus | Finds |
 |-------|-------|-------|
-| 🛡️ **SENTINEL** | Quality | Test gaps, regression risks, coverage holes |
-| 🔒 **GUARDIAN** | Security | Vulnerabilities, auth issues, exposed secrets |
-| 🏗️ **ARCHITECT** | Code Health | Tech debt, patterns, dependencies |
-| 🧭 **NAVIGATOR** | UX | User friction, error messages, accessibility |
-| 📜 **HERALD** | Documentation | Missing docs, outdated guides, setup gaps |
-| ⚙️ **OPERATOR** | Production | Deployment risks, logging, CI/CD issues |
+| **SENTINEL** | Quality | Test gaps, regression risks, coverage holes |
+| **GUARDIAN** | Security | Vulnerabilities, auth issues, exposed secrets |
+| **ARCHITECT** | Code Health | Tech debt, patterns, dependencies |
+| **NAVIGATOR** | UX | User friction, error messages, accessibility |
+| **HERALD** | Documentation | Missing docs, outdated guides, setup gaps |
+| **OPERATOR** | Production | Deployment risks, logging, CI/CD issues |
 
 ## Quick Start
 
 ```powershell
-# Clone Review Council
-git clone https://github.com/yourusername/review-council.git
-cd review-council
+# Clone Code Conclave
+git clone https://github.com/yourusername/code-conclave.git
+cd code-conclave
 
 # Review any project
-.\review-council.ps1 -Project "C:\path\to\your\project"
+.\cli\ccl.ps1 -Project "C:\path\to\your\project"
 ```
 
 ## Requirements
 
-- PowerShell 5.1+ (Windows) or PowerShell Core (Mac/Linux)  
+- PowerShell 5.1+ (Windows) or PowerShell Core (Mac/Linux)
 - [Claude Code CLI](https://docs.anthropic.com/claude-code) installed and authenticated
 
 ## Usage
@@ -50,38 +51,32 @@ cd review-council
 ### Full Review (All 6 Agents)
 
 ```powershell
-.\review-council.ps1 -Project "C:\repos\my-app"
+.\cli\ccl.ps1 -Project "C:\repos\my-app"
 ```
 
 ### Single Agent
 
 ```powershell
-.\review-council.ps1 -Project "C:\repos\my-app" -Agent sentinel
-.\review-council.ps1 -Project "C:\repos\my-app" -Agent guardian
+.\cli\ccl.ps1 -Project "C:\repos\my-app" -Agent sentinel
+.\cli\ccl.ps1 -Project "C:\repos\my-app" -Agent guardian
 ```
 
 ### Multiple Specific Agents
 
 ```powershell
-.\review-council.ps1 -Project "C:\repos\my-app" -Agents sentinel,guardian,architect
-```
-
-### Parallel Execution (Faster)
-
-```powershell
-.\review-council.ps1 -Project "C:\repos\my-app" -Parallel
+.\cli\ccl.ps1 -Project "C:\repos\my-app" -Agents sentinel,guardian,architect
 ```
 
 ### Resume From Agent
 
 ```powershell
-.\review-council.ps1 -Project "C:\repos\my-app" -StartFrom architect
+.\cli\ccl.ps1 -Project "C:\repos\my-app" -StartFrom architect
 ```
 
 ### Dry Run
 
 ```powershell
-.\review-council.ps1 -Project "C:\repos\my-app" -DryRun
+.\cli\ccl.ps1 -Project "C:\repos\my-app" -DryRun
 ```
 
 ## Output
@@ -90,7 +85,7 @@ Results are saved to your project:
 
 ```
 your-project/
-└── .review-council/
+└── .code-conclave/
     ├── sentinel-findings.md
     ├── guardian-findings.md
     ├── architect-findings.md
@@ -134,11 +129,32 @@ your-project/
 | **CONDITIONAL** | No blockers, >3 high issues |
 | **HOLD** | Blockers present |
 
+## Project Structure
+
+```
+code-conclave/
+├── core/
+│   ├── agents/          # Agent instruction files
+│   ├── standards/       # Compliance packs (CMMC, ISO, FDA)
+│   ├── schemas/         # JSON schemas for findings & standards
+│   ├── mappings/        # Finding-to-control mappings
+│   └── templates/       # Report templates
+├── cli/
+│   ├── ccl.ps1          # Main CLI entry point
+│   ├── ccl.bat          # Windows batch wrapper
+│   ├── commands/        # CLI subcommands
+│   └── config/          # Example configuration
+├── dashboard/           # Live monitoring dashboard
+├── docs/                # Documentation
+├── shared/              # Shared utilities
+└── examples/            # Sample output
+```
+
 ## Customization
 
 ### Add Custom Agents
 
-Create a new file in `agents/`:
+Create a new file in `core/agents/`:
 
 ```markdown
 # CUSTOM - Your Agent
@@ -158,15 +174,17 @@ Assess [what] for release readiness.
 ```
 
 Then run:
+
 ```powershell
-.\review-council.ps1 -Project "..." -Agent custom
+.\cli\ccl.ps1 -Project "..." -Agent custom
 ```
 
 ### Override Agent Behavior
 
 Copy an agent file to your project:
+
 ```
-your-project/.review-council/agents/sentinel.md
+your-project/.code-conclave/agents/sentinel.md
 ```
 
 Project-specific overrides take precedence.
@@ -174,9 +192,8 @@ Project-specific overrides take precedence.
 ## Tips
 
 1. **Start with SENTINEL + GUARDIAN** for quick security/quality check
-2. **Run full council before releases** for comprehensive review
-3. **Use -Parallel** when you don't need agent handoffs
-4. **Add .review-council/reviews/ to .gitignore**
+2. **Run full conclave before releases** for comprehensive review
+3. **Add .code-conclave/reviews/ to .gitignore**
 
 ## License
 
@@ -184,4 +201,4 @@ MIT
 
 ---
 
-Built with 🤖 by humans who got tired of missing things in code reviews.
+Built with AI by humans who got tired of missing things in code reviews.

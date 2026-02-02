@@ -1,4 +1,4 @@
-# Review Council .gitignore
+# Code Conclave .gitignore
 
 # Don't commit review outputs (they're project-specific)
 **/reviews/
@@ -20,3 +20,7 @@ Thumbs.db
 
 # PowerShell
 *.psm1.bak
+*.ps1.bak
+
+# Node
+node_modules/

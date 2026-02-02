@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Conclave - Live Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        council: {
+                            bg: '#0a0a0f',
+                            card: '#12121a',
+                            border: '#1e1e2e',
+                            accent: '#00d4ff',
+                            success: '#00ff88',
+                            warning: '#ffaa00',
+                            danger: '#ff4466',
+                            purple: '#aa66ff',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes scan {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .scanning {
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.4), transparent);
+            background-size: 200% 100%;
+            animation: scan 2s linear infinite;
+        }
+        .agent-card { transition: all 0.3s ease; cursor: pointer; }
+        .agent-card:hover { transform: translateY(-4px); }
+        .agent-card.running { border-color: #00d4ff; box-shadow: 0 0 30px rgba(0, 212, 255, 0.3); }
+        .agent-card.complete { border-color: #00ff88; }
+        .agent-card.complete:hover { box-shadow: 0 0 30px rgba(0, 255, 136, 0.3); }
+        .agent-card.failed { border-color: #ff4466; }
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti 3s ease-out forwards;
+        }
+        .log-entry { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .connection-dot { animation: glow-pulse 2s infinite; }
+        .slide-panel { animation: slideIn 0.3s ease; }
+        .finding-card { transition: all 0.2s ease; }
+        .finding-card:hover { background: rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #12121a; }
+        ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 4px; }
+        .severity-badge { cursor: pointer; transition: all 0.2s; }
+        .severity-badge:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body class="bg-council-bg text-white font-sans min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Progress Bar
+        const ProgressBar = ({ progress, color }) => (
+            <div className="w-full h-2 bg-council-border rounded-full overflow-hidden">
+                <div
+                    className="h-full transition-all duration-500 ease-out rounded-full"
+                    style={{ width: `${progress}%`, backgroundColor: color, boxShadow: `0 0 10px ${color}` }}
+                />
+            </div>
+        );
+
+        // Severity Badge (clickable)
+        const SeverityBadge = ({ label, count, color, bgColor, onClick, active }) => (
+            <div
+                className={`severity-badge ${bgColor} rounded-lg p-2 text-center ${active ? 'ring-2 ring-white' : ''}`}
+                onClick={onClick}
+            >
+                <div className={`text-xl font-bold ${color}`}>{count}</div>
+                <div className="text-xs text-gray-500">{label}</div>
+            </div>
+        );
+
+        // Agent Card
+        const AgentCard = ({ agent, status, findings, progress, onClick }) => {
+            const statusClasses = {
+                pending: 'border-council-border opacity-50',
+                running: 'running border-council-accent',
+                complete: 'complete border-council-success',
+                failed: 'failed border-council-danger',
+            };
+            const statusText = { pending: 'Waiting...', running: 'Scanning...', complete: 'Complete', failed: 'Failed' };
+
+            return (
+                <div
+                    className={`agent-card bg-council-card border-2 rounded-xl p-5 ${statusClasses[status]}`}
+                    onClick={() => status === 'complete' && onClick && onClick(agent)}
+                >
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                            <span className="text-3xl">{agent.icon}</span>
+                            <div>
+                                <h3 className="font-bold text-lg" style={{ color: agent.color }}>{agent.name}</h3>
+                                <p className="text-gray-400 text-sm">{agent.role}</p>
+                            </div>
+                        </div>
+                        <div className={`px-3 py-1 rounded-full text-xs font-mono ${
+                            status === 'running' ? 'bg-council-accent/20 text-council-accent' :
+                            status === 'complete' ? 'bg-council-success/20 text-council-success' :
+                            status === 'failed' ? 'bg-council-danger/20 text-council-danger' :
+                            'bg-gray-800 text-gray-500'
+                        }`}>
+                            {statusText[status]}
+                        </div>
+                    </div>
+
+                    {status === 'running' && (
+                        <div className="space-y-2">
+                            <ProgressBar progress={progress} color={agent.color} />
+                            <div className="h-1 w-full scanning rounded-full" />
+                        </div>
+                    )}
+
+                    {status === 'complete' && findings && (
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                            <SeverityBadge label="BLOCKER" count={findings.blockers} color="text-red-400" bgColor="bg-red-500/10" />
+                            <SeverityBadge label="HIGH" count={findings.high} color="text-orange-400" bgColor="bg-orange-500/10" />
+                            <SeverityBadge label="MEDIUM" count={findings.medium} color="text-yellow-400" bgColor="bg-yellow-500/10" />
+                            <SeverityBadge label="LOW" count={findings.low} color="text-gray-400" bgColor="bg-gray-500/10" />
+                        </div>
+                    )}
+
+                    {status === 'complete' && (
+                        <div className="mt-3 text-center text-xs text-gray-500">Click to view details</div>
+                    )}
+
+                    {status === 'pending' && (
+                        <div className="h-16 flex items-center justify-center">
+                            <div className="text-gray-600 text-sm">Queued</div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Findings Detail Panel
+        const FindingsPanel = ({ agent, findings, content, onClose }) => {
+            const [filter, setFilter] = useState('all');
+
+            // Parse findings from markdown content
+            const parsedFindings = [];
+            if (content) {
+                const findingRegex = /### ([A-Z]+-\d+): (.+?) \[([A-Z]+)\]\s*\n+\*\*Location:\*\* ([^\n]+)\s*\n\*\*Effort:\*\* ([^\n]+)\s*\n+\*\*Issue:\*\*\s*\n([\s\S]*?)(?=\n\*\*Evidence|\n\*\*Recommendation|\n---|\n###|$)/g;
+                let match;
+                while ((match = findingRegex.exec(content)) !== null) {
+                    parsedFindings.push({
+                        id: match[1],
+                        title: match[2],
+                        severity: match[3],
+                        location: match[4],
+                        effort: match[5],
+                        issue: match[6].trim(),
+                    });
+                }
+            }
+
+            const filteredFindings = filter === 'all'
+                ? parsedFindings
+                : parsedFindings.filter(f => f.severity === filter);
+
+            const severityColor = {
+                BLOCKER: 'text-red-400 bg-red-500/20 border-red-500/50',
+                HIGH: 'text-orange-400 bg-orange-500/20 border-orange-500/50',
+                MEDIUM: 'text-yellow-400 bg-yellow-500/20 border-yellow-500/50',
+                LOW: 'text-gray-400 bg-gray-500/20 border-gray-500/50',
+            };
+
+            return (
+                <div className="fixed inset-0 z-50 flex">
+                    {/* Backdrop */}
+                    <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+
+                    {/* Panel */}
+                    <div className="slide-panel absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-council-bg border-l border-council-border overflow-hidden flex flex-col">
+                        {/* Header */}
+                        <div className="p-6 border-b border-council-border">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-3xl">{agent.icon}</span>
+                                    <div>
+                                        <h2 className="text-2xl font-bold" style={{ color: agent.color }}>{agent.name}</h2>
+                                        <p className="text-gray-400">{agent.role}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={onClose}
+                                    className="p-2 hover:bg-council-card rounded-lg transition"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Filter buttons */}
+                            <div className="flex gap-2 mt-4">
+                                {['all', 'BLOCKER', 'HIGH', 'MEDIUM', 'LOW'].map(f => (
+                                    <button
+                                        key={f}
+                                        onClick={() => setFilter(f)}
+                                        className={`px-3 py-1 rounded-full text-xs font-mono transition ${
+                                            filter === f
+                                                ? 'bg-council-accent text-black'
+                                                : 'bg-council-card text-gray-400 hover:bg-council-border'
+                                        }`}
+                                    >
+                                        {f === 'all' ? 'ALL' : f}
+                                        {f !== 'all' && findings && ` (${findings[f.toLowerCase() + (f === 'BLOCKER' ? 's' : '')]})`}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Findings List */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                            {filteredFindings.length > 0 ? (
+                                filteredFindings.map((finding, i) => (
+                                    <div key={i} className={`finding-card p-4 rounded-xl border ${severityColor[finding.severity]}`}>
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <span className="font-mono text-sm text-gray-500">{finding.id}</span>
+                                                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${severityColor[finding.severity]}`}>
+                                                        {finding.severity}
+                                                    </span>
+                                                    <span className="text-xs text-gray-500">{finding.effort}</span>
+                                                </div>
+                                                <h3 className="font-semibold text-lg mb-2">{finding.title}</h3>
+                                                <p className="text-sm text-gray-400 mb-2">
+                                                    <span className="text-gray-500">Location:</span> <code className="text-council-accent">{finding.location}</code>
+                                                </p>
+                                                <p className="text-sm text-gray-300">{finding.issue}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : content ? (
+                                <div className="text-center py-12">
+                                    <div className="text-gray-500 mb-2">No {filter !== 'all' ? filter : ''} findings</div>
+                                    {filter !== 'all' && (
+                                        <button onClick={() => setFilter('all')} className="text-council-accent text-sm">
+                                            Show all findings
+                                        </button>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <div className="text-gray-500 mb-4">Loading findings...</div>
+                                    <div className="text-sm text-gray-600">
+                                        Summary: {findings?.blockers || 0} blockers, {findings?.high || 0} high, {findings?.medium || 0} medium, {findings?.low || 0} low
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-4 border-t border-council-border bg-council-card">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500">
+                                    {filteredFindings.length} finding{filteredFindings.length !== 1 ? 's' : ''} shown
+                                </span>
+                                <span className="text-gray-500">
+                                    Total: {(findings?.blockers || 0) + (findings?.high || 0) + (findings?.medium || 0) + (findings?.low || 0)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Live Log
+        const LiveLog = ({ logs }) => {
+            const logRef = useRef(null);
+            useEffect(() => {
+                if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
+            }, [logs]);
+
+            return (
+                <div className="bg-council-card border border-council-border rounded-xl overflow-hidden">
+                    <div className="px-4 py-3 border-b border-council-border flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500" />
+                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                        <span className="ml-2 text-gray-400 text-sm font-mono">code-conclave.log</span>
+                    </div>
+                    <div ref={logRef} className="h-48 overflow-y-auto p-4 font-mono text-sm">
+                        {logs.map((log, i) => (
+                            <div key={i} className="log-entry flex gap-3 mb-1">
+                                <span className="text-gray-600">{log.time}</span>
+                                <span className={`${
+                                    log.type === 'info' ? 'text-council-accent' :
+                                    log.type === 'success' ? 'text-council-success' :
+                                    log.type === 'warning' ? 'text-council-warning' :
+                                    log.type === 'error' ? 'text-council-danger' : 'text-gray-400'
+                                }`}>{log.message}</span>
+                            </div>
+                        ))}
+                        <span className="animate-pulse">_</span>
+                    </div>
+                </div>
+            );
+        };
+
+        // Verdict Banner
+        const VerdictBanner = ({ verdict, totals }) => {
+            const config = {
+                SHIP: { color: '#00ff88', bg: 'bg-green-500/10', text: 'READY TO SHIP', subtitle: 'All critical checks passed!' },
+                CONDITIONAL: { color: '#ffaa00', bg: 'bg-yellow-500/10', text: 'CONDITIONAL', subtitle: 'Review HIGH items before release' },
+                HOLD: { color: '#ff4466', bg: 'bg-red-500/10', text: 'HOLD RELEASE', subtitle: 'Blockers must be resolved' },
+            }[verdict];
+
+            return (
+                <div className={`${config.bg} border-2 rounded-2xl p-8 text-center`} style={{ borderColor: config.color }}>
+                    <div className="text-5xl font-bold mb-2 animate-float" style={{ color: config.color }}>
+                        {config.text}
+                    </div>
+                    <div className="text-gray-400 text-lg mb-6">{config.subtitle}</div>
+                    <div className="flex justify-center gap-8">
+                        {[
+                            { label: 'Blockers', value: totals.blockers, color: 'text-red-400' },
+                            { label: 'High', value: totals.high, color: 'text-orange-400' },
+                            { label: 'Medium', value: totals.medium, color: 'text-yellow-400' },
+                            { label: 'Low', value: totals.low, color: 'text-gray-400' },
+                        ].map(({ label, value, color }) => (
+                            <div key={label} className="text-center">
+                                <div className={`text-3xl font-bold ${color}`}>{value}</div>
+                                <div className="text-gray-500 text-sm">{label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Confetti
+        const Confetti = ({ active }) => {
+            if (!active) return null;
+            const pieces = Array.from({ length: 50 }, (_, i) => ({
+                id: i, left: Math.random() * 100, delay: Math.random() * 2,
+                color: ['#00ff88', '#00d4ff', '#aa66ff', '#ffaa00', '#ff4466'][Math.floor(Math.random() * 5)],
+            }));
+            return (
+                <div className="fixed inset-0 pointer-events-none overflow-hidden z-40">
+                    {pieces.map(p => (
+                        <div key={p.id} className="confetti-piece" style={{
+                            left: `${p.left}%`, top: '-20px', backgroundColor: p.color,
+                            animationDelay: `${p.delay}s`, borderRadius: Math.random() > 0.5 ? '50%' : '0',
+                        }} />
+                    ))}
+                </div>
+            );
+        };
+
+        // Connection Status
+        const ConnectionStatus = ({ connected, mode }) => (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-council-card border border-council-border">
+                <div className={`w-2 h-2 rounded-full connection-dot ${connected ? 'bg-council-success' : 'bg-council-danger'}`} />
+                <span className="text-xs font-mono text-gray-400">{connected ? 'LIVE' : 'OFFLINE'}</span>
+            </div>
+        );
+
+        // Main Dashboard
+        const Dashboard = () => {
+            const [connected, setConnected] = useState(false);
+            const [state, setState] = useState({ project: 'connecting...', agents: {}, logs: [], verdict: null });
+            const [showConfetti, setShowConfetti] = useState(false);
+            const [selectedAgent, setSelectedAgent] = useState(null);
+            const [findingsContent, setFindingsContent] = useState({});
+            const wsRef = useRef(null);
+
+            // WebSocket connection
+            useEffect(() => {
+                const connect = () => {
+                    const ws = new WebSocket('ws://localhost:3847');
+
+                    ws.onopen = () => {
+                        setConnected(true);
+                    };
+
+                    ws.onmessage = (event) => {
+                        const msg = JSON.parse(event.data);
+                        if (msg.type === 'state') {
+                            const serverState = msg.data;
+                            const transformedAgents = {};
+
+                            Object.entries(serverState.agents || {}).forEach(([id, agent]) => {
+                                transformedAgents[id] = {
+                                    id, name: agent.name, role: agent.role,
+                                    icon: agent.icon || '?', color: agent.color || '#00d4ff',
+                                    status: agent.status || 'pending', progress: agent.progress || 0,
+                                    findings: agent.findings,
+                                };
+                            });
+
+                            setState({
+                                project: serverState.project || 'unknown',
+                                agents: transformedAgents,
+                                logs: serverState.logs || [],
+                                verdict: serverState.verdict,
+                            });
+
+                            if (serverState.verdict === 'SHIP' && !showConfetti) {
+                                setShowConfetti(true);
+                                setTimeout(() => setShowConfetti(false), 4000);
+                            }
+                        } else if (msg.type === 'findings-content') {
+                            setFindingsContent(prev => ({ ...prev, [msg.agentId]: msg.content }));
+                        }
+                    };
+
+                    ws.onclose = () => {
+                        setConnected(false);
+                        setTimeout(connect, 3000);
+                    };
+
+                    ws.onerror = () => ws.close();
+                    wsRef.current = ws;
+                };
+
+                connect();
+                return () => { if (wsRef.current) wsRef.current.close(); };
+            }, []);
+
+            // Fetch findings content when agent selected
+            useEffect(() => {
+                if (selectedAgent && !findingsContent[selectedAgent.id]) {
+                    fetch(`/api/findings/${selectedAgent.id}`)
+                        .then(res => res.text())
+                        .then(content => {
+                            setFindingsContent(prev => ({ ...prev, [selectedAgent.id]: content }));
+                        })
+                        .catch(() => {});
+                }
+            }, [selectedAgent]);
+
+            const agents = Object.values(state.agents);
+            const totals = agents.reduce((acc, a) => {
+                const f = a.findings || { blockers: 0, high: 0, medium: 0, low: 0 };
+                return { blockers: acc.blockers + f.blockers, high: acc.high + f.high, medium: acc.medium + f.medium, low: acc.low + f.low };
+            }, { blockers: 0, high: 0, medium: 0, low: 0 });
+            const completedCount = agents.filter(a => a.status === 'complete').length;
+            const overallProgress = agents.length ? (completedCount / agents.length) * 100 : 0;
+
+            // Format time estimate
+            const formatTime = (seconds) => {
+                if (!seconds) return null;
+                if (seconds < 60) return `${seconds}s`;
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+            };
+            const timeEstimate = formatTime(state.timeEstimate);
+
+            return (
+                <div className="min-h-screen p-6">
+                    <Confetti active={showConfetti} />
+
+                    {selectedAgent && (
+                        <FindingsPanel
+                            agent={selectedAgent}
+                            findings={selectedAgent.findings}
+                            content={findingsContent[selectedAgent.id]}
+                            onClose={() => setSelectedAgent(null)}
+                        />
+                    )}
+
+                    <header className="max-w-7xl mx-auto mb-8">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="text-3xl font-bold flex items-center gap-3">
+                                    <span className="text-council-accent">&#9876;</span> Code Conclave
+                                </h1>
+                                <p className="text-gray-400 mt-1">AI-Powered Code Review Orchestrator</p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <ConnectionStatus connected={connected} />
+                                <div className="text-right">
+                                    <div className="text-sm text-gray-400">Project</div>
+                                    <div className="font-mono text-council-accent">{state.project}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-6">
+                            <div className="flex justify-between text-sm mb-2">
+                                <span className="text-gray-400">Overall Progress</span>
+                                <div className="flex gap-4">
+                                    {timeEstimate && completedCount < agents.length && (
+                                        <span className="text-council-warning font-mono">~{timeEstimate} remaining</span>
+                                    )}
+                                    <span className="text-council-accent font-mono">{completedCount}/{agents.length} agents</span>
+                                </div>
+                            </div>
+                            <div className="h-3 bg-council-border rounded-full overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-council-accent to-council-success transition-all duration-500" style={{ width: `${overallProgress}%` }} />
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto">
+                        {state.verdict && <div className="mb-8"><VerdictBanner verdict={state.verdict} totals={totals} /></div>}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                            {agents.map(agent => (
+                                <AgentCard
+                                    key={agent.id}
+                                    agent={agent}
+                                    status={agent.status}
+                                    findings={agent.findings}
+                                    progress={agent.progress}
+                                    onClick={setSelectedAgent}
+                                />
+                            ))}
+                        </div>
+
+                        <LiveLog logs={state.logs} />
+
+                        {completedCount > 0 && (
+                            <div className="mt-8 grid grid-cols-4 gap-4">
+                                {[
+                                    { label: 'Total Blockers', value: totals.blockers, color: 'text-red-400' },
+                                    { label: 'Total High', value: totals.high, color: 'text-orange-400' },
+                                    { label: 'Total Medium', value: totals.medium, color: 'text-yellow-400' },
+                                    { label: 'Total Low', value: totals.low, color: 'text-gray-400' },
+                                ].map(({ label, value, color }) => (
+                                    <div key={label} className="bg-council-card border border-council-border rounded-xl p-4 text-center">
+                                        <div className={`text-3xl font-bold ${color}`}>{value}</div>
+                                        <div className="text-gray-400 text-sm">{label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </main>
+
+                    <footer className="max-w-7xl mx-auto mt-12 text-center text-gray-600 text-sm">
+                        Code Conclave v2.0 - Click any completed agent to view findings
+                    </footer>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<Dashboard />);
+    </script>
+</body>
+</html>

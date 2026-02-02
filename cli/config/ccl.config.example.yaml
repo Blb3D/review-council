@@ -1,0 +1,20 @@
+# Code Conclave Configuration
+# Copy this file to your project's .code-conclave/config.yaml
+
+project:
+  name: "my-project"
+  version: "1.0.0"
+
+agents:
+  sentinel:
+    coverage_target: 80
+
+  guardian:
+    scan_dependencies: true
+
+  herald:
+    required_docs:
+      - "README.md"
+
+output:
+  format: "markdown"

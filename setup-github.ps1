@@ -4,7 +4,7 @@
 #>
 
 param(
-    [string]$RepoName = "review-council",
+    [string]$RepoName = "code-conclave",
     [string]$Description = "AI-powered code review orchestrator - deploy 6 specialized agents to review your codebase"
 )
 
@@ -38,7 +38,7 @@ try {
         Write-Host "  Initializing git repository..." -ForegroundColor Yellow
         git init
         git add .
-        git commit -m "Initial commit - Review Council v1.0"
+        git commit -m "Initial commit - Code Conclave v2.0"
     }
     else {
         # Repo exists, make sure everything is committed
@@ -46,7 +46,7 @@ try {
         if ($status) {
             Write-Host "  Committing changes..." -ForegroundColor Yellow
             git add .
-            git commit -m "Initial commit - Review Council v1.0"
+            git commit -m "Initial commit - Code Conclave v2.0"
         }
     }
 
@@ -57,7 +57,7 @@ try {
     Write-Host ""
     Write-Host "  SUCCESS! Private repo created." -ForegroundColor Green
     Write-Host ""
-    
+
     $username = gh api user -q ".login"
     Write-Host "  URL: https://github.com/$username/$RepoName" -ForegroundColor Cyan
     Write-Host ""
