@@ -72,6 +72,10 @@ param(
 
     [int]$Timeout = 40,
 
+    # Output Format
+    [ValidateSet("markdown", "json", "junit")]
+    [string]$OutputFormat = "markdown",
+
     # Compliance Standard Parameters
     [string]$Standard,
 
@@ -99,6 +103,11 @@ if (Test-Path $yamlParserPath) {
 }
 if (Test-Path $mappingEnginePath) {
     . $mappingEnginePath
+}
+
+$junitFormatterPath = Join-Path $Script:LibDir "junit-formatter.ps1"
+if (Test-Path $junitFormatterPath) {
+    . $junitFormatterPath
 }
 
 $Script:AgentDefs = [ordered]@{
@@ -723,6 +732,24 @@ function Main {
     # Generate synthesis
     if (-not $SkipSynthesis -and $validAgents.Count -gt 1) {
         New-SynthesisReport -ProjectPath $Project -ReviewsDir $reviewsDir -AllFindings $allFindings
+    }
+
+    # Generate JUnit output if requested
+    if ($OutputFormat -eq "junit") {
+        Write-Status "Generating JUnit XML..." "INFO"
+
+        # Parse findings from markdown files for JUnit format
+        $junitFindings = Get-FindingsForJUnit -ReviewsDir $reviewsDir -AgentDefs $Script:AgentDefs
+
+        $junitPath = Join-Path $reviewsDir "conclave-results.xml"
+        $junitResult = Export-JUnitResults `
+            -AllFindings $junitFindings `
+            -OutputPath $junitPath `
+            -ProjectName (Split-Path $Project -Leaf) `
+            -Duration $totalDuration.TotalSeconds
+
+        Write-Status "JUnit XML: $($junitResult.Path)" "OK"
+        Write-Status "  Tests: $($junitResult.TotalTests), Failures: $($junitResult.Failures), Passed: $($junitResult.Passed)" "INFO"
     }
 
     # Generate compliance mapping if -Standard was specified

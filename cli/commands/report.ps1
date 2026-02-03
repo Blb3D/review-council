@@ -33,7 +33,7 @@ param(
     [ValidateSet("executive-summary", "full-report", "gap-analysis", "traceability-matrix", "release-readiness")]
     [string]$Template = "release-readiness",
 
-    [ValidateSet("markdown", "json", "csv")]
+    [ValidateSet("markdown", "json", "csv", "junit")]
     [string]$Format = "markdown",
 
     [string]$Standard,
@@ -53,6 +53,9 @@ if (Test-Path (Join-Path $libPath "yaml-parser.ps1")) {
 }
 if (Test-Path (Join-Path $libPath "mapping-engine.ps1")) {
     . (Join-Path $libPath "mapping-engine.ps1")
+}
+if (Test-Path (Join-Path $libPath "junit-formatter.ps1")) {
+    . (Join-Path $libPath "junit-formatter.ps1")
 }
 
 # Agent definitions
@@ -455,7 +458,28 @@ $reportContent = ""
 $extension = switch ($Format) {
     "json" { ".json" }
     "csv" { ".csv" }
+    "junit" { ".xml" }
     default { ".md" }
+}
+
+# Handle JUnit format specially - it generates its own output
+if ($Format -eq "junit") {
+    Write-Host "  Generating JUnit XML output..." -ForegroundColor Gray
+
+    # Parse findings for JUnit format
+    $junitFindings = Get-FindingsForJUnit -ReviewsDir $reviewsDir -AgentDefs $AgentDefs
+
+    $junitOutputPath = if ($OutputPath) { $OutputPath } else { Join-Path $reviewsDir "conclave-results.xml" }
+
+    $junitResult = Export-JUnitResults `
+        -AllFindings $junitFindings `
+        -OutputPath $junitOutputPath `
+        -ProjectName $projectName
+
+    Write-Host "  JUnit XML: $($junitResult.Path)" -ForegroundColor Green
+    Write-Host "  Tests: $($junitResult.TotalTests), Failures: $($junitResult.Failures), Passed: $($junitResult.Passed)" -ForegroundColor Gray
+    Write-Host ""
+    exit 0
 }
 
 switch ($Template) {
