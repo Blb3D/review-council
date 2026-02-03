@@ -197,29 +197,12 @@ Map Code Conclave findings to relevant controls.
 
 ---
 
-### TASK-006: Create ISO 13485 Pack
+### TASK-006: Create FDA 21 CFR Part 820 QSR Pack
 **Assignee:** Claude.ai (domain knowledge)
 **Priority:** HIGH
 **Effort:** 2 hours
 
-Create `core/standards/regulated/medical/iso-13485.yaml`
-
-Key sections relevant to software:
-- 4.1.6 - Software validation
-- 7.3 - Design and development
-- 7.5.6 - Identification and traceability
-- 8.2.4 - Monitoring and measurement
-
-Map Code Conclave findings to relevant controls.
-
----
-
-### TASK-007: Create FDA 21 CFR Part 820 Pack
-**Assignee:** Claude.ai (domain knowledge)
-**Priority:** HIGH  
-**Effort:** 2 hours
-
-Create `core/standards/regulated/medical/fda-21cfr820.yaml`
+Create `core/standards/regulated/medical/fda-820-qsr.yaml`
 
 Key sections:
 - 820.30 - Design Controls
@@ -228,7 +211,25 @@ Key sections:
 - 820.90 - Nonconforming Product
 - 820.100 - CAPA
 
-Also include 21 CFR Part 11 (Electronic Records) mappings.
+Map Code Conclave findings to relevant controls.
+
+---
+
+### TASK-007: Create FDA 21 CFR Part 11 Pack
+**Assignee:** Claude.ai (domain knowledge)
+**Priority:** HIGH
+**Effort:** 2 hours
+
+Create `core/standards/regulated/medical/fda-21-cfr-11.yaml`
+
+Key sections:
+- 11.10 - Controls for Closed Systems
+- 11.30 - Controls for Open Systems
+- 11.50 - Signature Manifestations
+- 11.70 - Signature/Record Linking
+- 11.100 - General Requirements for Electronic Signatures
+
+Map Code Conclave findings to relevant controls.
 
 ---
 
@@ -368,8 +369,8 @@ Create basic extension with:
 | TASK-003: Agent Headers | VS Claude | DONE (in TASK-001) | MEDIUM |
 | TASK-004: Standard Schema | VS Claude | DONE | HIGH |
 | TASK-005: CMMC L2 Pack | Claude.ai | DONE | HIGH |
-| TASK-006: ISO 13485 Pack | Claude.ai | TODO | HIGH |
-| TASK-007: FDA 820 Pack | Claude.ai | TODO | HIGH |
+| TASK-006: FDA 820 QSR Pack | Claude.ai | DONE | HIGH |
+| TASK-007: FDA 21 CFR Part 11 Pack | Claude.ai | TODO | HIGH |
 | TASK-008: CLI Standards Support | VS Claude | TODO | HIGH |
 | TASK-009: Mapping Engine | VS Claude | TODO | HIGH |
 | TASK-010: Report Templates | VS Claude | TODO | MEDIUM |
