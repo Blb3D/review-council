@@ -39,6 +39,18 @@
 
 .EXAMPLE
     .\ccl.ps1 -Project "C:\repos\my-app" -Agent sentinel
+
+.EXAMPLE
+    .\ccl.ps1 -Standards list
+
+.EXAMPLE
+    .\ccl.ps1 -Standards info -Standard cmmc-l2
+
+.EXAMPLE
+    .\ccl.ps1 -Project "C:\repos\my-app" -Standard cmmc-l2
+
+.EXAMPLE
+    .\ccl.ps1 -Map "C:\repos\my-app\.code-conclave\reviews" -Standard cmmc-l2
 #>
 
 [CmdletBinding()]
@@ -58,7 +70,15 @@ param(
 
     [switch]$DryRun,
 
-    [int]$Timeout = 40
+    [int]$Timeout = 40,
+
+    # Compliance Standard Parameters
+    [string]$Standard,
+
+    [ValidateSet("list", "info")]
+    [string]$Standards,
+
+    [string]$Map
 )
 
 # ============================================================================
@@ -67,6 +87,19 @@ param(
 
 $Script:ToolRoot = Split-Path $PSScriptRoot -Parent
 $Script:AgentsDir = Join-Path $ToolRoot "core" "agents"
+$Script:StandardsDir = Join-Path $ToolRoot "core" "standards"
+$Script:LibDir = Join-Path $PSScriptRoot "lib"
+
+# Source library files if they exist
+$yamlParserPath = Join-Path $Script:LibDir "yaml-parser.ps1"
+$mappingEnginePath = Join-Path $Script:LibDir "mapping-engine.ps1"
+
+if (Test-Path $yamlParserPath) {
+    . $yamlParserPath
+}
+if (Test-Path $mappingEnginePath) {
+    . $mappingEnginePath
+}
 
 $Script:AgentDefs = [ordered]@{
     sentinel  = @{ Name = "SENTINEL";  Role = "Quality and Compliance"; Color = "Yellow" }
@@ -512,7 +545,48 @@ function New-SynthesisReport {
 function Main {
     Write-Logo
 
-    # Check for Claude Code
+    # Handle -Standards command (no Claude required)
+    if ($Standards) {
+        $standardsScript = Join-Path $PSScriptRoot "commands" "standards.ps1"
+        if (Test-Path $standardsScript) {
+            switch ($Standards) {
+                "list" {
+                    & $standardsScript -Command "list"
+                }
+                "info" {
+                    if (-not $Standard) {
+                        Write-Status "Please specify -Standard for info command" "ERROR"
+                        Write-Host "    Example: .\ccl.ps1 -Standards info -Standard cmmc-l2" -ForegroundColor Gray
+                        return
+                    }
+                    & $standardsScript -Command "info" -StandardId $Standard
+                }
+            }
+        }
+        else {
+            Write-Status "Standards command not found: $standardsScript" "ERROR"
+        }
+        return
+    }
+
+    # Handle -Map command (no Claude required)
+    if ($Map) {
+        if (-not $Standard) {
+            Write-Status "Please specify -Standard for mapping" "ERROR"
+            Write-Host "    Example: .\ccl.ps1 -Map `"./project/.code-conclave/reviews`" -Standard cmmc-l2" -ForegroundColor Gray
+            return
+        }
+        $mapScript = Join-Path $PSScriptRoot "commands" "map.ps1"
+        if (Test-Path $mapScript) {
+            & $mapScript -ReviewsPath $Map -StandardId $Standard
+        }
+        else {
+            Write-Status "Map command not found: $mapScript" "ERROR"
+        }
+        return
+    }
+
+    # Check for Claude Code (only needed for reviews)
     $claudeExists = Get-Command claude -ErrorAction SilentlyContinue
     if (-not $claudeExists -and -not $DryRun) {
         Write-Status "Claude Code CLI not found. Install from: https://docs.anthropic.com/claude-code" "ERROR"
@@ -568,6 +642,20 @@ function Main {
     }
 
     Write-Host "  Project: $Project" -ForegroundColor White
+
+    # Display compliance standard if specified
+    if ($Standard) {
+        $standardInfo = Get-StandardById -StandardId $Standard -StandardsDir $Script:StandardsDir
+        if ($standardInfo) {
+            Write-Host "  Standard: $($standardInfo.name) ($Standard)" -ForegroundColor Magenta
+        }
+        else {
+            Write-Status "Standard not found: $Standard" "WARN"
+            Write-Host "  Run 'ccl -Standards list' to see available standards" -ForegroundColor Gray
+            $Standard = $null  # Clear to skip compliance mapping later
+        }
+    }
+
     Write-Host ""
 
     # Determine agents to run
@@ -635,6 +723,18 @@ function Main {
     # Generate synthesis
     if (-not $SkipSynthesis -and $validAgents.Count -gt 1) {
         New-SynthesisReport -ProjectPath $Project -ReviewsDir $reviewsDir -AllFindings $allFindings
+    }
+
+    # Generate compliance mapping if -Standard was specified
+    if ($Standard -and -not $DryRun) {
+        Write-Banner "COMPLIANCE MAPPING" "Magenta"
+        $mapScript = Join-Path $PSScriptRoot "commands" "map.ps1"
+        if (Test-Path $mapScript) {
+            & $mapScript -ReviewsPath $reviewsDir -StandardId $Standard
+        }
+        else {
+            Write-Status "Compliance mapping not available" "WARN"
+        }
     }
 
     Write-Host "  Results: $reviewsDir" -ForegroundColor Cyan
