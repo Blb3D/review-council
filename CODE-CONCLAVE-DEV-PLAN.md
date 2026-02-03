@@ -366,7 +366,7 @@ Create basic extension with:
 | TASK-001: Repo Structure | VS Claude | DONE | BLOCKER |
 | TASK-002: Dashboard Branding | VS Claude | DONE (in TASK-001) | HIGH |
 | TASK-003: Agent Headers | VS Claude | DONE (in TASK-001) | MEDIUM |
-| TASK-004: Standard Schema | VS Claude | TODO | HIGH |
+| TASK-004: Standard Schema | VS Claude | DONE | HIGH |
 | TASK-005: CMMC L2 Pack | Claude.ai | TODO | HIGH |
 | TASK-006: ISO 13485 Pack | Claude.ai | TODO | HIGH |
 | TASK-007: FDA 820 Pack | Claude.ai | TODO | HIGH |
