@@ -148,13 +148,25 @@ function Parse-YamlObject {
                 # Quoted string
                 $result[$key] = $Matches[1]
             }
-            elseif ($value -match '^\d+$') {
-                # Integer
-                $result[$key] = [int]$value
+            elseif ($value -match '^[+-]?\d+$') {
+                # Integer (including optional sign)
+                $parsedInt = 0
+                if ([int]::TryParse($value, [ref]$parsedInt)) {
+                    $result[$key] = $parsedInt
+                }
+                else {
+                    $result[$key] = $value
+                }
             }
-            elseif ($value -match '^\d+\.\d+$') {
-                # Float
-                $result[$key] = [double]$value
+            elseif ($value -match '^[+-]?(\d+\.?\d*|\d*\.?\d+)([eE][+-]?\d+)?$') {
+                # Float (including optional sign and scientific notation)
+                $parsedDouble = 0.0
+                if ([double]::TryParse($value, [System.Globalization.NumberStyles]::Float, [System.Globalization.CultureInfo]::InvariantCulture, [ref]$parsedDouble)) {
+                    $result[$key] = $parsedDouble
+                }
+                else {
+                    $result[$key] = $value
+                }
             }
             elseif ($value -eq 'true') {
                 $result[$key] = $true
@@ -350,8 +362,14 @@ function Parse-MultilineString {
         }
 
         # Add line content (stripped of the base indentation)
-        $content = $line.Substring([Math]::Min($Indent, $line.Length))
-        [void]$sb.AppendLine($content)
+        # If line is shorter than expected indent, add empty content
+        if ($line.Length -lt $Indent) {
+            [void]$sb.AppendLine("")
+        }
+        else {
+            $content = $line.Substring($Indent)
+            [void]$sb.AppendLine($content)
+        }
         $Index.Value++
     }
 
@@ -381,11 +399,26 @@ function Parse-InlineArray {
             if (-not $inQuote) {
                 $inQuote = $true
                 $quoteChar = $char
+                $current += $char
             }
             elseif ($char -eq $quoteChar) {
-                $inQuote = $false
+                # Check for escaped quote (preceded by odd number of backslashes)
+                $backslashCount = 0
+                for ($j = $i - 1; $j -ge 0 -and $inner[$j] -eq '\'; $j--) {
+                    $backslashCount++
+                }
+                if (($backslashCount % 2) -eq 1) {
+                    # Escaped quote - keep it
+                    $current += $char
+                }
+                else {
+                    # End of quoted section
+                    $inQuote = $false
+                    $current += $char
+                }
             }
             else {
+                # Different quote char inside quoted string
                 $current += $char
             }
         }
@@ -402,15 +435,18 @@ function Parse-InlineArray {
         $items += $current.Trim()
     }
 
-    # Clean up quotes from items
+    # Clean up quotes from items (ensure matching quote pairs)
     $items = $items | ForEach-Object {
         $item = $_.Trim()
-        if ($item -match '^"(.*)"$' -or $item -match "^'(.*)'$") {
-            $Matches[1]
+        if ($item.Length -ge 2) {
+            $firstChar = $item[0]
+            $lastChar = $item[$item.Length - 1]
+            if (($firstChar -eq $lastChar) -and ($firstChar -eq '"' -or $firstChar -eq "'")) {
+                # Matching quote pair - remove them
+                $item = $item.Substring(1, $item.Length - 2)
+            }
         }
-        else {
-            $item
-        }
+        $item
     }
 
     return $items
@@ -427,12 +463,116 @@ function Parse-InlineObject {
     }
 
     $result = @{}
-    $pairs = $inner -split ',(?=\s*["\w]+\s*:)'
 
+    # Split into pairs by commas that are not inside quotes or nested structures
+    $pairs = @()
+    $current = ''
+    $inQuote = $false
+    $quoteChar = ''
+    $braceLevel = 0
+    $bracketLevel = 0
+
+    for ($i = 0; $i -lt $inner.Length; $i++) {
+        $char = $inner[$i]
+
+        if (($char -eq '"' -or $char -eq "'") -and -not $inQuote) {
+            $inQuote = $true
+            $quoteChar = $char
+            $current += $char
+        }
+        elseif ($inQuote -and $char -eq $quoteChar) {
+            $inQuote = $false
+            $current += $char
+        }
+        elseif (-not $inQuote) {
+            if ($char -eq '{') {
+                $braceLevel++
+                $current += $char
+            }
+            elseif ($char -eq '}') {
+                $braceLevel--
+                $current += $char
+            }
+            elseif ($char -eq '[') {
+                $bracketLevel++
+                $current += $char
+            }
+            elseif ($char -eq ']') {
+                $bracketLevel--
+                $current += $char
+            }
+            elseif ($char -eq ',' -and $braceLevel -eq 0 -and $bracketLevel -eq 0) {
+                if ($current.Trim() -ne '') {
+                    $pairs += $current.Trim()
+                }
+                $current = ''
+            }
+            else {
+                $current += $char
+            }
+        }
+        else {
+            $current += $char
+        }
+    }
+
+    if ($current.Trim() -ne '') {
+        $pairs += $current.Trim()
+    }
+
+    # Parse each key:value pair
     foreach ($pair in $pairs) {
-        if ($pair -match '^\s*"?([^":]+)"?\s*:\s*(.*)$') {
-            $key = $Matches[1].Trim()
-            $val = $Matches[2].Trim().Trim('"', "'")
+        if ([string]::IsNullOrWhiteSpace($pair)) {
+            continue
+        }
+
+        # Find the first colon not inside quotes
+        $inQuote = $false
+        $quoteChar = ''
+        $colonIndex = -1
+
+        for ($i = 0; $i -lt $pair.Length; $i++) {
+            $char = $pair[$i]
+
+            if (($char -eq '"' -or $char -eq "'") -and -not $inQuote) {
+                $inQuote = $true
+                $quoteChar = $char
+            }
+            elseif ($inQuote -and $char -eq $quoteChar) {
+                $inQuote = $false
+            }
+            elseif (-not $inQuote -and $char -eq ':') {
+                $colonIndex = $i
+                break
+            }
+        }
+
+        if ($colonIndex -lt 0) {
+            continue
+        }
+
+        $key = $pair.Substring(0, $colonIndex).Trim()
+        $val = $pair.Substring($colonIndex + 1).Trim()
+
+        # Remove surrounding quotes from key
+        if ($key.Length -ge 2) {
+            $firstChar = $key[0]
+            $lastChar = $key[$key.Length - 1]
+            if (($firstChar -eq $lastChar) -and ($firstChar -eq '"' -or $firstChar -eq "'")) {
+                $key = $key.Substring(1, $key.Length - 2)
+            }
+        }
+
+        # Remove surrounding quotes from value
+        if ($val.Length -ge 2) {
+            $firstChar = $val[0]
+            $lastChar = $val[$val.Length - 1]
+            if (($firstChar -eq $lastChar) -and ($firstChar -eq '"' -or $firstChar -eq "'")) {
+                $val = $val.Substring(1, $val.Length - 2)
+            }
+        }
+
+        if ($key -ne '') {
             $result[$key] = $val
         }
     }
