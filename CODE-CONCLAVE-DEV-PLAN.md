@@ -372,9 +372,9 @@ Create basic extension with:
 | TASK-006: FDA 820 QSR Pack | Claude.ai | DONE | HIGH |
 | TASK-007: FDA 21 CFR Part 11 Pack | Claude.ai | DONE | HIGH |
 | TASK-008: CLI Standards Support | VS Claude | DONE | HIGH |
-| TASK-009: Mapping Engine | VS Claude | TODO | HIGH |
-| TASK-010: Report Templates | VS Claude | TODO | MEDIUM |
-| TASK-011: Report Generator | VS Claude | TODO | MEDIUM |
+| TASK-009: Mapping Engine | VS Claude | DONE | HIGH |
+| TASK-010: Report Templates | VS Claude | DONE | MEDIUM |
+| TASK-011: Report Generator | VS Claude | DONE | MEDIUM |
 | TASK-012: VS Code Extension | TBD | BACKLOG | LOW |
 
 ---
