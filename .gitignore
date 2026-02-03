@@ -1,4 +1,4 @@
-# Review Council .gitignore
+# Code Conclave .gitignore
 
 # Don't commit review outputs (they're project-specific)
 **/reviews/
@@ -7,6 +7,7 @@
 
 # Local config overrides
 config.local.yaml
+.claude/
 
 # OS files
 .DS_Store
@@ -20,3 +21,7 @@ Thumbs.db
 
 # PowerShell
 *.psm1.bak
+*.ps1.bak
+
+# Node
+node_modules/

@@ -1,4 +1,4 @@
-# Review Council Agent Contracts
+# Code Conclave Agent Contracts
 
 This document defines the shared rules, severity definitions, and output formats that all agents must follow.
 

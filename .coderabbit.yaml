@@ -1,0 +1,20 @@
+language: en-US
+reviews:
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  path_instructions:
+    - path: "core/agents/**"
+      instructions: "These are agent instruction files for AI code review. Check for clarity, consistency, and completeness of review instructions."
+    - path: "core/schemas/**"
+      instructions: "These are JSON Schema files. Validate schema correctness, required fields, and proper use of JSON Schema draft-07 features."
+    - path: "cli/**"
+      instructions: "PowerShell CLI scripts. Check for proper error handling, parameter validation, and consistent branding (Code Conclave, .code-conclave)."
+    - path: "dashboard/**"
+      instructions: "Node.js + React dashboard. Check for XSS risks, proper WebSocket handling, and UI consistency."
+    - path: "core/standards/**"
+      instructions: "Compliance pack definitions. Verify control IDs are accurate, agent mappings are reasonable, and finding patterns are specific enough to be useful."
+chat:
+  auto_reply: true

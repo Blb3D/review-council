@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Code Conclave Finding",
+  "description": "Schema for individual findings reported by Code Conclave agents",
+  "type": "object",
+  "required": ["id", "agent", "title", "severity", "location"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique finding identifier (e.g., SENTINEL-001)",
+      "pattern": "^[A-Z]+-\\d+$"
+    },
+    "agent": {
+      "type": "string",
+      "description": "Agent that reported this finding",
+      "enum": ["SENTINEL", "GUARDIAN", "ARCHITECT", "NAVIGATOR", "HERALD", "OPERATOR"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Brief title of the finding"
+    },
+    "severity": {
+      "type": "string",
+      "description": "Severity level",
+      "enum": ["BLOCKER", "HIGH", "MEDIUM", "LOW"]
+    },
+    "location": {
+      "type": "string",
+      "description": "File path and optional line number (e.g., src/auth.py:42)"
+    },
+    "effort": {
+      "type": "string",
+      "description": "Estimated effort to fix",
+      "enum": ["S", "M", "L"]
+    },
+    "issue": {
+      "type": "string",
+      "description": "Description of what is wrong"
+    },
+    "evidence": {
+      "type": "string",
+      "description": "Concrete proof - code snippets, command output"
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "How to fix it"
+    },
+    "cross_ref": {
+      "type": "string",
+      "description": "Cross-reference to another agent's domain if applicable"
+    }
+  }
+}
