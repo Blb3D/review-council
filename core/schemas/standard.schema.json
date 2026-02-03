@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Code Conclave Compliance Standard",
+  "description": "Schema for compliance standard packs used by Code Conclave agents",
+  "type": "object",
+  "required": ["id", "name", "domain", "version", "controls"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the standard (e.g., cmmc-l2, iso-13485)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Full display name of the standard"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Industry domain (e.g., cybersecurity, medical, aerospace)"
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the standard definition"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the standard and its purpose"
+    },
+    "controls": {
+      "type": "array",
+      "description": "List of controls defined by the standard",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "agents"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Control identifier (e.g., AC.L2-3.1.1)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Short title of the control"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of what the control requires"
+          },
+          "agents": {
+            "type": "array",
+            "description": "Code Conclave agents responsible for evaluating this control",
+            "items": {
+              "type": "string",
+              "enum": ["SENTINEL", "GUARDIAN", "ARCHITECT", "NAVIGATOR", "HERALD", "OPERATOR"]
+            }
+          },
+          "finding_patterns": {
+            "type": "array",
+            "description": "Patterns to match findings against this control",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "mappings": {
+      "type": "object",
+      "description": "Cross-references to other standards (e.g., NIST SP 800-171 to CMMC)",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
