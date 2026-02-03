@@ -392,7 +392,7 @@ function Export-ReportAsCsv {
         # Sanitize all fields - escape quotes and remove newlines
         $id = ($f.Id -as [string]) -replace '"', '""'
         $agent = ($f.Agent -as [string]) -replace '"', '""'
-        $title = ($f.Title -as [string]) -replace '(`r`n|`n|`r)', ' ' -replace '"', '""'
+        $title = ($f.Title -as [string]) -replace "(`r`n|`n|`r)", ' ' -replace '"', '""'
         $severity = ($f.Severity -as [string]) -replace '"', '""'
         [void]$sb.AppendLine("`"$id`",`"$agent`",`"$title`",`"$severity`"")
     }
