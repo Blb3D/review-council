@@ -10,7 +10,7 @@
     Path to the project or .code-conclave directory.
 
 .PARAMETER Template
-    Report template to use: executive-summary, full-report, gap-analysis, traceability-matrix
+    Report template to use: executive-summary, full-report, gap-analysis, traceability-matrix, release-readiness
 
 .PARAMETER Format
     Output format: markdown (default), json, csv
@@ -386,11 +386,15 @@ function Export-ReportAsCsv {
     param([array]$AllFindings)
 
     $sb = New-Object System.Text.StringBuilder
-    [void]$sb.AppendLine("Finding ID,Agent,Title,Severity")
+    [void]$sb.AppendLine("`"Finding ID`",`"Agent`",`"Title`",`"Severity`"")
 
     foreach ($f in $AllFindings) {
-        $title = $f.Title -replace '"', '""'
-        [void]$sb.AppendLine("$($f.Id),$($f.Agent),`"$title`",$($f.Severity)")
+        # Sanitize all fields - escape quotes and remove newlines
+        $id = ($f.Id -as [string]) -replace '"', '""'
+        $agent = ($f.Agent -as [string]) -replace '"', '""'
+        $title = ($f.Title -as [string]) -replace '(`r`n|`n|`r)', ' ' -replace '"', '""'
+        $severity = ($f.Severity -as [string]) -replace '"', '""'
+        [void]$sb.AppendLine("`"$id`",`"$agent`",`"$title`",`"$severity`"")
     }
 
     return $sb.ToString()
@@ -417,7 +421,16 @@ else {
     exit 1
 }
 
-$projectRoot = Split-Path (Split-Path $reviewsDir -Parent) -Parent
+# Determine project root based on reviews directory structure
+$reviewsParent = Split-Path $reviewsDir -Parent
+if ((Split-Path $reviewsParent -Leaf) -eq ".code-conclave") {
+    # Layout: project\.code-conclave\reviews
+    $projectRoot = Split-Path $reviewsParent -Parent
+}
+else {
+    # Layout: project\reviews or reviews passed directly
+    $projectRoot = $reviewsParent
+}
 $projectName = Split-Path $projectRoot -Leaf
 
 Write-Host "  Project: $projectName" -ForegroundColor White
@@ -464,6 +477,9 @@ switch ($Template) {
         if ($Format -eq "json") {
             $reportContent = Export-ReportAsJson -ReviewsDir $reviewsDir -ProjectName $projectName -AllCounts $allCounts -AllFindings $allFindings
         }
+        elseif ($Format -eq "csv") {
+            $reportContent = Export-ReportAsCsv -AllFindings $allFindings
+        }
         else {
             $reportContent = New-ExecutiveSummaryReport -ReviewsDir $reviewsDir -ProjectName $projectName -AllCounts $allCounts -AllFindings $allFindings
         }
@@ -471,18 +487,67 @@ switch ($Template) {
     }
 
     "full-report" {
-        # For full-report, use the template file with placeholders
-        $templatePath = Join-Path $Script:TemplatesDir "full-report.md"
-        if (Test-Path $templatePath) {
-            $reportContent = Get-Content $templatePath -Raw
-            # Replace placeholders with actual values
-            $reportContent = $reportContent -replace '{{PROJECT_NAME}}', $projectName
-            $reportContent = $reportContent -replace '{{TIMESTAMP}}', (Get-Date -Format "yyyy-MM-dd HH:mm")
-            $reportContent = $reportContent -replace '{{TOTAL_FINDINGS}}', $allFindings.Count
-            # Add more placeholder replacements as needed
+        if ($Format -eq "json") {
+            $reportContent = Export-ReportAsJson -ReviewsDir $reviewsDir -ProjectName $projectName -AllCounts $allCounts -AllFindings $allFindings
+        }
+        elseif ($Format -eq "csv") {
+            $reportContent = Export-ReportAsCsv -AllFindings $allFindings
         }
         else {
-            $reportContent = "Template not found: $templatePath"
+            # For full-report, use the template file with placeholders
+            $templatePath = Join-Path $Script:TemplatesDir "full-report.md"
+            if (Test-Path $templatePath) {
+                $reportContent = Get-Content $templatePath -Raw
+
+                # Calculate counts
+                $blockerCount = ($allFindings | Where-Object { $_.Severity -eq "BLOCKER" }).Count
+                $highCount = ($allFindings | Where-Object { $_.Severity -eq "HIGH" }).Count
+                $mediumCount = ($allFindings | Where-Object { $_.Severity -eq "MEDIUM" }).Count
+                $lowCount = ($allFindings | Where-Object { $_.Severity -eq "LOW" }).Count
+
+                # Determine verdict
+                $verdict = if ($blockerCount -gt 0) { "HOLD" }
+                           elseif ($highCount -gt 3) { "CONDITIONAL" }
+                           else { "SHIP" }
+
+                # Build agent reports section
+                $agentReportsSb = New-Object System.Text.StringBuilder
+                foreach ($agentKey in $AgentDefs.Keys) {
+                    $agent = $AgentDefs[$agentKey]
+                    $agentFindings = $allFindings | Where-Object { $_.Agent -eq $agent.Name }
+                    if ($agentFindings.Count -gt 0) {
+                        [void]$agentReportsSb.AppendLine("### $($agent.Name) - $($agent.Role)")
+                        [void]$agentReportsSb.AppendLine("")
+                        foreach ($af in $agentFindings) {
+                            [void]$agentReportsSb.AppendLine("- **$($af.Id)** [$($af.Severity)]: $($af.Title)")
+                        }
+                        [void]$agentReportsSb.AppendLine("")
+                    }
+                }
+
+                # Replace placeholders with actual values
+                $reportContent = $reportContent -replace '{{PROJECT_NAME}}', $projectName
+                $reportContent = $reportContent -replace '{{TIMESTAMP}}', (Get-Date -Format "yyyy-MM-dd HH:mm")
+                $reportContent = $reportContent -replace '{{TOTAL_FINDINGS}}', $allFindings.Count
+                $reportContent = $reportContent -replace '{{VERDICT}}', $verdict
+                $reportContent = $reportContent -replace '{{BLOCKER_COUNT}}', $blockerCount
+                $reportContent = $reportContent -replace '{{HIGH_COUNT}}', $highCount
+                $reportContent = $reportContent -replace '{{MEDIUM_COUNT}}', $mediumCount
+                $reportContent = $reportContent -replace '{{LOW_COUNT}}', $lowCount
+                $reportContent = $reportContent -replace '{{INFO_COUNT}}', '0'
+                $reportContent = $reportContent -replace '{{AGENT_REPORTS}}', $agentReportsSb.ToString()
+
+                # Compliance mapping placeholder (requires -Standard)
+                if ($Standard) {
+                    $reportContent = $reportContent -replace '{{COMPLIANCE_MAPPING}}', "See separate gap-analysis report for $Standard compliance mapping."
+                }
+                else {
+                    $reportContent = $reportContent -replace '{{COMPLIANCE_MAPPING}}', "*Run with -Standard parameter to include compliance mapping.*"
+                }
+            }
+            else {
+                $reportContent = "Template not found: $templatePath"
+            }
         }
         $defaultName = "FULL-REPORT"
     }
@@ -492,16 +557,26 @@ switch ($Template) {
             Write-Host "  ERROR: -Standard required for gap-analysis template" -ForegroundColor Red
             exit 1
         }
-        # Use mapping engine for gap analysis
-        $std = Get-StandardById -StandardId $Standard -StandardsDir $Script:StandardsDir
-        if (-not $std) {
-            Write-Host "  ERROR: Standard not found: $Standard" -ForegroundColor Red
-            exit 1
+        if ($Format -eq "json") {
+            $reportContent = Export-ReportAsJson -ReviewsDir $reviewsDir -ProjectName $projectName -AllCounts $allCounts -AllFindings $allFindings
         }
-        $mapping = Get-ComplianceMapping -Findings $allFindings -Standard $std
-        $tempOutput = Join-Path $reviewsDir "COMPLIANCE-MAPPING-$($Standard.ToUpper()).md"
-        Export-ComplianceReport -Mapping $mapping -OutputPath $tempOutput -ProjectName $projectName
-        $reportContent = Get-Content $tempOutput -Raw
+        elseif ($Format -eq "csv") {
+            $reportContent = Export-ReportAsCsv -AllFindings $allFindings
+        }
+        else {
+            # Use mapping engine for gap analysis
+            $std = Get-StandardById -StandardId $Standard -StandardsDir $Script:StandardsDir
+            if (-not $std) {
+                Write-Host "  ERROR: Standard not found: $Standard" -ForegroundColor Red
+                exit 1
+            }
+            $mapping = Get-ComplianceMapping -Findings $allFindings -Standard $std
+            $tempOutput = Join-Path $reviewsDir "COMPLIANCE-MAPPING-$($Standard.ToUpper()).md"
+            Export-ComplianceReport -Mapping $mapping -OutputPath $tempOutput -ProjectName $projectName
+            $reportContent = Get-Content $tempOutput -Raw
+            # Clean up temporary file
+            Remove-Item -Path $tempOutput -ErrorAction SilentlyContinue
+        }
         $defaultName = "GAP-ANALYSIS-$($Standard.ToUpper())"
     }
 
@@ -510,8 +585,88 @@ switch ($Template) {
             Write-Host "  ERROR: -Standard required for traceability-matrix template" -ForegroundColor Red
             exit 1
         }
+        if ($Format -eq "json") {
+            $reportContent = Export-ReportAsJson -ReviewsDir $reviewsDir -ProjectName $projectName -AllCounts $allCounts -AllFindings $allFindings
+        }
+        elseif ($Format -eq "csv") {
+            $reportContent = Export-ReportAsCsv -AllFindings $allFindings
+        }
+        else {
+            # Generate traceability matrix
+            $std = Get-StandardById -StandardId $Standard -StandardsDir $Script:StandardsDir
+            if (-not $std) {
+                Write-Host "  ERROR: Standard not found: $Standard" -ForegroundColor Red
+                exit 1
+            }
+            $mapping = Get-ComplianceMapping -Findings $allFindings -Standard $std
+
+            $sb = New-Object System.Text.StringBuilder
+            [void]$sb.AppendLine("# Traceability Matrix")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("**Project:** $projectName")
+            [void]$sb.AppendLine("**Standard:** $($std.name)")
+            [void]$sb.AppendLine("**Generated:** $(Get-Date -Format 'yyyy-MM-dd HH:mm')")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("---")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("## Overview")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("| Metric | Value |")
+            [void]$sb.AppendLine("|--------|-------|")
+            [void]$sb.AppendLine("| Total Controls | $($mapping.Coverage.TotalControls) |")
+            [void]$sb.AppendLine("| Controls with Findings | $($mapping.Coverage.Addressed) |")
+            [void]$sb.AppendLine("| Total Findings | $($allFindings.Count) |")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("---")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("## Reverse Mapping: Finding → Controls")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("| Finding ID | Agent | Title | Severity | Mapped Controls |")
+            [void]$sb.AppendLine("|------------|-------|-------|----------|-----------------|")
+
+            foreach ($m in $mapping.MappedFindings) {
+                $controlIds = ($m.Controls | ForEach-Object { $_.Id }) -join ", "
+                $title = ConvertTo-MarkdownSafe -Text $m.Finding.Title
+                [void]$sb.AppendLine("| $($m.Finding.Id) | $($m.Finding.Agent) | $title | $($m.Finding.Severity) | $controlIds |")
+            }
+
+            # Add unmapped findings
+            $mappedIds = $mapping.MappedFindings | ForEach-Object { $_.Finding.Id }
+            $unmapped = $allFindings | Where-Object { $_.Id -notin $mappedIds }
+            if ($unmapped.Count -gt 0) {
+                foreach ($uf in $unmapped) {
+                    $title = ConvertTo-MarkdownSafe -Text $uf.Title
+                    [void]$sb.AppendLine("| $($uf.Id) | $($uf.Agent) | $title | $($uf.Severity) | *Not mapped* |")
+                }
+            }
+
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("---")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("## Gaps: Controls Without Findings")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("| Control ID | Title | Domain | Recommended Agent |")
+            [void]$sb.AppendLine("|------------|-------|--------|-------------------|")
+
+            foreach ($gap in $mapping.Gaps | Select-Object -First 50) {
+                $agents = if ($gap.Agents) { ($gap.Agents -join ", ").ToUpper() } else { "-" }
+                $title = ConvertTo-MarkdownSafe -Text $gap.Title
+                $domain = ConvertTo-MarkdownSafe -Text $gap.DomainName
+                [void]$sb.AppendLine("| $($gap.Id) | $title | $domain | $agents |")
+            }
+
+            if ($mapping.Gaps.Count -gt 50) {
+                [void]$sb.AppendLine("| ... | *$($mapping.Gaps.Count - 50) more gaps* | | |")
+            }
+
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("---")
+            [void]$sb.AppendLine("")
+            [void]$sb.AppendLine("*Generated by Code Conclave v2.0*")
+
+            $reportContent = $sb.ToString()
+        }
         $defaultName = "TRACEABILITY-$($Standard.ToUpper())"
-        $reportContent = "# Traceability Matrix`n`nStandard: $Standard`nProject: $projectName`n`n*Template-based generation coming soon*"
     }
 }
 
