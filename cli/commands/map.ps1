@@ -53,7 +53,7 @@ function Parse-FindingsMarkdown {
     $findings = @()
 
     # Pattern 1: ### AGENT-001: Title [SEVERITY]
-    $pattern1 = '###\s+([A-Z]+-\d+):\s*(.+?)\s*\[(BLOCKER|HIGH|MEDIUM|LOW)\]'
+    $pattern1 = '###\s+([A-Z]+\-\d+):\s*(.+?)\s*\[(BLOCKER|HIGH|MEDIUM|LOW)\]'
     $matches1 = [regex]::Matches($Content, $pattern1)
 
     foreach ($match in $matches1) {
@@ -68,6 +68,9 @@ function Parse-FindingsMarkdown {
     # Pattern 2: ## [SEVERITY] Finding Title (with ID in body)
     # This catches alternative formats
     $pattern2 = '##\s*\[(BLOCKER|HIGH|MEDIUM|LOW)\]\s*(.+?)(?:\r?\n)'
+
+    # Counter for auto-generated IDs
+    $autoIdCounter = 0
     $matches2 = [regex]::Matches($Content, $pattern2)
 
     foreach ($match in $matches2) {
@@ -80,7 +83,8 @@ function Parse-FindingsMarkdown {
             $idPattern = "($AgentName-\d+)"
             $idMatch = [regex]::Match($Content.Substring($match.Index, [Math]::Min(500, $Content.Length - $match.Index)), $idPattern)
 
-            $id = if ($idMatch.Success) { $idMatch.Groups[1].Value } else { "$AgentName-AUTO" }
+            $autoIdCounter++
+            $id = if ($idMatch.Success) { $idMatch.Groups[1].Value } else { "$AgentName-AUTO-$autoIdCounter" }
 
             $findings += @{
                 Id = $id

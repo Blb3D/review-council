@@ -13,6 +13,21 @@ if (Test-Path $yamlParserPath) {
     . $yamlParserPath
 }
 
+function ConvertTo-MarkdownSafe {
+    <#
+    .SYNOPSIS
+        Escape special characters for use in markdown tables.
+    #>
+    param([string]$Text)
+
+    if ([string]::IsNullOrEmpty($Text)) {
+        return ""
+    }
+
+    # Escape pipe characters which break markdown tables
+    return $Text -replace '\|', '\|'
+}
+
 function Get-AvailableStandards {
     <#
     .SYNOPSIS
@@ -368,7 +383,8 @@ function Export-ComplianceReport {
 
     foreach ($domainId in ($Mapping.ByDomain.Keys | Sort-Object)) {
         $d = $Mapping.ByDomain[$domainId]
-        [void]$sb.AppendLine("| $($d.Name) ($domainId) | $($d.Total) | $($d.Addressed) | $($d.Gaps) | $($d.Coverage)% |")
+        $domainName = ConvertTo-MarkdownSafe -Text $d.Name
+        [void]$sb.AppendLine("| $domainName ($domainId) | $($d.Total) | $($d.Addressed) | $($d.Gaps) | $($d.Coverage)% |")
     }
 
     [void]$sb.AppendLine("")
@@ -388,7 +404,8 @@ function Export-ComplianceReport {
 
         foreach ($m in $Mapping.MappedFindings) {
             $controlIds = ($m.Controls | ForEach-Object { $_.Id }) -join ", "
-            [void]$sb.AppendLine("| $($m.Finding.Id): $($m.Finding.Title) | $($m.Finding.Severity) | $controlIds |")
+            $findingTitle = ConvertTo-MarkdownSafe -Text $m.Finding.Title
+            [void]$sb.AppendLine("| $($m.Finding.Id): $findingTitle | $($m.Finding.Severity) | $controlIds |")
         }
     }
 
@@ -427,7 +444,9 @@ function Export-ComplianceReport {
         foreach ($gap in $Mapping.Gaps) {
             $agents = if ($gap.Agents) { ($gap.Agents -join ", ").ToUpper() } else { "-" }
             $critical = if ($gap.Critical) { " **" } else { "" }
-            [void]$sb.AppendLine("| $($gap.Id)$critical | $($gap.Title) | $($gap.DomainName) | $agents |")
+            $gapTitle = ConvertTo-MarkdownSafe -Text $gap.Title
+            $gapDomain = ConvertTo-MarkdownSafe -Text $gap.DomainName
+            [void]$sb.AppendLine("| $($gap.Id)$critical | $gapTitle | $gapDomain | $agents |")
         }
 
         [void]$sb.AppendLine("")
