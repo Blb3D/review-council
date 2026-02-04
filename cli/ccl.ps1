@@ -82,7 +82,10 @@ param(
     [ValidateSet("list", "info")]
     [string]$Standards,
 
-    [string]$Map
+    [string]$Map,
+
+    # CI/CD Mode - enables exit codes for pipeline integration
+    [switch]$CI
 )
 
 # ============================================================================
@@ -599,6 +602,7 @@ function Main {
     $claudeExists = Get-Command claude -ErrorAction SilentlyContinue
     if (-not $claudeExists -and -not $DryRun) {
         Write-Status "Claude Code CLI not found. Install from: https://docs.anthropic.com/claude-code" "ERROR"
+        if ($CI -or $env:TF_BUILD) { exit 10 }
         return
     }
 
@@ -627,6 +631,7 @@ function Main {
     # Validate project
     if (-not (Test-Path $Project)) {
         Write-Status "Project path does not exist: $Project" "ERROR"
+        if ($CI -or $env:TF_BUILD) { exit 12 }
         return
     }
 
@@ -703,6 +708,7 @@ function Main {
 
     if ($validAgents.Count -eq 0) {
         Write-Status "No valid agents to run" "ERROR"
+        if ($CI -or $env:TF_BUILD) { exit 11 }
         return
     }
 
@@ -725,6 +731,14 @@ function Main {
 
     $totalDuration = (Get-Date) - $startTime
     $totalMins = [math]::Round($totalDuration.TotalMinutes, 1)
+
+    # Check if all agents failed
+    $failedAgents = @($allFindings.Values | Where-Object { $_ -and $_.Error })
+    $allFailed = $failedAgents.Count -eq $validAgents.Count
+    if ($allFailed -and $validAgents.Count -gt 0 -and -not $DryRun) {
+        Write-Status "All agents failed to execute" "ERROR"
+        if ($CI -or $env:TF_BUILD) { exit 13 }
+    }
 
     Write-Banner "REVIEW COMPLETE" "Green"
     Write-Host "  Duration: $totalMins minutes" -ForegroundColor Gray
@@ -766,6 +780,36 @@ function Main {
         else {
             Write-Status "Compliance mapping not available" "WARN"
         }
+    }
+
+    # Calculate verdict for exit codes
+    $totalBlockers = ($allFindings.Values | Where-Object { $_ } | Measure-Object -Property Blockers -Sum).Sum
+    $totalHigh = ($allFindings.Values | Where-Object { $_ } | Measure-Object -Property High -Sum).Sum
+    if ($null -eq $totalBlockers) { $totalBlockers = 0 }
+    if ($null -eq $totalHigh) { $totalHigh = 0 }
+
+    $verdict = if ($totalBlockers -gt 0) { "HOLD" }
+               elseif ($totalHigh -gt 3) { "CONDITIONAL" }
+               else { "SHIP" }
+
+    # Determine exit code based on verdict
+    $exitCode = switch ($verdict) {
+        "SHIP"        { 0 }
+        "CONDITIONAL" { 2 }
+        "HOLD"        { 1 }
+        default       { 0 }
+    }
+
+    # Detect CI environment
+    $isCI = $CI -or $env:TF_BUILD -or $env:GITHUB_ACTIONS -or $env:CI -or $env:JENKINS_URL
+
+    if ($isCI) {
+        Write-Host ""
+        $exitColor = if ($exitCode -eq 0) { "Green" } elseif ($exitCode -eq 2) { "Yellow" } else { "Red" }
+        Write-Host "  CI Mode: Verdict=$verdict, Exit code=$exitCode" -ForegroundColor $exitColor
+        Write-Host "  Results: $reviewsDir" -ForegroundColor Cyan
+        Write-Host ""
+        exit $exitCode
     }
 
     Write-Host "  Results: $reviewsDir" -ForegroundColor Cyan
