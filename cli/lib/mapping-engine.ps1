@@ -44,19 +44,19 @@ function Get-AvailableStandards {
     }
 
     $yamlFiles = Get-ChildItem -Path $StandardsDir -Recurse -Filter "*.yaml" -ErrorAction SilentlyContinue |
-                 Where-Object { $_.Name -ne ".gitkeep" }
+    Where-Object { $_.Name -ne ".gitkeep" }
 
     foreach ($file in $yamlFiles) {
         try {
             $content = Get-YamlContent -Path $file.FullName
             if ($content -and $content.id) {
                 $standards += @{
-                    Id = $content.id
-                    Name = $content.name
-                    Domain = $content.domain
-                    Version = $content.version
+                    Id          = $content.id
+                    Name        = $content.name
+                    Domain      = $content.domain
+                    Version     = $content.version
                     Description = $content.description
-                    Path = $file.FullName
+                    Path        = $file.FullName
                 }
             }
         }
@@ -111,13 +111,13 @@ function Get-AllControls {
             if ($domain.controls) {
                 foreach ($ctrl in $domain.controls) {
                     $controls += @{
-                        Id = $ctrl.id
-                        Title = $ctrl.title
-                        DomainId = $domain.id
-                        DomainName = $domain.name
-                        Agents = $ctrl.agents
+                        Id              = $ctrl.id
+                        Title           = $ctrl.title
+                        DomainId        = $domain.id
+                        DomainName      = $domain.name
+                        Agents          = $ctrl.agents
                         FindingPatterns = $ctrl.finding_patterns
-                        Critical = $ctrl.critical -eq $true
+                        Critical        = $ctrl.critical -eq $true
                     }
                 }
             }
@@ -132,26 +132,26 @@ function Get-AllControls {
                     if ($section.subsections) {
                         foreach ($subsection in $section.subsections) {
                             $controls += @{
-                                Id = $subsection.id
-                                Title = $subsection.title
-                                DomainId = $subpart.id
-                                DomainName = $subpart.name
-                                Agents = $subsection.agents
+                                Id              = $subsection.id
+                                Title           = $subsection.title
+                                DomainId        = $subpart.id
+                                DomainName      = $subpart.name
+                                Agents          = $subsection.agents
                                 FindingPatterns = $subsection.finding_patterns
-                                Critical = $subsection.critical -eq $true
+                                Critical        = $subsection.critical -eq $true
                             }
                         }
                     }
                     else {
                         # Section without subsections is the control
                         $controls += @{
-                            Id = $section.id
-                            Title = $section.title
-                            DomainId = $subpart.id
-                            DomainName = $subpart.name
-                            Agents = $section.agents
+                            Id              = $section.id
+                            Title           = $section.title
+                            DomainId        = $subpart.id
+                            DomainName      = $subpart.name
+                            Agents          = $section.agents
                             FindingPatterns = $section.finding_patterns
-                            Critical = $section.critical -eq $true
+                            Critical        = $section.critical -eq $true
                         }
                     }
                 }
@@ -231,17 +231,17 @@ function Get-ComplianceMapping {
     )
 
     $mapping = @{
-        StandardId = $Standard.id
-        StandardName = $Standard.name
-        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        TotalControls = 0
+        StandardId        = $Standard.id
+        StandardName      = $Standard.name
+        Timestamp         = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        TotalControls     = 0
         AddressedControls = 0
-        GappedControls = 0
-        CoveragePercent = 0
-        ByDomain = @{}
-        MappedFindings = @()
-        Gaps = @()
-        CriticalGaps = @()
+        GappedControls    = 0
+        CoveragePercent   = 0
+        ByDomain          = @{}
+        MappedFindings    = @()
+        Gaps              = @()
+        CriticalGaps      = @()
     }
 
     # Get all controls
@@ -257,7 +257,7 @@ function Get-ComplianceMapping {
 
         if ($matchedControls.Count -gt 0) {
             $mapping.MappedFindings += @{
-                Finding = $finding
+                Finding  = $finding
                 Controls = $matchedControls
             }
 
@@ -295,11 +295,11 @@ function Get-ComplianceMapping {
         $domainTotal = $domainControls.Count
 
         $mapping.ByDomain[$group.Name] = @{
-            Name = $domainControls[0].DomainName
-            Total = $domainTotal
+            Name      = $domainControls[0].DomainName
+            Total     = $domainTotal
             Addressed = $domainAddressed
-            Gaps = $domainTotal - $domainAddressed
-            Coverage = if ($domainTotal -gt 0) { [math]::Round(($domainAddressed / $domainTotal) * 100, 1) } else { 0 }
+            Gaps      = $domainTotal - $domainAddressed
+            Coverage  = if ($domainTotal -gt 0) { [math]::Round(($domainAddressed / $domainTotal) * 100, 1) } else { 0 }
         }
     }
 
@@ -353,9 +353,9 @@ function Export-ComplianceReport {
 
     # Verdict
     $verdict = if ($Mapping.CriticalGaps.Count -gt 0) { "CRITICAL GAPS" }
-               elseif ($Mapping.CoveragePercent -lt 50) { "LOW COVERAGE" }
-               elseif ($Mapping.CoveragePercent -lt 80) { "PARTIAL COVERAGE" }
-               else { "GOOD COVERAGE" }
+    elseif ($Mapping.CoveragePercent -lt 50) { "LOW COVERAGE" }
+    elseif ($Mapping.CoveragePercent -lt 80) { "PARTIAL COVERAGE" }
+    else { "GOOD COVERAGE" }
     [void]$sb.AppendLine("**Verdict:** $verdict")
     [void]$sb.AppendLine("")
     [void]$sb.AppendLine("---")
@@ -478,7 +478,9 @@ function Export-ComplianceReport {
     return $OutputPath
 }
 
-# Export functions
-Export-ModuleMember -Function Get-AvailableStandards, Get-StandardById, Get-AllControls,
-                              Test-FindingPattern, Match-FindingToControls, Get-ComplianceMapping,
-                              Get-AgentControls, Export-ComplianceReport -ErrorAction SilentlyContinue
+# Export functions (only when loaded as module)
+if ($MyInvocation.MyCommand.ScriptBlock.Module) {
+    Export-ModuleMember -Function Get-AvailableStandards, Get-StandardById, Get-AllControls,
+    Test-FindingPattern, Match-FindingToControls, Get-ComplianceMapping,
+    Get-AgentControls, Export-ComplianceReport
+}
