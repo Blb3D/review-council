@@ -582,6 +582,6 @@ function Parse-InlineObject {
 
 # Export functions
 #Export-ModuleMember -Function Get-YamlContent, ConvertFrom-SimpleYaml -ErrorAction SilentlyContinue
-       if ($MyInvocation.MyCommand.ScriptBlock.Module) {
-           Export-ModuleMember -Function Get-YamlContent, ConvertFrom-SimpleYaml, Test-YamlValid, Get-YamlStructure
-         }
+if ($MyInvocation.MyCommand.ScriptBlock.Module) {
+    Export-ModuleMember -Function Get-YamlContent, ConvertFrom-SimpleYaml, Test-YamlValid, Get-YamlStructure
+}
