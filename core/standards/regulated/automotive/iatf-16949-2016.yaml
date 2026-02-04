@@ -1,0 +1,1576 @@
+# IATF 16949:2016 - Quality Management System Requirements
+# for Automotive Production and Relevant Service Parts Organizations
+# Comprehensive Compliance Pack for Code Conclave
+#
+# Standard: IATF 16949:2016 (1st Edition, October 2016)
+# Publisher: International Automotive Task Force (IATF)
+# Base Standard: ISO 9001:2015 (incorporated by reference, NOT included)
+#
+# CRITICAL: IATF 16949 is NOT a standalone standard
+# Must be implemented IN CONJUNCTION with ISO 9001:2015
+
+metadata:
+  standard_id: "IATF 16949:2016"
+  standard_name: "Quality Management System Requirements for Automotive Production and Relevant Service Parts Organizations"
+  version: "1st Edition"
+  publication_date: "2016-10-01"
+  publisher: "IATF (International Automotive Task Force)"
+  base_standard: "ISO 9001:2015"
+  replaces: "ISO/TS 16949:2009"
+  document_url: "https://www.iatfglobaloversight.org/"
+  
+  iatf_members:
+    oems:
+      - "BMW Group"
+      - "Daimler AG (Mercedes-Benz)"
+      - "Ford Motor Company"
+      - "General Motors"
+      - "Stellantis (FCA, PSA)"
+      - "Renault Group"
+      - "Volkswagen AG"
+    trade_associations:
+      - "AIAG (Automotive Industry Action Group) - Americas"
+      - "ANFIA (Italy)"
+      - "FIEV (France)"
+      - "SMMT (UK)"
+      - "VDA (Germany)"
+
+applicability:
+  industries:
+    - "Automotive manufacturing"
+    - "Automotive parts and components"
+    - "Service parts"
+    - "Accessory parts"
+    - "Heat treating, plating, painting services"
+    - "Assembly operations"
+  organizations:
+    - "OEM suppliers (Tier 1, 2, 3)"
+    - "Parts manufacturers"
+    - "Assembly operations"
+    - "Sequencing operations"
+    - "Special process providers"
+  exclusions:
+    - "Standalone sequencing/warehousing without manufacturing"
+    - "Aftermarket-only parts (unless OEM customer requires)"
+    - "Design centers without manufacturing responsibility"
+  certification_statistics:
+    certified_sites_worldwide: ">70,000"
+    note: "Required by most major automotive OEMs for supplier qualification"
+
+# ============================================================================
+# KEY DEFINITIONS (Clause 3)
+# ============================================================================
+definitions:
+  accessory_part:
+    definition: "Additional component(s) specified by customer that are mechanically or electronically connected to vehicle or powertrain before or after delivery to end-user"
+    
+  aftermarket_part:
+    definition: "Replacement part(s) not procured or released by OEM for service part applications, which may or may not be produced to original equipment specifications"
+    
+  control_plan:
+    definition: "Documented description of systems and processes required for controlling product and processes"
+    note: "Key deliverable of APQP process"
+    
+  customer_specific_requirements:
+    id: "CSR"
+    definition: "Interpretations of or supplemental requirements linked to specific clauses of this automotive QMS standard"
+    note: "Each OEM publishes their own CSRs"
+    
+  design_responsible_organization:
+    definition: "Organization with authority to establish new or change existing product specification for product supplied to automotive customer"
+    
+  error_proofing:
+    definition: "Product and manufacturing process design and development to prevent manufacture of nonconforming products"
+    japanese_term: "Poka-yoke"
+    
+  laboratory:
+    definition: "Facility for inspection, test, or calibration that may include chemical, metallurgical, dimensional, physical, electrical, or reliability testing"
+    
+  manufacturing_feasibility:
+    definition: "Analysis and evaluation of proposed project to determine if it is technically feasible to manufacture product to meet customer requirements"
+    
+  manufacturing_site:
+    definition: "Location at which value-added manufacturing processes occur"
+    
+  predictive_maintenance:
+    definition: "Approach using data from process and equipment to predict when maintenance should be performed"
+    
+  premium_freight:
+    definition: "Extra costs or charges incurred additional to contracted delivery"
+    note: "Key metric tracked by OEMs"
+    
+  preventive_maintenance:
+    definition: "Planned action to eliminate causes of equipment failure and unplanned production interruptions"
+    
+  product_safety:
+    definition: "Standards relating to design and manufacture of products to ensure they do not pose harm or hazard to customers"
+    
+  reaction_plan:
+    definition: "Action or series of steps prescribed in control plan in event abnormal or nonconforming characteristics are detected"
+    
+  remote_location:
+    definition: "Location supporting sites where non-manufacturing processes occur"
+    
+  service_part:
+    definition: "Replacement part(s) procured or released by OEM for service part applications"
+    
+  significant_characteristics:
+    note: "See 'special characteristics'"
+    
+  special_characteristics:
+    definition: "Classification of product characteristic or manufacturing process parameter that can affect safety, compliance with regulations, fit, function, performance, or subsequent processing of product"
+    critical: true
+    
+  supporting_function:
+    definition: "Non-manufacturing process activity occurring at site or remote location that supports manufacturing site(s)"
+    
+  total_productive_maintenance:
+    id: "TPM"
+    definition: "System of maintaining and improving integrity of production and quality systems through machines, equipment, processes, and employees that add value to organization"
+    
+  trade_off_curve:
+    definition: "Tool for understanding and communicating relationships of various design characteristics of product"
+
+# ============================================================================
+# CORE TOOLS (Required by IATF 16949)
+# ============================================================================
+core_tools:
+  description: "Five quality tools developed by AIAG, referenced throughout IATF 16949"
+  
+  APQP:
+    name: "Advanced Product Quality Planning"
+    description: "Structured approach to product quality planning for new/modified products and processes"
+    manual: "AIAG APQP Manual (3rd Edition, 2024)"
+    iatf_references:
+      - "8.1.1: Operational planning"
+      - "8.3.2.1: Design and development planning"
+    phases:
+      - "Phase 1: Plan and Define Program"
+      - "Phase 2: Product Design and Development"
+      - "Phase 3: Process Design and Development"
+      - "Phase 4: Product and Process Validation"
+      - "Phase 5: Feedback, Assessment, and Corrective Action"
+      
+  PPAP:
+    name: "Production Part Approval Process"
+    description: "Process to validate production process can consistently meet customer requirements"
+    manual: "AIAG PPAP Manual (4th Edition, 2006)"
+    iatf_references:
+      - "8.3.4.4: Product approval process"
+      - "7.5.3.2.1: Record retention"
+    submission_levels:
+      level_1: "Part Submission Warrant (PSW) only"
+      level_2: "PSW with product samples and limited supporting data"
+      level_3: "PSW with product samples and complete supporting data (DEFAULT)"
+      level_4: "PSW and other requirements per customer direction"
+      level_5: "PSW with product samples and complete supporting data at manufacturing location"
+    elements_18:
+      - "1. Design Records"
+      - "2. Authorized Engineering Change Documents"
+      - "3. Customer Engineering Approval"
+      - "4. Design FMEA"
+      - "5. Process Flow Diagrams"
+      - "6. Process FMEA"
+      - "7. Control Plan"
+      - "8. Measurement System Analysis Studies"
+      - "9. Dimensional Results"
+      - "10. Records of Material/Performance Tests"
+      - "11. Initial Process Studies"
+      - "12. Qualified Laboratory Documentation"
+      - "13. Appearance Approval Report (AAR)"
+      - "14. Sample Production Parts"
+      - "15. Master Sample"
+      - "16. Checking Aids"
+      - "17. Customer-Specific Requirements"
+      - "18. Part Submission Warrant (PSW)"
+      
+  FMEA:
+    name: "Failure Mode and Effects Analysis"
+    description: "Proactive risk assessment technique for product/process development"
+    manual: "AIAG & VDA FMEA Handbook (2019)"
+    iatf_references:
+      - "4.4.1.2: Product safety"
+      - "8.3.2.1: Design planning"
+      - "8.3.5.1: Design outputs"
+      - "8.3.5.2: Manufacturing process design output"
+      - "8.5.1.1: Control plan"
+      - "9.1.1.1: Monitoring and measurement of manufacturing processes"
+    types:
+      DFMEA: "Design FMEA - failure modes in product design"
+      PFMEA: "Process FMEA - failure modes in manufacturing process"
+    risk_assessment:
+      severity: "Impact on customer (1-10)"
+      occurrence: "Likelihood of cause occurring (1-10)"
+      detection: "Ability to detect before customer (1-10)"
+      action_priority: "High/Medium/Low based on S-O-D combination"
+      
+  MSA:
+    name: "Measurement System Analysis"
+    description: "Statistical methods to evaluate measurement system variability"
+    manual: "AIAG MSA Manual (4th Edition, 2010)"
+    iatf_references:
+      - "7.1.5.1.1: Measurement system analysis"
+    studies:
+      - "Gage R&R (Repeatability and Reproducibility)"
+      - "Bias"
+      - "Linearity"
+      - "Stability"
+    acceptance_criteria:
+      gage_rr_percent:
+        acceptable: "<10%"
+        marginal: "10-30%"
+        unacceptable: ">30%"
+        
+  SPC:
+    name: "Statistical Process Control"
+    description: "Methods for monitoring and controlling process performance"
+    manual: "AIAG SPC Manual (2nd Edition, 2005)"
+    iatf_references:
+      - "8.3.5.2: Manufacturing process design output"
+      - "8.6.4: Verification and acceptance of conformity"
+      - "9.1.1.1: Monitoring and measurement"
+    control_charts:
+      variables:
+        - "X-bar and R chart"
+        - "X-bar and s chart"
+        - "Individual and Moving Range (I-MR)"
+      attributes:
+        - "p chart (proportion nonconforming)"
+        - "np chart (number nonconforming)"
+        - "c chart (count of defects)"
+        - "u chart (defects per unit)"
+    capability_indices:
+      Cp: "Process capability (spread vs specification)"
+      Cpk: "Process capability index (centering + spread)"
+      Pp: "Process performance"
+      Ppk: "Process performance index"
+      minimum_requirement: "Cpk ≥ 1.33 (Ppk ≥ 1.67 for initial studies)"
+
+# ============================================================================
+# CLAUSE 4: CONTEXT OF THE ORGANIZATION
+# ============================================================================
+clause_4:
+  title: "Context of the Organization"
+  
+  section_4.1:
+    title: "Understanding the organization and its context"
+    iso_requirement: true
+    
+  section_4.2:
+    title: "Understanding the needs and expectations of interested parties"
+    iso_requirement: true
+    
+  section_4.3:
+    title: "Determining the scope of the QMS"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "4.3.1"
+        title: "Determining the scope of the QMS - supplemental"
+        requirement: "Supporting functions, whether on-site or remote, shall be included in QMS scope"
+        
+      - id: "4.3.2"
+        title: "Customer-specific requirements"
+        requirement: "Customer-specific requirements shall be evaluated and included in QMS scope"
+        critical: true
+        
+  section_4.4:
+    title: "Quality management system and its processes"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "4.4.1.1"
+        title: "Conformance of products and processes"
+        requirement: "Organization shall ensure conformance of all products and processes, including service parts and those outsourced, to all applicable customer, statutory, and regulatory requirements"
+        
+      - id: "4.4.1.2"
+        title: "Product safety"
+        requirement: "Organization shall have documented processes for management of product safety related products and manufacturing processes"
+        critical: true
+        includes:
+          - "Identification of statutory and regulatory product safety requirements"
+          - "Customer notification of product safety requirements"
+          - "Special approval for design and process FMEA"
+          - "Identification of product safety-related characteristics"
+          - "Identification and control at manufacturing and inspection points"
+          - "Special approval for control plans and process flow diagrams"
+          - "Reaction plans for product safety"
+          - "Defined responsibilities, escalation, flow of information"
+          - "Training identified by organization or customer"
+          - "Changes involving product or process shall be approved"
+          - "Transfer of product safety requirements throughout supply chain"
+          - "Product traceability by manufactured lot minimum"
+          - "Lessons learned for new product introduction"
+
+# ============================================================================
+# CLAUSE 5: LEADERSHIP
+# ============================================================================
+clause_5:
+  title: "Leadership"
+  
+  section_5.1:
+    title: "Leadership and commitment"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "5.1.1.1"
+        title: "Corporate responsibility"
+        requirement: "Organization shall define and implement corporate responsibility policies including at minimum anti-bribery policy, employee code of conduct, ethics escalation policy"
+        
+      - id: "5.1.1.2"
+        title: "Process effectiveness and efficiency"
+        requirement: "Top management shall review product realization processes and support processes to evaluate and improve their effectiveness and efficiency"
+        includes:
+          - "Process performance results"
+          - "Actions from previous reviews"
+          
+      - id: "5.1.1.3"
+        title: "Process owners"
+        requirement: "Top management shall identify process owners who are responsible for managing organization's processes and related outputs"
+        
+  section_5.2:
+    title: "Policy"
+    iso_requirement: true
+    
+  section_5.3:
+    title: "Organizational roles, responsibilities and authorities"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "5.3.1"
+        title: "Organizational roles, responsibilities, and authorities - supplemental"
+        requirement: "Top management shall assign personnel with responsibility and authority to ensure customer requirements are met"
+        includes:
+          - "Selection of special characteristics"
+          - "Quality objectives and related training"
+          - "Corrective and preventive actions"
+          - "Product design and development"
+          - "Capacity analyses"
+          - "Logistics information"
+          - "Customer scorecards"
+          - "Customer portals"
+          
+      - id: "5.3.2"
+        title: "Responsibility and authority for product requirements and corrective actions"
+        requirement: "Top management shall ensure personnel responsible for conformity have authority to stop shipment and stop production to correct quality problems"
+        note: "Due to design of manufacturing processes in some organizations, quality may not always be managed at personnel level. Alternative: designated trained personnel assuming responsibility"
+        critical: true
+
+# ============================================================================
+# CLAUSE 6: PLANNING
+# ============================================================================
+clause_6:
+  title: "Planning"
+  
+  section_6.1:
+    title: "Actions to address risks and opportunities"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "6.1.2.1"
+        title: "Risk analysis"
+        requirement: "Organization shall include in risk analysis at minimum lessons learned from product recalls, product audits, field returns and repairs, complaints, scrap, and rework"
+        
+      - id: "6.1.2.2"
+        title: "Preventive action"
+        requirement: "Organization shall determine and implement action(s) to eliminate causes of potential nonconformities to prevent their occurrence"
+        process:
+          - "Determine potential nonconformities and their causes"
+          - "Evaluate need for action to prevent occurrence"
+          - "Determine and implement action needed"
+          - "Document information on actions taken"
+          - "Review effectiveness of preventive action taken"
+          - "Utilize lessons learned to prevent recurrence in similar processes"
+          
+      - id: "6.1.2.3"
+        title: "Contingency plans"
+        requirement: "Organization shall identify and evaluate internal and external risks to manufacturing processes and infrastructure equipment; define contingency plans according to risk and impact to customer; prepare contingency plans for continuity of supply"
+        critical: true
+        triggers:
+          - "Key equipment failures"
+          - "Interruption from externally provided products, processes, services"
+          - "Recurring natural disasters"
+          - "Fire"
+          - "Utility interruptions"
+          - "Cyber-attacks on IT systems"
+          - "Labor shortages"
+          - "Infrastructure disruptions"
+        requirements:
+          - "Notify customer of extent and duration of any situation impacting operations"
+          - "Test contingency plans for effectiveness (tabletop simulations)"
+          - "Review contingency plans at minimum annually (multidisciplinary team including top management)"
+          - "Document plan, including revisions based on lessons learned"
+          
+  section_6.2:
+    title: "Quality objectives and planning to achieve them"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "6.2.2.1"
+        title: "Quality objectives and planning to achieve them - supplemental"
+        requirement: "Top management shall ensure quality objectives to meet customer requirements are defined, established, and maintained for relevant functions, processes, and levels throughout organization"
+        note: "Results of organization's review regarding interested parties and their relevant requirements shall be considered when organization establishes its annual (at minimum) quality objectives and related performance targets"
+        
+  section_6.3:
+    title: "Planning of changes"
+    iso_requirement: true
+
+# ============================================================================
+# CLAUSE 7: SUPPORT
+# ============================================================================
+clause_7:
+  title: "Support"
+  
+  section_7.1:
+    title: "Resources"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "7.1.3.1"
+        title: "Plant, facility, and equipment planning"
+        requirement: "Organization shall use multidisciplinary approach including risk identification and mitigation for developing and improving plant, facility, and equipment plans"
+        includes:
+          - "Optimize material flow, handling, value-added use of floor space"
+          - "Facilitate synchronous material flow"
+          - "Manufacturing feasibility"
+          - "Capacity planning"
+          
+      - id: "7.1.4.1"
+        title: "Environment for the operation of processes - supplemental"
+        requirement: "Organization shall maintain premises in state of order, cleanliness, and repair consistent with product and manufacturing process needs"
+        
+      - id: "7.1.5.1.1"
+        title: "Measurement system analysis"
+        requirement: "Statistical studies shall be conducted to analyze variation present in results of each type of inspection, measuring, and test equipment system identified in control plan"
+        critical: true
+        note: "Methods and acceptance criteria shall conform to AIAG MSA reference manual or equivalent method approved by customer"
+        
+      - id: "7.1.5.2.1"
+        title: "Calibration/verification records"
+        requirement: "Organization shall have documented process for managing calibration/verification records"
+        includes:
+          - "Identification of equipment including measurement standard"
+          - "Revisions following engineering changes"
+          - "Any out-of-specification readings as received for calibration"
+          - "Assessment of impact of out-of-specification condition"
+          - "Statements of conformity to specification after calibration"
+          - "Notification to customer if suspect product shipped"
+          
+      - id: "7.1.5.3"
+        title: "Laboratory requirements"
+        subsections:
+          - id: "7.1.5.3.1"
+            title: "Internal laboratory"
+            requirement: "Internal laboratory facility shall have defined scope including capability to perform required inspection, test, or calibration services"
+            scope_includes:
+              - "Adequate laboratory procedures"
+              - "Laboratory personnel competence"
+              - "Testing of product"
+              - "Ability to perform services correctly, traceable to relevant process standards"
+              - "Review of related records"
+              
+          - id: "7.1.5.3.2"
+            title: "External laboratory"
+            requirement: "External/commercial/independent laboratory facilities used for inspection, test, or calibration services shall have defined laboratory scope including capability to perform required services"
+            options:
+              - "Accredited to ISO/IEC 17025 (or national equivalent) for relevant scope"
+              - "Evidence laboratory is acceptable to customer (e.g., customer second-party assessment)"
+            note: "Calibration services may be performed by OEM if qualified"
+            
+      - id: "7.1.6.1"
+        title: "Organizational knowledge - supplemental"
+        requirement: "Organization shall identify and maintain organizational knowledge, at minimum: lessons learned, past project information, project successes and failures"
+        
+  section_7.2:
+    title: "Competence"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "7.2.1"
+        title: "Competence - supplemental"
+        requirement: "Organization shall establish and maintain documented process(es) for identifying training needs including awareness and achieving competence for all personnel performing work affecting quality of products and processes"
+        includes:
+          - "Product requirements"
+          - "People performing specific assigned tasks shall be qualified as required"
+          - "Special attention to customer-specific requirements"
+          
+      - id: "7.2.2"
+        title: "Competence - on-the-job training"
+        requirement: "Organization shall provide on-the-job training for any new or modified job affecting quality requirements, contract/temporary staff, and internal transfers"
+        
+      - id: "7.2.3"
+        title: "Internal auditor competency"
+        requirement: "Organization shall have documented process for verifying internal auditors are competent"
+        minimum_competencies:
+          - "Understanding of automotive process approach for auditing including risk-based thinking"
+          - "Understanding of applicable customer-specific requirements"
+          - "Understanding of ISO 9001 and IATF 16949 requirements related to audit scope"
+          - "Understanding of applicable core tools requirements related to audit scope"
+          - "Understanding of how to plan, conduct, report, and close out audit findings"
+        maintenance:
+          - "Minimum number of audits per year (defined by organization)"
+          - "Maintaining knowledge of relevant requirements based on internal changes and external changes"
+          
+      - id: "7.2.4"
+        title: "Second-party auditor competency"
+        requirement: "Organization shall demonstrate competency of auditors performing second-party audits"
+        competencies:
+          - "Automotive process approach"
+          - "Customer-specific requirements"
+          - "Applicable core tools"
+          - "How to plan, conduct, report, close findings"
+          
+  section_7.3:
+    title: "Awareness"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "7.3.1"
+        title: "Awareness - supplemental"
+        requirement: "Organization shall maintain documented information that demonstrates that all employees are aware of their impact on product quality and importance of their activities in achieving, maintaining, and improving quality"
+        
+      - id: "7.3.2"
+        title: "Employee motivation and empowerment"
+        requirement: "Organization shall maintain documented process(es) to motivate employees to achieve quality objectives, make continual improvements, and create environment that promotes innovation"
+        includes:
+          - "Promotion of quality and technological awareness"
+          
+  section_7.4:
+    title: "Communication"
+    iso_requirement: true
+    
+  section_7.5:
+    title: "Documented information"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "7.5.1.1"
+        title: "Quality management system documentation"
+        requirement: "QMS shall be documented and shall include quality manual (hardcopy or electronic)"
+        
+      - id: "7.5.3.2.1"
+        title: "Record retention"
+        requirement: "Organization shall define, document, and implement record retention policy"
+        minimum_retention: "Active production plus one calendar year, unless otherwise specified by customer or regulatory agency"
+        includes:
+          - "PPAP records (including tooling records)"
+          - "Product design records"
+          - "Inspection/test records"
+          - "Calibration records"
+          - "Internal audit results"
+          - "External audit results"
+        note: "If customer or regulatory requirement exceeds this, use the longer period"
+        
+      - id: "7.5.3.2.2"
+        title: "Engineering specifications"
+        requirement: "Organization shall have documented process describing review, distribution, and implementation of all customer engineering standards/specifications and related revisions based on customer-required schedules"
+        critical: true
+        timing: "10 working days maximum from receipt of notification of changes"
+        includes:
+          - "Documented information of date change implemented in production"
+          - "Update of appropriate documents (FMEA, control plan, etc.)"
+          - "Impact assessment and communication to customer when changes affect PPAP"
+# IATF 16949:2016 - Part 2: Clause 8 Operation
+# Heavy automotive-specific requirements for production and service provision
+
+# ============================================================================
+# CLAUSE 8: OPERATION
+# ============================================================================
+clause_8:
+  title: "Operation"
+  
+  section_8.1:
+    title: "Operational planning and control"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "8.1.1"
+        title: "Operational planning and control - supplemental"
+        requirement: "Planning of product realization shall include customer product requirements and technical specifications, logistics requirements, manufacturing feasibility, project planning, acceptance criteria, resources"
+        
+      - id: "8.1.2"
+        title: "Confidentiality"
+        requirement: "Organization shall ensure confidentiality of customer-contracted products, projects under development, and related product information"
+        
+  section_8.2:
+    title: "Requirements for products and services"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "8.2.1.1"
+        title: "Customer communication - supplemental"
+        requirement: "Written or verbal communication shall be in language agreed upon with customer"
+        
+      - id: "8.2.2.1"
+        title: "Determining the requirements for products and services - supplemental"
+        requirement: "Requirements shall include recycling, environmental impact, and characteristics identified as result of organization's knowledge of product and manufacturing processes"
+        includes:
+          - "Compliance to applicable governmental, safety, environmental regulations"
+          - "Ability to comply with country of manufacture, country of receipt, customer-identified country of destination"
+          
+      - id: "8.2.3.1"
+        title: "Review of requirements related to products and services"
+        subsections:
+          - id: "8.2.3.1.1"
+            title: "Review of requirements - supplemental"
+            requirement: "Organization shall retain evidence of waiver authorized by customer for requirements review"
+            
+          - id: "8.2.3.1.2"
+            title: "Customer-designated special characteristics"
+            requirement: "Organization shall conform to customer requirements for designation, approval documentation, and control of special characteristics"
+            critical: true
+            
+          - id: "8.2.3.1.3"
+            title: "Organization manufacturing feasibility"
+            requirement: "Organization shall use multidisciplinary approach to conduct analysis to determine if it is feasible that organization's manufacturing processes are capable of consistently producing product meeting all requirements"
+            timing: "Prior to committing to supply product"
+            
+  section_8.3:
+    title: "Design and development of products and services"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "8.3.1.1"
+        title: "Design and development of products and services - supplemental"
+        requirement: "Requirements apply to product and manufacturing process design and development; focus on error prevention rather than detection"
+        
+      - id: "8.3.2.1"
+        title: "Design and development planning - supplemental"
+        requirement: "Organization shall ensure design and development planning includes all affected stakeholders within organization and its supply chain as appropriate"
+        includes:
+          - "Project management (e.g., APQP or VDA-RGA)"
+          - "Product and manufacturing process design activities (e.g., DFM and DFA)"
+          - "Development of product requirements"
+          - "Development and review of product design risk analysis (DFMEA)"
+          - "Development and review of manufacturing process risk analysis (PFMEA)"
+        critical: true
+        note: "Includes validation activities throughout supply chain"
+        
+      - id: "8.3.2.2"
+        title: "Product design skills"
+        requirement: "Organization shall ensure personnel with product design responsibility are competent and have applicable design tools and techniques"
+        examples:
+          - "Geometric Dimensioning and Tolerancing (GD&T)"
+          - "Design for Manufacturability (DFM)"
+          - "Design for Assembly (DFA)"
+          - "Value Engineering (VE)"
+          - "Design of Experiments (DOE)"
+          - "FMEA"
+          - "Finite Element Analysis (FEA)"
+          - "Solid Modeling"
+          - "Simulation techniques"
+          
+      - id: "8.3.2.3"
+        title: "Development of products with embedded software"
+        requirement: "Organization shall use a process for quality assurance of products with internally developed embedded software"
+        includes:
+          - "Software development assessment methodology"
+          - "Prioritization based on risk and potential impact"
+          - "Scope of software development activities"
+          - "Retained documented information of self-assessment results"
+        references: "Automotive SPICE, CMMI"
+        
+      - id: "8.3.3.1"
+        title: "Product design input"
+        requirement: "Organization shall identify, document, and review product design input requirements"
+        includes:
+          - "Product specifications including special characteristics"
+          - "Boundary and interface requirements"
+          - "Identification, traceability, and packaging"
+          - "Consideration of design alternatives"
+          - "Assessment of input requirements"
+          - "Feasibility analysis"
+          - "Targets for conformity to product requirements"
+        sources:
+          - "Previous design projects"
+          - "Benchmarking"
+          - "Supplier feedback"
+          - "Internal input"
+          - "Field data"
+          - "Other relevant sources"
+          
+      - id: "8.3.3.2"
+        title: "Manufacturing process design input"
+        requirement: "Organization shall identify, document, and review manufacturing process design input requirements"
+        includes:
+          - "Product design output data including special characteristics"
+          - "Targets for productivity, process capability, timing, and cost"
+          - "Alternative manufacturing technologies"
+          - "Customer requirements if any"
+          - "Experience from previous developments"
+          - "New materials"
+          - "Product handling and ergonomic requirements"
+          - "Design for manufacturing and design for assembly"
+          
+      - id: "8.3.3.3"
+        title: "Special characteristics"
+        requirement: "Organization shall use multidisciplinary approach to establish, document, and implement its process(es) to identify special characteristics"
+        critical: true
+        includes:
+          - "Documentation of all special characteristics in drawings, FMEA, control plans, operator instructions"
+          - "Specific marking and reaction plans for special characteristics"
+          - "Control of all special characteristics (product and manufacturing process)"
+          - "Customer-specific symbols or organization's equivalent symbols/notations"
+          
+      - id: "8.3.4.1"
+        title: "Monitoring"
+        requirement: "Measurements at specified stages during design and development shall be defined, analyzed, and reported with summary results as input to management review"
+        note: "Includes reporting quality risks, costs, lead times, critical paths, etc. to customer as required"
+        
+      - id: "8.3.4.2"
+        title: "Design and development validation"
+        requirement: "Design and development validation shall be performed in accordance with customer requirements including applicable industry and governmental agency issued regulatory standards"
+        timing: "Timing of validation shall be planned in alignment with customer-specified timing"
+        note: "Where contractually agreed with customer, includes evaluation of product's interaction, including embedded software, within end user's product system"
+        
+      - id: "8.3.4.3"
+        title: "Prototype program"
+        requirement: "When required by customer, organization shall have prototype program and control plan"
+        includes:
+          - "Use same suppliers, tooling, and manufacturing processes as will be used in production"
+          - "Monitoring of performance testing activities for timely completion and conformity"
+          - "When services are outsourced, includes type and extent of control in QMS scope"
+          
+      - id: "8.3.4.4"
+        title: "Product approval process"
+        requirement: "Organization shall establish, implement, and maintain a product and manufacturing process approval process conforming to requirements defined by customer"
+        critical: true
+        note: "Organization shall approve externally provided products and services per 8.4.3 prior to submission of part approval to customer"
+        reference: "AIAG PPAP Manual"
+        
+      - id: "8.3.5.1"
+        title: "Design and development outputs - supplemental"
+        requirement: "Product design output shall be expressed in terms that can be verified and validated against product design input requirements"
+        includes:
+          - "Design risk analysis (DFMEA)"
+          - "Reliability study results"
+          - "Product special characteristics and specifications"
+          - "Product error-proofing results"
+          - "Product definition including 3D models, technical data packages, manufacturing information, GD&T"
+          - "2D drawings and manufacturing information"
+          - "Product design review results"
+          - "Service diagnostic guidelines, repair and serviceability instructions"
+          - "Service part requirements"
+          - "Packaging and labeling requirements for shipping"
+          
+      - id: "8.3.5.2"
+        title: "Manufacturing process design output"
+        requirement: "Organization shall document manufacturing process design output in manner that enables verification against manufacturing process design inputs"
+        critical: true
+        includes:
+          - "Specifications and drawings"
+          - "Special characteristics for product and manufacturing process"
+          - "Identification of process input variables that impact characteristics"
+          - "Tooling and equipment for production and control, including capability studies"
+          - "Manufacturing process flow diagram/layout including linkage to product, process, tooling"
+          - "Capacity analysis"
+          - "Manufacturing process FMEA"
+          - "Maintenance plans and instructions"
+          - "Control plan"
+          - "Standardized work and work instructions"
+          - "Process approval acceptance criteria"
+          - "Data for quality, reliability, maintainability, and measurability"
+          - "Results of error-proofing verification"
+          - "Methods of rapid detection and feedback of product/manufacturing process nonconformities"
+          
+      - id: "8.3.6.1"
+        title: "Design and development changes - supplemental"
+        requirement: "Organization shall evaluate all design changes after initial product approval, including changes proposed by organization or suppliers"
+        determines:
+          - "Impact on fit, form, function, performance, and/or durability"
+          - "Required customer approval prior to production implementation"
+          - "Customer engineering approval required"
+          - "Informational notification only"
+        critical: true
+        note: "Changes affecting customer requirements require written customer approval"
+        
+  section_8.4:
+    title: "Control of externally provided processes, products and services"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "8.4.1.1"
+        title: "General - supplemental"
+        requirement: "Organization shall include all products and services that affect customer requirements"
+        includes:
+          - "Subassembly, sequencing, sorting, rework, and calibration services"
+          
+      - id: "8.4.1.2"
+        title: "Supplier selection process"
+        requirement: "Organization shall have documented supplier selection process"
+        includes:
+          - "Assessment of selected supplier's risk to product conformity and uninterrupted supply"
+          - "Relevant quality and delivery performance"
+          - "Evaluation of supplier's QMS"
+          - "Multidisciplinary decision-making"
+          - "Assessment of supplier software development capability if applicable"
+        critical: true
+        
+      - id: "8.4.1.3"
+        title: "Customer-directed sources (also known as 'Directed-Buy')"
+        requirement: "When specified by customer, organization shall purchase products, materials, or services from customer-directed sources"
+        note: "All requirements of 8.4 (except 8.4.1.2) apply to control of customer-directed sources"
+        
+      - id: "8.4.2.1"
+        title: "Type and extent of control - supplemental"
+        requirement: "Organization shall have documented process to identify outsourced processes and to select type and extent of controls used to verify conformity"
+        includes:
+          - "Criteria and actions for escalating or reducing control based on supplier performance"
+          
+      - id: "8.4.2.2"
+        title: "Statutory and regulatory requirements"
+        requirement: "Organization shall document process to assure purchased products conform to current applicable statutory and regulatory requirements"
+        scope: "Country of manufacture, country of receipt, customer-identified country of destination"
+        
+      - id: "8.4.2.3"
+        title: "Supplier quality management system development"
+        requirement: "Organization shall require its suppliers of automotive products and services to develop, implement, and improve QMS"
+        progression:
+          step_1: "Conformity to ISO 9001 through 2nd-party audits"
+          step_2: "ISO 9001 certification through 3rd-party audits"
+          ultimate_goal: "IATF 16949 certification by IATF-recognized CB"
+        note: "Unless otherwise specified by customer, sequence may begin at any step"
+        
+      - id: "8.4.2.3.1"
+        title: "Automotive product-related software or automotive products with embedded software"
+        requirement: "Organization shall require suppliers to implement and maintain process for software quality assurance"
+        methods: "Automotive SPICE, CMMI, or equivalent"
+        includes:
+          - "Prioritization based on risk"
+          - "Self-assessment results retained"
+          
+      - id: "8.4.2.4"
+        title: "Supplier monitoring"
+        requirement: "Organization shall have documented process and criteria to evaluate supplier performance"
+        minimum_indicators:
+          - "Delivered product conformance to requirements"
+          - "Customer disruptions at receiving plant including yard holds and stop ships"
+          - "Delivery schedule performance"
+          - "Number of occurrences of premium freight"
+          - "Customer notifications related to quality or delivery issues"
+          - "Supplier returns, warranty, field actions, and recalls"
+          
+      - id: "8.4.2.4.1"
+        title: "Second-party audits"
+        requirement: "Organization shall include second-party audit in supplier management approach"
+        audit_triggers:
+          - "Supplier risk assessment"
+          - "Supplier monitoring results"
+          - "Level of QMS certification"
+          - "Automotive product-related software or embedded software"
+        purposes:
+          - "QMS audits"
+          - "Manufacturing process audits"
+          - "Product audits"
+          
+      - id: "8.4.2.5"
+        title: "Supplier development"
+        requirement: "Organization shall determine priority, type, extent, and timing of required supplier development actions"
+        inputs:
+          - "Performance issues identified through supplier monitoring"
+          - "Supplier audit findings"
+          - "Third-party QMS certification status"
+          - "Risk analysis"
+        actions:
+          - "At minimum, active supplier development of suppliers not meeting minimum acceptable performance"
+          
+      - id: "8.4.3.1"
+        title: "Information for external providers - supplemental"
+        requirement: "Organization shall pass down all applicable statutory and regulatory requirements and special product and process characteristics to suppliers, requiring them to cascade applicable requirements down through supply chain"
+        
+  section_8.5:
+    title: "Production and service provision"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "8.5.1.1"
+        title: "Control plan"
+        requirement: "Organization shall develop control plans (in accordance with Annex A) at system, subsystem, component, and/or material level for relevant manufacturing site and all supplied product, including for bulk materials as well as for parts"
+        critical: true
+        links_to:
+          - "Risk analysis output (PFMEA)"
+          - "Process flow diagram"
+        includes:
+          - "Controls used for manufacturing process control including verification of job set-ups"
+          - "First-off/last-off part validation, as applicable"
+          - "Methods for monitoring of control exercised over special characteristics"
+          - "Customer-required information"
+          - "Specified reaction plan when nonconforming product detected, process becomes statistically unstable, or statistically not capable"
+        review_update_triggers:
+          - "Organization determines it has shipped nonconforming product to customer"
+          - "Any change affecting product, manufacturing process, measurement, logistics, supply sources, production volume changes, or risk analysis (FMEA)"
+          - "After customer complaint and corrective action implementation"
+          - "At set frequency based on risk analysis"
+          
+      - id: "8.5.1.2"
+        title: "Standardized work - operator instructions and visual standards"
+        requirement: "Organization shall ensure standardized work documents are communicated to, and understood by, employees responsible for performing work"
+        requirements:
+          - "Legible"
+          - "In language understood by personnel"
+          - "Accessible for use at designated work area"
+          - "Derived from sources including control plans"
+          
+      - id: "8.5.1.3"
+        title: "Verification of job set-ups"
+        requirement: "Organization shall verify job set-ups when performed (initial run, material change, job change) and maintain documented information"
+        methods:
+          - "Last-off/first-off comparison"
+          - "Statistical methods (SPC)"
+          
+      - id: "8.5.1.4"
+        title: "Verification after shutdown"
+        requirement: "Organization shall define and implement actions necessary to ensure product conformance to requirements after planned or unplanned production shutdown period"
+        
+      - id: "8.5.1.5"
+        title: "Total productive maintenance"
+        requirement: "Organization shall develop, implement, and maintain documented TPM system"
+        includes:
+          - "Identification of process equipment necessary to produce conforming product at required volume"
+          - "Availability of replacement parts for equipment"
+          - "Provision of resources for machine, equipment, facility maintenance"
+          - "Packaging and preservation of equipment, tooling, gaging"
+          - "Applicable customer-specific requirements"
+          - "Documented maintenance objectives"
+          - "Regular review of maintenance plan against objectives"
+          - "Use of predictive maintenance methods"
+          - "Periodic overhaul"
+          
+      - id: "8.5.1.6"
+        title: "Management of production tooling and manufacturing, test, inspection tooling and equipment"
+        requirement: "Organization shall provide resources for tool and gage design, fabrication, and verification activities"
+        includes:
+          - "Maintenance and repair facilities and personnel"
+          - "Storage and recovery"
+          - "Set-up"
+          - "Tool change programs for perishable tools"
+          - "Tool design modification documentation including engineering change level"
+          - "Tool modification and revision to documentation"
+          - "Tool identification"
+          - "Verification/acceptance before tooling placed in production"
+          - "Periodic verification during production life"
+        customer_owned:
+          - "Permanent visible marking (ownership visible when installed)"
+          
+      - id: "8.5.1.7"
+        title: "Production scheduling"
+        requirement: "Organization shall ensure production is scheduled to meet customer orders/demands such as Just-In-Time (JIT) and is supported by information system for key stages of production"
+        includes:
+          - "Inventory status"
+          - "Permits access to production and delivery schedules"
+          
+      - id: "8.5.2.1"
+        title: "Identification and traceability - supplemental"
+        requirement: "Purpose of traceability is to support identification of clear start and stop points for product received by customer or in field that may contain quality and/or safety-related nonconformities"
+        retention: "As defined in 7.5.3.2.1"
+        
+      - id: "8.5.4.1"
+        title: "Preservation - supplemental"
+        requirement: "Preservation shall include identification, handling, contamination control, packaging, storage, transmission or transportation, and protection"
+        
+      - id: "8.5.5.1"
+        title: "Feedback of information from service"
+        requirement: "Organization shall ensure process is established, implemented, and maintained for communicating information on service concerns to manufacturing, material handling, logistics, engineering, and design activities"
+        note: "Intention of 'service concerns' is to ensure organization is aware of nonconforming product and material identified external to the organization"
+        
+      - id: "8.5.6.1"
+        title: "Control of changes - supplemental"
+        requirement: "Organization shall have documented process to control and react to changes that impact product realization"
+        requirements:
+          - "Define verification and validation activities to ensure compliance with customer requirements"
+          - "Validate changes prior to implementation"
+          - "Document evidence of risk analysis"
+          - "Retain records of verification and validation"
+        note: "Changes including supply source changes shall require verification of effects of changes on manufacturing process, including change in product parameters and/or manufacturing process"
+        customer_notification: "Organization shall notify customer of any planned production process changes affecting product realization and obtain approval where required"
+        
+      - id: "8.5.6.1.1"
+        title: "Temporary change of process controls"
+        requirement: "Organization shall identify, document, and maintain list of process controls including inspection, measurement, test, and error-proofing devices that includes primary process control and approved back-up or alternate methods"
+        critical: true
+        includes:
+          - "Internal approval of alternate control methods before production use"
+          - "Daily verification of output with alternative controls"
+          - "Accelerated verification of compliance with customer-requested rework requirements"
+          - "Documented startup and daily validation"
+          - "Full traceability of all product produced with alternate methods"
+          - "Verification that all error-proofing devices are restarted when normal processes resume"
+          
+  section_8.6:
+    title: "Release of products and services"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "8.6.1"
+        title: "Release of products and services - supplemental"
+        requirement: "Organization shall ensure planned arrangements to verify product and service requirements have been met encompass control plan and are documented as specified in control plan"
+        includes:
+          - "Initial release and release after changes include acceptance criteria"
+          
+      - id: "8.6.2"
+        title: "Layout inspection and functional testing"
+        requirement: "A layout inspection and functional verification to applicable customer engineering material and performance standards shall be performed for each product"
+        frequency: "As specified in control plans"
+        results: "Available for customer review"
+        
+      - id: "8.6.3"
+        title: "Appearance items"
+        requirement: "For organization-designated 'appearance items', organization shall provide appropriate resources including lighting, masters for evaluation, color masters, and required training for personnel"
+        
+      - id: "8.6.4"
+        title: "Verification and acceptance of conformity of externally provided products and services"
+        requirement: "Organization shall have process to assure quality of externally provided processes, products, and services"
+        methods:
+          - "Receipt of and evaluation of statistical data provided by supplier"
+          - "Receiving inspection and/or testing such as sampling based on performance"
+          - "Second or third-party assessments or audits of supplier sites with records of acceptable delivered product conformance"
+          - "Part evaluation by designated laboratory"
+          - "Another method agreed with customer"
+          
+      - id: "8.6.5"
+        title: "Statutory and regulatory conformity"
+        requirement: "Prior to release of externally provided products into their production flow, organization shall confirm and be able to provide evidence that externally provided processes, products, and services conform to latest applicable statutory and regulatory requirements in countries of manufacture, countries of receipt, and customer-identified country of destination"
+        
+      - id: "8.6.6"
+        title: "Acceptance criteria"
+        requirement: "Acceptance criteria shall be defined by organization and, where appropriate or required, approved by customer"
+        attribute_sampling: "Acceptance level shall be zero defects"
+        
+  section_8.7:
+    title: "Control of nonconforming outputs"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "8.7.1.1"
+        title: "Customer authorization for concession"
+        requirement: "Organization shall obtain customer concession or deviation permit prior to further processing whenever product or manufacturing process is different from currently approved"
+        includes:
+          - "When product does not conform to specification requirements"
+          - "When manufacturing process differs from currently approved"
+        expiration: "Obtain customer approval of any extension"
+        labeling: "Proper identification on each shipping container"
+        flowdown: "Obtain customer approval before processing with sub-tier supplier"
+        retention: "Retain documented information"
+        
+      - id: "8.7.1.2"
+        title: "Control of nonconforming product - customer-specified process"
+        requirement: "Organization shall conform to applicable customer-specified controls for nonconforming product"
+        
+      - id: "8.7.1.3"
+        title: "Control of suspect product"
+        requirement: "Organization shall ensure that product with unidentified or suspect status is classified and controlled as nonconforming product"
+        training: "All appropriate manufacturing personnel on containment of suspect and nonconforming product"
+        
+      - id: "8.7.1.4"
+        title: "Control of reworked product"
+        requirement: "Organization shall utilize risk analysis methodology (such as FMEA) to assess risks in rework process prior to decision to rework"
+        requirements:
+          - "Appropriate inspection/verification/traceability to original processing requirements"
+          - "Accessible work instructions including re-inspection requirements"
+          - "Customer approval where required"
+          
+      - id: "8.7.1.5"
+        title: "Control of repaired product"
+        requirement: "Organization shall utilize risk analysis methodology to assess risks in repair process prior to decision to repair"
+        requirements:
+          - "Customer approval before repair of product"
+          - "Documented process for repair confirmation per control plan or verified procedure"
+          - "Disassembly/repair work instructions including re-inspection and traceability requirements"
+          - "Documented authorization from customer for concession for repaired product"
+          - "Clear identification/individual traceability to support warranty tracking"
+          
+      - id: "8.7.1.6"
+        title: "Customer notification"
+        requirement: "Organization shall immediately notify customer(s) in event nonconforming product has been shipped"
+        includes: "Detailed documentation of event"
+        
+      - id: "8.7.1.7"
+        title: "Nonconforming product disposition"
+        requirement: "Organization shall have documented process for disposition of nonconforming product not subject to rework or repair"
+        scrap_requirement: "Product not meeting requirements shall be rendered unusable prior to disposal"
+        prohibition: "Organization shall not divert nonconforming product to service or other use without prior customer approval"
+# IATF 16949:2016 - Part 3: Clauses 9-10, Agent Mappings, Implementation
+
+# ============================================================================
+# CLAUSE 9: PERFORMANCE EVALUATION
+# ============================================================================
+clause_9:
+  title: "Performance Evaluation"
+  
+  section_9.1:
+    title: "Monitoring, measurement, analysis and evaluation"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "9.1.1.1"
+        title: "Monitoring and measurement of manufacturing processes"
+        requirement: "Organization shall perform process studies on all new manufacturing processes to verify process capability and provide additional input for process control"
+        note: "Where applicable, maintained through life of manufacturing process per control plan"
+        minimum_acceptable:
+          initial_study: "Ppk ≥ 1.67"
+          ongoing: "Cpk ≥ 1.33"
+        unstable_process:
+          - "Containment and 100% inspection"
+          - "Corrective action plan with timing and assigned responsibilities"
+          - "Approve plan with customer if required"
+        note_2: "Special characteristics may have higher customer-specified requirements"
+        
+      - id: "9.1.1.2"
+        title: "Identification of statistical tools"
+        requirement: "Organization shall determine appropriate use of statistical tools"
+        timing: "During APQP process or equivalent"
+        includes:
+          - "Verification that appropriate statistical tools are included in quality planning"
+          
+      - id: "9.1.1.3"
+        title: "Application of statistical concepts"
+        requirement: "Statistical concepts such as variation, control (stability), process capability, and consequences of over-adjustment shall be understood and used by employees involved in collection, analysis, and management of statistical data"
+        
+      - id: "9.1.2.1"
+        title: "Customer satisfaction - supplemental"
+        requirement: "Customer satisfaction shall be monitored through continual evaluation of internal and external performance indicators to ensure conformity to product and process specifications and other customer requirements"
+        includes:
+          - "Delivered part quality performance"
+          - "Customer disruptions"
+          - "Field returns, recalls, and warranties"
+          - "Delivery schedule performance (including premium freight incidents)"
+          - "Customer notifications related to quality or delivery issues, including special status"
+          
+      - id: "9.1.3.1"
+        title: "Prioritization"
+        requirement: "Trends in quality and operational performance shall be compared to objectives and lead to action to support prioritization of actions for improving customer satisfaction"
+        
+  section_9.2:
+    title: "Internal audit"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "9.2.2.1"
+        title: "Internal audit programme"
+        requirement: "Organization shall have documented internal audit process"
+        includes:
+          - "Development and implementation of entire internal audit programme"
+          - "Includes QMS audits, manufacturing process audits, product audits"
+        audit_frequency:
+          - "Audit entire QMS over each calendar year"
+          - "Audit all processes over each three-year period"
+          - "Sample manufacturing processes each audit using customer-specific requirements"
+          - "Increase frequency when internal/external changes occur or quality issues identified"
+        annual_review: "Update audit programme as appropriate"
+        
+      - id: "9.2.2.2"
+        title: "Quality management system audit"
+        requirement: "Organization shall audit all QMS processes over each calendar year in accordance with annual programme"
+        includes_verification:
+          - "Effectiveness of QMS"
+          - "Conformance with IATF 16949"
+          - "Conformance with ISO 9001:2015"
+          - "Conformance with customer-specific requirements"
+          - "Update of QMS for changes"
+          
+      - id: "9.2.2.3"
+        title: "Manufacturing process audit"
+        requirement: "Organization shall audit all manufacturing processes over each three-year period to determine their effectiveness and efficiency"
+        includes:
+          - "Sampling all shifts with appropriate handoff evaluation"
+          - "Customer-required approaches (e.g., VDA 6.3, CQI audits)"
+          
+      - id: "9.2.2.4"
+        title: "Product audit"
+        requirement: "Organization shall audit products using customer-specific approaches at appropriate stages of production and delivery to verify conformity to all specified requirements"
+        examples: "VDA 6.5, customer-specific requirements"
+        frequency: "Defined by customer or organization if not defined by customer"
+        
+  section_9.3:
+    title: "Management review"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "9.3.1.1"
+        title: "Management review - supplemental"
+        requirement: "Management review shall be conducted at minimum annually"
+        frequency: "May be increased based on internal/external changes affecting QMS and performance"
+        
+      - id: "9.3.2.1"
+        title: "Management review inputs - supplemental"
+        requirement: "Inputs to management review shall include:"
+        inputs:
+          - "Cost of poor quality (internal and external failure costs)"
+          - "Process effectiveness measures"
+          - "Process efficiency measures"
+          - "Product conformance"
+          - "Manufacturing feasibility assessments for changes to existing operations, new facilities or new products"
+          - "Customer satisfaction (per 9.1.2.1)"
+          - "Review of performance against maintenance objectives"
+          - "Warranty performance (where applicable)"
+          - "Review of customer scorecards (where applicable)"
+          - "Identification of potential field failures identified through risk analysis (FMEA)"
+          - "Actual field failures and their impact on safety or environment"
+          
+      - id: "9.3.3.1"
+        title: "Management review outputs - supplemental"
+        requirement: "Top management shall document and implement action plan when customer performance targets are not met"
+
+# ============================================================================
+# CLAUSE 10: IMPROVEMENT
+# ============================================================================
+clause_10:
+  title: "Improvement"
+  
+  section_10.1:
+    title: "General"
+    iso_requirement: true
+    
+  section_10.2:
+    title: "Nonconformity and corrective action"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "10.2.3"
+        title: "Problem solving"
+        requirement: "Organization shall have documented process(es) for problem solving"
+        critical: true
+        includes:
+          - "Defined approaches for various types and scale of problems"
+          - "Containment, interim actions, and related activities"
+          - "Root cause analysis, methodology used, analysis, and results"
+          - "Implementation of systemic corrective actions including consideration of impact on similar processes and products"
+          - "Verification of effectiveness of implemented corrective actions"
+          - "Review and, where appropriate, updating of appropriate documented information"
+        customer_specific: "Organization shall use customer-prescribed problem-solving processes, tools, or systems unless approved by customer to use alternatives"
+        examples: "8D, A3, PDCA"
+        
+      - id: "10.2.4"
+        title: "Error-proofing"
+        requirement: "Organization shall have documented process to determine use of appropriate error-proofing methodologies"
+        includes:
+          - "Details of error-proofing methodology used shall be documented in process risk analysis (PFMEA) and test frequencies shall be documented in control plan"
+          - "Records of error-proofing device challenges"
+        master_parts: "Includes manufacture and use of fail and pass master parts"
+        failure_mode: "Where feasible, devices shall be designed to produce a fault signal/alert when failure detected in device (or component of device worn or failing)"
+        
+      - id: "10.2.5"
+        title: "Warranty management systems"
+        requirement: "When organization is required to provide warranty for product(s), organization shall implement warranty management process"
+        includes:
+          - "Method for warranty part analysis including NTF (No Trouble Found)"
+          - "Customer-specific requirements"
+          
+      - id: "10.2.6"
+        title: "Customer complaints and field failure test analysis"
+        requirement: "Organization shall perform analysis on customer complaints and field failures, including any returned parts"
+        includes:
+          - "Initiate problem solving and corrective action to prevent recurrence"
+          - "When requested by customer, perform analysis on interaction of embedded software with customer product system"
+          - "Communicate results of testing/analysis to customer and within organization"
+          
+  section_10.3:
+    title: "Continual improvement"
+    iso_requirement: true
+    automotive_supplements:
+      - id: "10.3.1"
+        title: "Continual improvement - supplemental"
+        requirement: "Organization shall have documented process for continual improvement"
+        includes:
+          - "Identification of methodology used"
+          - "Manufacturing process improvement actions to reduce process variation and waste"
+          - "Risk analysis (such as FMEA)"
+        note: "Continual improvement is implemented once manufacturing processes are statistically capable and stable, or when product characteristics are predictable and meet customer requirements"
+
+# ============================================================================
+# AGENT-TO-CONTROL MAPPINGS
+# ============================================================================
+agent_mappings:
+  GUARDIAN:
+    description: "Security-focused findings map to product safety, control plans, and supplier controls"
+    primary_controls:
+      - "4.4.1.2"     # Product safety
+      - "8.3.3.3"     # Special characteristics
+      - "8.4.1.2"     # Supplier selection
+      - "8.5.1.1"     # Control plan
+      - "8.7"         # Control of nonconforming outputs
+    secondary_controls:
+      - "8.4.2.4"     # Supplier monitoring
+      - "8.5.6.1.1"   # Temporary change controls
+      - "6.1.2.3"     # Contingency plans (cyber-attacks)
+      
+  SENTINEL:
+    description: "Monitoring and audit findings map to performance evaluation, statistical controls, and audits"
+    primary_controls:
+      - "9.1.1.1"     # Process monitoring (Cpk/Ppk)
+      - "9.2.2"       # Internal audit programme
+      - "9.1.2.1"     # Customer satisfaction monitoring
+      - "7.1.5.1.1"   # MSA
+      - "8.6.2"       # Layout inspection
+    secondary_controls:
+      - "9.2.2.3"     # Manufacturing process audit
+      - "9.2.2.4"     # Product audit
+      - "9.1.1.2"     # Statistical tools
+      
+  ARCHITECT:
+    description: "Design and structure findings map to design controls, APQP, and documented processes"
+    primary_controls:
+      - "8.3.2.1"     # Design planning (APQP)
+      - "8.3.3.1"     # Product design input
+      - "8.3.5.1"     # Design outputs (DFMEA)
+      - "8.3.5.2"     # Manufacturing process design output (PFMEA)
+      - "8.3.4.4"     # Product approval (PPAP)
+    secondary_controls:
+      - "8.3.2.3"     # Embedded software
+      - "8.3.6.1"     # Design changes
+      - "7.5.3.2.2"   # Engineering specifications
+      
+  HERALD:
+    description: "Communication and documentation findings map to documented information, training, and customer communication"
+    primary_controls:
+      - "7.5"         # Documented information
+      - "7.2.1"       # Competence
+      - "7.3.1"       # Awareness
+      - "8.2.1.1"     # Customer communication
+      - "8.5.1.2"     # Standardized work/operator instructions
+    secondary_controls:
+      - "7.5.3.2.1"   # Record retention
+      - "7.2.3"       # Internal auditor competency
+      - "5.1.1.1"     # Corporate responsibility/ethics
+      
+  OPERATOR:
+    description: "Production and process findings map to production controls, maintenance, and external provider management"
+    primary_controls:
+      - "8.5.1.1"     # Control plan
+      - "8.5.1.5"     # TPM
+      - "8.5.1.6"     # Production tooling management
+      - "8.4"         # External provider control
+      - "10.2.4"      # Error-proofing
+    secondary_controls:
+      - "8.5.1.3"     # Verification of job set-ups
+      - "8.5.1.7"     # Production scheduling (JIT)
+      - "8.7.1.4"     # Rework control
+      
+  NAVIGATOR:
+    description: "Strategic and planning findings map to leadership, risk management, and continual improvement"
+    primary_controls:
+      - "5.1"         # Leadership
+      - "6.1.2.1"     # Risk analysis
+      - "6.1.2.3"     # Contingency plans
+      - "9.3"         # Management review
+      - "10.3.1"      # Continual improvement
+    secondary_controls:
+      - "5.3.2"       # Authority to stop production
+      - "6.2.2.1"     # Quality objectives
+      - "10.2.3"      # Problem solving
+
+# ============================================================================
+# COMMON AUDIT FINDINGS
+# ============================================================================
+common_findings:
+  - finding_type: "Corrective action / Problem solving"
+    frequency: "Most common"
+    clauses: ["10.2.3"]
+    description: "Incomplete root cause analysis, ineffective actions, no verification of effectiveness"
+    
+  - finding_type: "Control plan implementation"
+    frequency: "Very common"
+    clauses: ["8.5.1.1"]
+    description: "Control plan not updated after changes, reaction plans not defined or followed"
+    
+  - finding_type: "Supplier monitoring and development"
+    frequency: "Very common"
+    clauses: ["8.4.2.4", "8.4.2.5"]
+    description: "Inadequate monitoring criteria, no development actions for poor performers"
+    
+  - finding_type: "PPAP/Product approval"
+    frequency: "Common"
+    clauses: ["8.3.4.4"]
+    description: "Incomplete submissions, missing customer approval, expired approvals"
+    
+  - finding_type: "Internal audit programme"
+    frequency: "Common"
+    clauses: ["9.2.2.1", "9.2.2.3"]
+    description: "Incomplete coverage, inadequate manufacturing process audits, missing process approach"
+    
+  - finding_type: "MSA / Calibration"
+    frequency: "Common"
+    clauses: ["7.1.5.1.1", "7.1.5.2.1"]
+    description: "Gage R&R not performed, out-of-specification conditions not assessed"
+    
+  - finding_type: "Training / Competence"
+    frequency: "Common"
+    clauses: ["7.2.1", "7.2.2"]
+    description: "Inadequate OJT documentation, missing competence records for contract workers"
+    
+  - finding_type: "Process capability"
+    frequency: "Common"
+    clauses: ["9.1.1.1"]
+    description: "Cpk below minimum, no reaction plan for unstable processes"
+
+# ============================================================================
+# CUSTOMER-SPECIFIC REQUIREMENTS (CSRs)
+# ============================================================================
+customer_specific_requirements:
+  description: "Major OEMs publish their own CSRs that supplement IATF 16949"
+  
+  general_motors:
+    document: "GM Customer Specific Requirements for IATF 16949:2016"
+    url: "https://www.iatfglobaloversight.org"
+    key_additions:
+      - "PFMEA with Risk Priority Levels"
+      - "Critical operation identification"
+      - "SCMS System uploads"
+      - "CQI assessments (Wire Harness, Software)"
+      
+  ford:
+    document: "Ford Motor Company Customer-Specific Requirements"
+    url: "https://www.iatfglobaloversight.org"
+    key_additions:
+      - "GPDS (Global Product Development System)"
+      - "Family control plans"
+      - "Q1 preferred quality status"
+      
+  stellantis:
+    document: "Stellantis Customer-Specific Requirements for IATF 16949"
+    url: "https://www.iatfglobaloversight.org"
+    key_additions:
+      - "Supplier quality manual requirements"
+      - "Process sign-off"
+      
+  volkswagen_group:
+    document: "VW Group Formel Q"
+    key_additions:
+      - "VDA standards integration"
+      - "Formel Q capability assessments"
+      
+  note: "Always check IATF Global Oversight website for latest CSR versions"
+
+# ============================================================================
+# RELATED STANDARDS AND MANUALS
+# ============================================================================
+related_standards:
+  base_standard:
+    - id: "ISO 9001:2015"
+      relationship: "IATF 16949 MUST be used in conjunction with ISO 9001:2015"
+      note: "ISO 9001 requirements are incorporated by reference, NOT included in IATF document"
+      
+  core_tools_manuals:
+    - id: "AIAG APQP Manual"
+      edition: "3rd Edition (2024)"
+      topic: "Advanced Product Quality Planning"
+    - id: "AIAG Control Plan Manual"
+      edition: "1st Edition (2024)"
+      topic: "Control Plan development"
+    - id: "AIAG PPAP Manual"
+      edition: "4th Edition (2006)"
+      topic: "Production Part Approval Process"
+    - id: "AIAG & VDA FMEA Handbook"
+      edition: "2019"
+      topic: "Failure Mode and Effects Analysis"
+    - id: "AIAG MSA Manual"
+      edition: "4th Edition (2010)"
+      topic: "Measurement System Analysis"
+    - id: "AIAG SPC Manual"
+      edition: "2nd Edition (2005)"
+      topic: "Statistical Process Control"
+      
+  cqi_standards:
+    description: "AIAG Continuous Quality Improvement standards for special processes"
+    standards:
+      - id: "CQI-9"
+        title: "Special Process: Heat Treat System Assessment"
+      - id: "CQI-11"
+        title: "Special Process: Plating System Assessment"
+      - id: "CQI-12"
+        title: "Special Process: Coating System Assessment"
+      - id: "CQI-15"
+        title: "Special Process: Welding System Assessment"
+      - id: "CQI-17"
+        title: "Special Process: Soldering System Assessment"
+      - id: "CQI-23"
+        title: "Special Process: Molding System Assessment"
+      - id: "CQI-27"
+        title: "Special Process: Casting System Assessment"
+        
+  vda_standards:
+    description: "German VDA standards often required by European OEMs"
+    standards:
+      - id: "VDA 6.3"
+        title: "Process Audit"
+      - id: "VDA 6.5"
+        title: "Product Audit"
+      - id: "VDA-RGA"
+        title: "Reifegradabsicherung (Maturity Level Assurance)"
+
+# ============================================================================
+# IMPLEMENTATION GUIDANCE
+# ============================================================================
+implementation_guidance:
+  phase_1_gap_analysis:
+    duration: "Months 1-2"
+    activities:
+      - "Gap analysis against IATF 16949 AND ISO 9001:2015"
+      - "Review customer-specific requirements for all OEM customers"
+      - "Assess current state of core tools implementation"
+      - "Identify resources and training needs"
+      
+  phase_2_documentation:
+    duration: "Months 2-4"
+    activities:
+      - "Establish quality manual"
+      - "Document product safety processes (4.4.1.2)"
+      - "Document contingency plans (6.1.2.3)"
+      - "Create/update control plan process"
+      - "Document problem-solving process (10.2.3)"
+      - "Establish supplier management procedures"
+      
+  phase_3_core_tools:
+    duration: "Months 3-6"
+    activities:
+      - "Implement APQP for new products"
+      - "Train personnel on FMEA methodology"
+      - "Conduct MSA studies for all gages in control plan"
+      - "Implement SPC for special characteristics"
+      - "Ensure PPAP capability"
+      
+  phase_4_implementation:
+    duration: "Months 4-8"
+    activities:
+      - "Implement all documented processes"
+      - "Conduct internal audits (QMS, process, product)"
+      - "Hold management reviews"
+      - "Address supplier development needs"
+      - "Verify process capability (Cpk targets)"
+      
+  phase_5_certification:
+    duration: "Months 8-12"
+    activities:
+      - "Select IATF-recognized certification body"
+      - "Complete Stage 1 audit (readiness review)"
+      - "Close Stage 1 findings"
+      - "Complete Stage 2 audit (certification audit)"
+      - "Close any major/minor nonconformities"
+      - "Receive IATF 16949 certificate"
+      - "Ensure IATF database registration"
+
+# ============================================================================
+# CERTIFICATION INFORMATION
+# ============================================================================
+certification:
+  bodies:
+    description: "Must use IATF-recognized certification bodies"
+    oversight_offices:
+      - "ANFIA (Italy)"
+      - "IATF France (VDA QMC acts as CB oversight)"
+      - "IAOB (Americas)"
+      - "SMMT (UK)"
+      - "VDA QMC (Germany)"
+    note: "List of recognized CBs available at iatfglobaloversight.org"
+    
+  audit_cycle:
+    initial: "Stage 1 + Stage 2 audits"
+    surveillance: "Every 12 months (±3 months)"
+    recertification: "Every 3 years"
+    
+  rules:
+    current: "IATF Rules 6th Edition"
+    effective: "January 2025"
+    changes: "Risk-based audit duration calculations"
+    
+  database:
+    name: "IATF Global Oversight Database"
+    url: "https://www.iatfglobaloversight.org"
+    purpose: "Public listing of all IATF 16949 certified sites"
+
+# ============================================================================
+# VERSION HISTORY
+# ============================================================================
+version_history:
+  - version: "1.0"
+    date: "2026-02-03"
+    author: "Code Conclave AI Agent"
+    changes: "Initial IATF 16949:2016 compliance pack creation"
+    
+notes:
+  - "IATF 16949:2016 is NOT a standalone standard - must be used with ISO 9001:2015"
+  - "511 total requirements (verb 'shall') in clauses 4-10"
+  - "Core tools (APQP, PPAP, FMEA, MSA, SPC) are mandatory"
+  - "Customer-specific requirements (CSRs) are mandatory additions"
+  - "IATF Rules 6th Edition effective January 2025"
+  - "A revision is in progress - check IATF website for updates"
+  - "Process capability minimums: Ppk ≥ 1.67 (initial), Cpk ≥ 1.33 (ongoing)"
