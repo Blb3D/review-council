@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  conclave:
+    build: .
+    image: conclave:latest
+    volumes:
+      - ./test-repo:/repo:ro
+      - ./output:/output
+    environment:
+      - CI=true
+    command: ["-Project", "/repo", "-OutputFormat", "junit", "-CI"]
