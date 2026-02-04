@@ -736,6 +736,10 @@ function Main {
 
     # Generate JUnit output if requested
     if ($OutputFormat -eq "junit") {
+        if (-not (Get-Command Export-JUnitResults -ErrorAction SilentlyContinue)) {
+            Write-Status "JUnit formatter not available. Ensure junit-formatter.ps1 is present in cli/lib/" "ERROR"
+            return
+        }
         Write-Status "Generating JUnit XML..." "INFO"
 
         # Parse findings from markdown files for JUnit format
