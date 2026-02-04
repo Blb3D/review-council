@@ -7,17 +7,17 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
   review:
     runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Initialize Code Conclave
-      shell: pwsh
-      run: |
-        .\cli\ccl.ps1 -Init -Project ${{ github.workspace }}
 
     - name: Run Code Conclave (DryRun)
       shell: pwsh
@@ -31,13 +31,11 @@ jobs:
       continue-on-error: true
 
     - name: Publish Test Results
-      uses: dorny/test-reporter@v1
+      uses: EnricoMi/publish-unit-test-result-action/windows@v2
       if: always()
       with:
-        name: Code Conclave Review
-        path: '**/.code-conclave/reviews/conclave-results.xml'
-        reporter: java-junit
-        fail-on-error: true
+        files: .code-conclave/reviews/conclave-results.xml
+        check_name: Code Conclave Review
 
     - name: Upload Reports
       uses: actions/upload-artifact@v4
