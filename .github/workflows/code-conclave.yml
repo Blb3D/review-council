@@ -10,6 +10,7 @@ on:
 permissions:
   contents: read
   checks: write
+  pull-requests: write
 
 jobs:
   review:
@@ -33,7 +34,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action/windows@v2
       if: always()
       with:
-        files: '**/conclave-results.xml'
+        files: .code-conclave/reviews/conclave-results.xml
         check_name: Code Conclave Review
 
     - name: Upload Reports
