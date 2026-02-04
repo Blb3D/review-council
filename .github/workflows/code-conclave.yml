@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   review:
     runs-on: windows-latest
@@ -26,13 +30,11 @@ jobs:
       continue-on-error: true
 
     - name: Publish Test Results
-      uses: dorny/test-reporter@v1
+      uses: EnricoMi/publish-unit-test-result-action/windows@v2
       if: always()
       with:
-        name: Code Conclave Review
-        path: '**/.code-conclave/reviews/conclave-results.xml'
-        reporter: java-junit
-        fail-on-error: true
+        files: '**/conclave-results.xml'
+        check_name: Code Conclave Review
 
     - name: Upload Reports
       uses: actions/upload-artifact@v4
