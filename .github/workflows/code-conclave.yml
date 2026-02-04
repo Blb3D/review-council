@@ -1,0 +1,26 @@
+name: Code Conclave Review
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  review:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Code Conclave
+      shell: pwsh
+      run: |
+        Write-Host "Running Code Conclave..."
+        $env:TF_BUILD = "true"
+        
+        # Run review (just GUARDIAN for quick test)
+        .\cli\ccl.ps1 -Project ${{ github.workspace }} -Agent guardian
+        
+        Write-Host "Review complete!"
