@@ -291,6 +291,282 @@ function Write-FindingsSummary {
 }
 
 # ============================================================================
+# MOCK FINDINGS FOR DRYRUN
+# ============================================================================
+
+function Get-MockFindings {
+    param([string]$AgentKey, [string]$AgentName)
+
+    $mockData = @{
+        guardian = @"
+# GUARDIAN Security Review
+
+## Findings
+
+### GUARDIAN-001: Hardcoded API Key [BLOCKER]
+
+**File:** src/config.js
+**Line:** 42
+
+**Evidence:** ``const API_KEY = "sk-proj-abc123..."``
+
+API key is hardcoded in source code, exposing credentials in version control.
+
+**Remediation:** Move to environment variable or secrets manager.
+
+### GUARDIAN-002: SQL Injection Risk [HIGH]
+
+**File:** src/db/queries.js
+**Line:** 87
+
+**Evidence:** ``query = "SELECT * FROM users WHERE id=" + userId``
+
+User input is concatenated directly into SQL query string.
+
+**Remediation:** Use parameterized queries or an ORM.
+
+### GUARDIAN-003: Missing HTTPS Enforcement [MEDIUM]
+
+**File:** src/api/client.js
+**Line:** 12
+
+HTTP endpoints used for API calls. Data transmitted in plaintext.
+
+**Remediation:** Update all endpoints to HTTPS. Add HSTS headers.
+
+### GUARDIAN-004: Verbose Error Messages [LOW]
+
+**File:** src/middleware/error-handler.js
+**Line:** 28
+
+Stack traces exposed in production error responses.
+
+**Remediation:** Return generic error messages in production.
+
+## Summary
+| Severity | Count |
+|----------|-------|
+| BLOCKER | 1 |
+| HIGH | 1 |
+| MEDIUM | 1 |
+| LOW | 1 |
+
+**Verdict: HOLD**
+"@
+        sentinel = @"
+# SENTINEL Quality Review
+
+## Findings
+
+### SENTINEL-001: Missing Unit Tests for Auth Module [BLOCKER]
+
+**File:** src/auth/login.js
+**Line:** 1
+
+Authentication module has zero test coverage. Critical path untested.
+
+**Remediation:** Add unit tests covering login, logout, token refresh flows.
+
+### SENTINEL-002: Cyclomatic Complexity Exceeds Threshold [HIGH]
+
+**File:** src/utils/parser.js
+**Line:** 145
+
+Function ``parseConfig`` has cyclomatic complexity of 28 (threshold: 15).
+
+**Remediation:** Refactor into smaller, focused functions.
+
+### SENTINEL-003: Inconsistent Error Handling [MEDIUM]
+
+**File:** src/services/
+**Line:** 0
+
+Mix of try/catch, .catch(), and uncaught promises across service layer.
+
+**Remediation:** Standardize error handling pattern across services.
+
+## Summary
+| Severity | Count |
+|----------|-------|
+| BLOCKER | 1 |
+| HIGH | 1 |
+| MEDIUM | 1 |
+
+**Verdict: HOLD**
+"@
+        architect = @"
+# ARCHITECT Code Health Review
+
+## Findings
+
+### ARCHITECT-001: Circular Dependency Detected [HIGH]
+
+**File:** src/services/user.js
+**Line:** 3
+
+Circular import between user.js and auth.js causes initialization issues.
+
+**Remediation:** Extract shared logic into a separate module.
+
+### ARCHITECT-002: Dead Code in Legacy Module [MEDIUM]
+
+**File:** src/legacy/helpers.js
+**Line:** 200
+
+150 lines of unreachable code after early return statement.
+
+**Remediation:** Remove dead code or restore intended logic.
+
+### ARCHITECT-003: Missing TypeScript Strict Mode [LOW]
+
+**File:** tsconfig.json
+**Line:** 5
+
+Strict mode disabled, allowing implicit any types.
+
+**Remediation:** Enable ``strict: true`` and fix resulting type errors.
+
+## Summary
+| Severity | Count |
+|----------|-------|
+| HIGH | 1 |
+| MEDIUM | 1 |
+| LOW | 1 |
+
+**Verdict: CONDITIONAL**
+"@
+        navigator = @"
+# NAVIGATOR UX Review
+
+## Findings
+
+### NAVIGATOR-001: No Loading States on API Calls [MEDIUM]
+
+**File:** src/components/Dashboard.jsx
+**Line:** 45
+
+API calls show no loading indicator. Users see blank screen during fetch.
+
+**Remediation:** Add loading spinners or skeleton screens.
+
+### NAVIGATOR-002: Missing Alt Text on Images [LOW]
+
+**File:** src/components/Gallery.jsx
+**Line:** 22
+
+Images rendered without alt attributes. Accessibility violation.
+
+**Remediation:** Add descriptive alt text to all images.
+
+## Summary
+| Severity | Count |
+|----------|-------|
+| MEDIUM | 1 |
+| LOW | 1 |
+
+**Verdict: SHIP**
+"@
+        herald = @"
+# HERALD Documentation Review
+
+## Findings
+
+### HERALD-001: Missing API Documentation [MEDIUM]
+
+**File:** src/api/
+**Line:** 0
+
+No API documentation or OpenAPI spec found for 12 endpoints.
+
+**Remediation:** Add JSDoc comments and generate OpenAPI spec.
+
+### HERALD-002: Outdated README [LOW]
+
+**File:** README.md
+**Line:** 1
+
+README references deprecated setup steps and removed dependencies.
+
+**Remediation:** Update README to reflect current project state.
+
+## Summary
+| Severity | Count |
+|----------|-------|
+| MEDIUM | 1 |
+| LOW | 1 |
+
+**Verdict: SHIP**
+"@
+        operator = @"
+# OPERATOR Production Readiness Review
+
+## Findings
+
+### OPERATOR-001: No Health Check Endpoint [HIGH]
+
+**File:** src/server.js
+**Line:** 1
+
+No /health or /readiness endpoint for container orchestration.
+
+**Remediation:** Add health check endpoint returning service status.
+
+### OPERATOR-002: Missing Rate Limiting [MEDIUM]
+
+**File:** src/middleware/
+**Line:** 0
+
+No rate limiting configured on public API endpoints.
+
+**Remediation:** Add rate limiting middleware (e.g., express-rate-limit).
+
+### OPERATOR-003: Hardcoded Port Number [LOW]
+
+**File:** src/server.js
+**Line:** 8
+
+Port 3000 hardcoded instead of using environment variable.
+
+**Remediation:** Use ``process.env.PORT || 3000``.
+
+## Summary
+| Severity | Count |
+|----------|-------|
+| HIGH | 1 |
+| MEDIUM | 1 |
+| LOW | 1 |
+
+**Verdict: CONDITIONAL**
+"@
+    }
+
+    if ($mockData.ContainsKey($AgentKey)) {
+        return $mockData[$AgentKey]
+    }
+
+    # Fallback for unknown agents
+    return @"
+# $AgentName Review
+
+## Findings
+
+### $($AgentName.Substring(0,3).ToUpper())-001: Sample Finding [MEDIUM]
+
+**File:** src/index.js
+**Line:** 1
+
+This is a mock finding generated by DryRun mode.
+
+## Summary
+| Severity | Count |
+|----------|-------|
+| MEDIUM | 1 |
+
+**Verdict: SHIP**
+"@
+}
+
+# ============================================================================
 # AGENT EXECUTION
 # ============================================================================
 
@@ -349,10 +625,13 @@ Begin the $($agent.Name) review now.
 "@
 
     if ($DryRun) {
-        Write-Status "DRY RUN - Would execute $($agent.Name) agent" "WARN"
-        Write-Host "    Target: $ProjectPath" -ForegroundColor DarkGray
-        Write-Host "    Output: $outputFile" -ForegroundColor DarkGray
-        return @{ Blockers = 0; High = 0; Medium = 0; Low = 0; Total = 0 }
+        Write-Status "DRY RUN - Generating mock findings for $($agent.Name)" "WARN"
+        $mockContent = Get-MockFindings -AgentKey $AgentKey -AgentName $agent.Name
+        $mockContent | Out-File -FilePath $outputFile -Encoding UTF8
+        Write-Status "Mock findings written: $outputFile" "OK"
+        $counts = Get-FindingsCounts $outputFile
+        Write-FindingsSummary $counts
+        return $counts
     }
 
     Write-Status "Deploying $($agent.Name)..." "RUNNING"
