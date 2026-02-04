@@ -14,11 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Initialize Code Conclave
-      shell: pwsh
-      run: |
-        .\cli\ccl.ps1 -Init -Project ${{ github.workspace }}
-
     - name: Run Code Conclave (DryRun)
       shell: pwsh
       run: |

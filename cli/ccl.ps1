@@ -919,14 +919,20 @@ function Main {
     # Check if initialized
     $ccDir = Join-Path $Project ".code-conclave"
     if (-not (Test-Path $ccDir)) {
-        Write-Status "Project not initialized. Run with -Init first:" "WARN"
-        Write-Host "    .\ccl.ps1 -Init -Project `"$Project`"" -ForegroundColor Gray
-        Write-Host ""
-        $response = Read-Host "  Initialize now? (Y/n)"
-        if ($response -ne 'n') {
+        $isCI = $CI -or $DryRun -or $env:TF_BUILD -or $env:GITHUB_ACTIONS -or $env:CI
+        if ($isCI) {
+            Write-Status "Auto-initializing project for CI..." "INFO"
             Initialize-Project -ProjectPath $Project
+        } else {
+            Write-Status "Project not initialized. Run with -Init first:" "WARN"
+            Write-Host "    .\ccl.ps1 -Init -Project `"$Project`"" -ForegroundColor Gray
+            Write-Host ""
+            $response = Read-Host "  Initialize now? (Y/n)"
+            if ($response -ne 'n') {
+                Initialize-Project -ProjectPath $Project
+            }
+            return
         }
-        return
     }
 
     $reviewsDir = Join-Path $ccDir "reviews"
