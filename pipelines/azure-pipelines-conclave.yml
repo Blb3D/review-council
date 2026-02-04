@@ -1,0 +1,392 @@
+# ============================================================================
+# Azure DevOps Pipeline: Code Conclave Review
+# ============================================================================
+# This pipeline runs Code Conclave reviews on Pull Requests with support for:
+#   - Tiered standards (required, default, PR-selected)
+#   - PR blocking based on verdict
+#   - Compliance report generation
+#   - Work item linking
+#
+# Setup Instructions:
+#   1. Add this file to your repo as azure-pipelines-conclave.yml
+#   2. Create a pipeline in Azure DevOps pointing to this file
+#   3. Configure branch policies to require this pipeline
+#   4. Add ANTHROPIC_API_KEY to pipeline variables (secret)
+#   5. Optional: Add Code Conclave repo as a resource
+#
+# ============================================================================
+
+trigger: none  # Only run on PR, not push
+
+pr:
+  branches:
+    include:
+      - main
+      - master
+      - develop
+      - release/*
+
+# ============================================================================
+# PARAMETERS (PR-Level Standard Selection)
+# ============================================================================
+# These appear as checkboxes when manually running the pipeline
+# For PR triggers, use PR description tags: [standards: cmmc-l2, itar]
+
+parameters:
+  - name: additionalStandards
+    displayName: 'Additional Compliance Standards'
+    type: object
+    default: []
+    values:
+      - cmmc-l2
+      - itar
+      - as9100-rev-d
+      - iso-13485-2016
+      - iso-14971-2019
+      - fda-820-qsr
+      - iatf-16949-2016
+
+  - name: skipStandards
+    displayName: 'Skip Default Standards'
+    type: object
+    default: []
+    values:
+      - fda-21-cfr-11
+      - cmmc-l2
+
+  - name: profile
+    displayName: 'Compliance Profile'
+    type: string
+    default: 'default'
+    values:
+      - default
+      - defense
+      - medical
+      - internal
+
+  - name: agentsToRun
+    displayName: 'Agents to Run'
+    type: string
+    default: 'all'
+    values:
+      - all
+      - sentinel
+      - guardian
+      - architect
+      - navigator
+      - herald
+      - operator
+
+# ============================================================================
+# VARIABLES
+# ============================================================================
+
+variables:
+  - name: System.Debug
+    value: false
+  - name: conclaveVersion
+    value: 'main'  # or pin to a specific tag/commit
+  - name: reviewTimeout
+    value: 90
+
+# ============================================================================
+# STAGES
+# ============================================================================
+
+stages:
+  # --------------------------------------------------------------------------
+  # Stage 1: Code Conclave Review
+  # --------------------------------------------------------------------------
+  - stage: CodeConclaveReview
+    displayName: 'Code Conclave Review'
+    jobs:
+      - job: Review
+        displayName: 'Run Code Review'
+        timeoutInMinutes: ${{ variables.reviewTimeout }}
+        
+        pool:
+          vmImage: 'windows-latest'
+          
+        steps:
+          # ------------------------------------------------------------------
+          # Step 1: Checkout source code
+          # ------------------------------------------------------------------
+          - checkout: self
+            displayName: 'Checkout Source'
+            fetchDepth: 0
+            
+          # ------------------------------------------------------------------
+          # Step 2: Checkout Code Conclave tool
+          # ------------------------------------------------------------------
+          - checkout: git://YourProject/review-council@${{ variables.conclaveVersion }}
+            displayName: 'Checkout Code Conclave'
+            path: 'code-conclave-tool'
+            # Alternative: Use a published artifact or NuGet package
+            
+          # ------------------------------------------------------------------
+          # Step 3: Install Claude Code CLI
+          # ------------------------------------------------------------------
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '20.x'
+              
+          - task: PowerShell@2
+            displayName: 'Install Claude Code CLI'
+            inputs:
+              targetType: 'inline'
+              script: |
+                npm install -g @anthropic-ai/claude-code
+                claude --version
+                
+          # ------------------------------------------------------------------
+          # Step 4: Parse PR Standards Selection
+          # ------------------------------------------------------------------
+          - task: PowerShell@2
+            displayName: 'Parse Standard Selection'
+            name: ParseStandards
+            inputs:
+              targetType: 'inline'
+              script: |
+                # Parse standards from PR description if present
+                # Look for: [standards: cmmc-l2, itar]
+                $prDescription = "$(System.PullRequest.Description)"
+                $standardsFromPR = @()
+                
+                if ($prDescription -match '\[standards:\s*([^\]]+)\]') {
+                    $standardsFromPR = $matches[1] -split ',' | ForEach-Object { $_.Trim() }
+                    Write-Host "Standards from PR description: $($standardsFromPR -join ', ')"
+                }
+                
+                # Combine with parameter selections
+                $additionalStandards = @('${{ join(',', parameters.additionalStandards) }}' -split ',' | Where-Object { $_ })
+                $skipStandards = @('${{ join(',', parameters.skipStandards) }}' -split ',' | Where-Object { $_ })
+                $profile = '${{ parameters.profile }}'
+                
+                # Build final standards list
+                $addList = ($standardsFromPR + $additionalStandards) | Select-Object -Unique
+                $skipList = $skipStandards
+                
+                # Set output variables
+                Write-Host "##vso[task.setvariable variable=AddStandards;isOutput=true]$($addList -join ',')"
+                Write-Host "##vso[task.setvariable variable=SkipStandards;isOutput=true]$($skipList -join ',')"
+                Write-Host "##vso[task.setvariable variable=Profile;isOutput=true]$profile"
+                
+                Write-Host ""
+                Write-Host "=== Standards Configuration ==="
+                Write-Host "Profile: $profile"
+                Write-Host "Additional: $($addList -join ', ')"
+                Write-Host "Skip: $($skipList -join ', ')"
+                
+          # ------------------------------------------------------------------
+          # Step 5: Run Code Conclave
+          # ------------------------------------------------------------------
+          - task: PowerShell@2
+            displayName: 'Run Code Conclave Review'
+            name: RunReview
+            env:
+              ANTHROPIC_API_KEY: $(ANTHROPIC_API_KEY)
+            inputs:
+              targetType: 'inline'
+              pwsh: true
+              script: |
+                $ErrorActionPreference = 'Continue'
+                
+                # Build command arguments
+                $args = @(
+                    "-Project", "$(Build.SourcesDirectory)",
+                    "-OutputFormat", "junit",
+                    "-CI"
+                )
+                
+                # Add profile if not default
+                $profile = "$(ParseStandards.Profile)"
+                if ($profile -and $profile -ne 'default') {
+                    $args += "-Profile", $profile
+                }
+                
+                # Add additional standards
+                $addStandards = "$(ParseStandards.AddStandards)"
+                if ($addStandards) {
+                    $args += "-AddStandards", $addStandards
+                }
+                
+                # Skip standards
+                $skipStandards = "$(ParseStandards.SkipStandards)"
+                if ($skipStandards) {
+                    $args += "-SkipStandards", $skipStandards
+                }
+                
+                # Agent selection
+                $agents = '${{ parameters.agentsToRun }}'
+                if ($agents -ne 'all') {
+                    $args += "-Agent", $agents
+                }
+                
+                Write-Host "=== Running Code Conclave ==="
+                Write-Host "Command: ccl.ps1 $($args -join ' ')"
+                Write-Host ""
+                
+                # Run the review
+                $startTime = Get-Date
+                & "$(Pipeline.Workspace)/code-conclave-tool/cli/ccl.ps1" @args
+                $exitCode = $LASTEXITCODE
+                $duration = (Get-Date) - $startTime
+                
+                Write-Host ""
+                Write-Host "=== Review Complete ==="
+                Write-Host "Duration: $([math]::Round($duration.TotalMinutes, 1)) minutes"
+                Write-Host "Exit Code: $exitCode"
+                
+                # Set output variables
+                Write-Host "##vso[task.setvariable variable=ExitCode;isOutput=true]$exitCode"
+                Write-Host "##vso[task.setvariable variable=Duration;isOutput=true]$([math]::Round($duration.TotalMinutes, 1))"
+                
+                # Determine verdict
+                $verdict = switch ($exitCode) {
+                    0 { "SHIP" }
+                    2 { "CONDITIONAL" }
+                    1 { "HOLD" }
+                    default { "ERROR" }
+                }
+                Write-Host "##vso[task.setvariable variable=Verdict;isOutput=true]$verdict"
+                
+          # ------------------------------------------------------------------
+          # Step 6: Publish Test Results
+          # ------------------------------------------------------------------
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/.code-conclave/reviews/conclave-results.xml'
+              testRunTitle: 'Code Conclave Review'
+              failTaskOnFailedTests: true
+              
+          # ------------------------------------------------------------------
+          # Step 7: Publish Reports as Artifact
+          # ------------------------------------------------------------------
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Review Reports'
+            condition: always()
+            inputs:
+              targetPath: '$(Build.SourcesDirectory)/.code-conclave/reviews'
+              artifact: 'code-conclave-reports'
+              publishLocation: 'pipeline'
+              
+          # ------------------------------------------------------------------
+          # Step 8: Post PR Comment with Summary
+          # ------------------------------------------------------------------
+          - task: PowerShell@2
+            displayName: 'Post PR Comment'
+            condition: and(always(), eq(variables['Build.Reason'], 'PullRequest'))
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+            inputs:
+              targetType: 'inline'
+              script: |
+                $verdict = "$(RunReview.Verdict)"
+                $duration = "$(RunReview.Duration)"
+                $exitCode = "$(RunReview.ExitCode)"
+                
+                # Read summary from report if exists
+                $reportPath = "$(Build.SourcesDirectory)/.code-conclave/reviews/RELEASE-READINESS-REPORT.md"
+                $summary = ""
+                if (Test-Path $reportPath) {
+                    $content = Get-Content $reportPath -Raw
+                    # Extract summary table
+                    if ($content -match '## Summary([\s\S]*?)---') {
+                        $summary = $matches[1].Trim()
+                    }
+                }
+                
+                # Build comment
+                $verdictEmoji = switch ($verdict) {
+                    "SHIP" { "✅" }
+                    "CONDITIONAL" { "⚠️" }
+                    "HOLD" { "❌" }
+                    default { "❓" }
+                }
+                
+                $comment = @"
+                ## $verdictEmoji Code Conclave Review: **$verdict**
+                
+                **Duration:** $duration minutes
+                
+                $summary
+                
+                [View Full Report]($(System.CollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)&view=artifacts)
+                
+                ---
+                *Automated code review by Code Conclave*
+                "@
+                
+                # Post comment via Azure DevOps API
+                $url = "$(System.CollectionUri)$(System.TeamProject)/_apis/git/repositories/$(Build.Repository.ID)/pullRequests/$(System.PullRequest.PullRequestId)/threads?api-version=7.0"
+                
+                $body = @{
+                    comments = @(
+                        @{
+                            parentCommentId = 0
+                            content = $comment
+                            commentType = 1
+                        }
+                    )
+                    status = 1
+                } | ConvertTo-Json -Depth 10
+                
+                $headers = @{
+                    Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"
+                    "Content-Type" = "application/json"
+                }
+                
+                try {
+                    Invoke-RestMethod -Uri $url -Method Post -Headers $headers -Body $body
+                    Write-Host "Posted PR comment successfully"
+                } catch {
+                    Write-Warning "Failed to post PR comment: $_"
+                }
+                
+          # ------------------------------------------------------------------
+          # Step 9: Update PR Status
+          # ------------------------------------------------------------------
+          - task: PowerShell@2
+            displayName: 'Update PR Status'
+            condition: always()
+            inputs:
+              targetType: 'inline'
+              script: |
+                $verdict = "$(RunReview.Verdict)"
+                $exitCode = [int]"$(RunReview.ExitCode)"
+                
+                # Fail the task if HOLD verdict
+                if ($verdict -eq "HOLD") {
+                    Write-Host "##vso[task.logissue type=error]Code Conclave verdict is HOLD - blocking merge"
+                    Write-Host "##vso[task.complete result=Failed;]HOLD verdict - blockers found"
+                    exit 1
+                }
+                elseif ($verdict -eq "CONDITIONAL") {
+                    Write-Host "##vso[task.logissue type=warning]Code Conclave verdict is CONDITIONAL - review findings before merge"
+                    Write-Host "##vso[task.complete result=SucceededWithIssues;]CONDITIONAL verdict - warnings found"
+                }
+                else {
+                    Write-Host "##vso[task.complete result=Succeeded;]SHIP verdict - ready to merge"
+                }
+
+# ============================================================================
+# BRANCH POLICY SETUP (Manual Steps)
+# ============================================================================
+#
+# To make this pipeline a required PR check:
+#
+# 1. Go to Project Settings > Repos > Policies
+# 2. Select your branch (e.g., main)
+# 3. Under "Build Validation", click "+"
+# 4. Select this pipeline
+# 5. Configure:
+#    - Trigger: Automatic
+#    - Policy requirement: Required
+#    - Build expiration: 12 hours (or your preference)
+#    - Display name: "Code Conclave Review"
+#
+# ============================================================================

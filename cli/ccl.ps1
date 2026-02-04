@@ -84,6 +84,13 @@ param(
 
     [string]$Map,
 
+    # Tiered Standards Support
+    [string]$Profile,                    # Use a pre-defined profile (e.g., defense, medical)
+    
+    [string[]]$AddStandards,             # Add standards to the review
+    
+    [string[]]$SkipStandards,            # Skip default standards
+
     # CI/CD Mode - enables exit codes for pipeline integration
     [switch]$CI
 )
@@ -93,8 +100,8 @@ param(
 # ============================================================================
 
 $Script:ToolRoot = Split-Path $PSScriptRoot -Parent
-$Script:AgentsDir = Join-Path $ToolRoot "core" "agents"
-$Script:StandardsDir = Join-Path $ToolRoot "core" "standards"
+$Script:AgentsDir = Join-Path (Join-Path $Script:ToolRoot "core") "agents"
+$Script:StandardsDir = Join-Path (Join-Path $Script:ToolRoot "core") "standards"
 $Script:LibDir = Join-Path $PSScriptRoot "lib"
 
 # Source library files if they exist
@@ -111,6 +118,11 @@ if (Test-Path $mappingEnginePath) {
 $junitFormatterPath = Join-Path $Script:LibDir "junit-formatter.ps1"
 if (Test-Path $junitFormatterPath) {
     . $junitFormatterPath
+}
+
+$configLoaderPath = Join-Path $Script:LibDir "config-loader.ps1"
+if (Test-Path $configLoaderPath) {
+    . $configLoaderPath
 }
 
 $Script:AgentDefs = [ordered]@{

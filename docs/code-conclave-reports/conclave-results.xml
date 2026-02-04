@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="review-council" timestamp="2026-02-04T04:00:24" tests="4" failures="2" errors="0" time="0.11">
+  <testsuite name="GUARDIAN" tests="4" failures="2" errors="0" skipped="0">
+    <testcase name="GUARDIAN-001: Hardcoded API Key" classname="GUARDIAN" file="src/config.js" line="42">
+      <failure message="[BLOCKER] Hardcoded API Key" type="blocker">Severity: BLOCKER
+File: src/config.js
+Line: 42
+
+Description:
+**File:** src/config.js
+**Line:** 42
+
+**Evidence:** `const API_KEY = "sk-proj-abc123..."`
+
+API key is hardcoded in source code, exposing credentials in version control.
+
+**Remediation:** Move to environment variable or secrets manager.</failure>
+    </testcase>
+    <testcase name="GUARDIAN-002: SQL Injection Risk" classname="GUARDIAN" file="src/db/queries.js" line="87">
+      <failure message="[HIGH] SQL Injection Risk" type="high">Severity: HIGH
+File: src/db/queries.js
+Line: 87
+
+Description:
+**File:** src/db/queries.js
+**Line:** 87
+
+**Evidence:** `query = "SELECT * FROM users WHERE id=" + userId`
+
+User input is concatenated directly into SQL query string.
+
+**Remediation:** Use parameterized queries or an ORM.</failure>
+    </testcase>
+    <testcase name="GUARDIAN-003: Missing HTTPS Enforcement" classname="GUARDIAN" file="src/api/client.js" line="12" />
+    <testcase name="GUARDIAN-004: Verbose Error Messages" classname="GUARDIAN" file="src/middleware/error-handler.js" line="28" />
+  </testsuite>
+</testsuites>

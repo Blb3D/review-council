@@ -1,0 +1,202 @@
+# ============================================================================
+# Code Conclave Configuration Schema
+# ============================================================================
+# This file defines the complete configuration options for Code Conclave.
+# Projects use a subset of these options in their .code-conclave/config.yaml
+# ============================================================================
+
+# Example complete configuration:
+
+project:
+  # Project identification
+  name: "filaops"                    # Project name (auto-detected from folder)
+  version: "1.0.0"                   # Project version
+  description: "FilaOps ERP System"  # Optional description
+  
+  # Industry classification (helps with default standard selection)
+  industry: "manufacturing"          # manufacturing, medical, aerospace, defense, software, etc.
+  
+  # Regulatory context (informational)
+  regulatory_context:
+    - "FDA registered facility"
+    - "DoD contractor"
+    - "ITAR controlled"
+
+# ============================================================================
+# COMPLIANCE STANDARDS CONFIGURATION
+# ============================================================================
+# Three tiers of standards:
+#   1. required  - Always applied, cannot be skipped (org-level mandates)
+#   2. default   - Applied by default, can be skipped with -SkipStandards
+#   3. available - Not applied by default, can be added with -AddStandards
+# ============================================================================
+
+standards:
+  # TIER 1: Required Standards (Always On)
+  # These are organizational mandates that cannot be bypassed.
+  # Typically set by corporate compliance or quality teams.
+  required:
+    - iso-9001-2015        # Base QMS - everyone needs this
+    
+  # TIER 2: Default Standards (On Unless Skipped)
+  # These are the normal standards for this project/repo.
+  # Developers can skip with: ccl -SkipStandards fda-21-cfr-11
+  default:
+    - fda-21-cfr-11        # E-records/e-signatures (DHR traceability)
+    - iso-13485-2016       # Medical device QMS
+    
+  # TIER 3: Available Standards (Off Unless Added)
+  # These are situationally applicable.
+  # Developers can add with: ccl -AddStandards cmmc-l2,itar
+  # Or select at PR creation time in Azure DevOps.
+  available:
+    - cmmc-l2              # CMMC Level 2 (defense contracts)
+    - itar                 # Export control (defense/aerospace)
+    - as9100-rev-d         # Aerospace QMS
+    - iso-14971-2019       # Risk management
+    - fda-820-qsr          # FDA Quality System Regulation
+    - iatf-16949-2016      # Automotive (if applicable)
+    
+  # Profiles: Pre-defined standard bundles
+  # Usage: ccl -Profile defense-medical
+  profiles:
+    defense-medical:
+      description: "Medical devices for DoD contracts"
+      standards:
+        - cmmc-l2
+        - itar
+        - fda-21-cfr-11
+        - iso-13485-2016
+        - iso-14971-2019
+        
+    aerospace:
+      description: "Aerospace manufacturing"
+      standards:
+        - as9100-rev-d
+        - itar
+        
+    internal-tools:
+      description: "Internal projects without regulatory requirements"
+      standards: []  # Only required standards apply
+
+# ============================================================================
+# AGENT CONFIGURATION
+# ============================================================================
+
+agents:
+  # Global settings
+  timeout: 40              # Minutes per agent (default: 40)
+  parallel: false          # Run agents in parallel (experimental)
+  
+  # Per-agent configuration
+  sentinel:
+    enabled: true
+    coverage_target: 80    # Minimum test coverage percentage
+    complexity_threshold: 15  # Max cyclomatic complexity
+    
+  guardian:
+    enabled: true
+    scan_dependencies: true    # Check for vulnerable dependencies
+    check_secrets: true        # Scan for hardcoded secrets
+    severity_threshold: high   # Minimum severity to report
+    
+  architect:
+    enabled: true
+    max_file_size: 500         # Lines - flag files over this size
+    check_circular_deps: true  # Detect circular dependencies
+    
+  navigator:
+    enabled: true
+    accessibility_level: "AA"  # WCAG level (A, AA, AAA)
+    check_mobile: true         # Check mobile responsiveness
+    
+  herald:
+    enabled: true
+    required_docs:
+      - "README.md"
+      - "CHANGELOG.md"
+    api_docs_required: true    # Require API documentation
+    
+  operator:
+    enabled: true
+    require_health_check: true     # Require /health endpoint
+    require_logging: true          # Require structured logging
+    require_metrics: true          # Require metrics endpoint
+
+# ============================================================================
+# OUTPUT CONFIGURATION
+# ============================================================================
+
+output:
+  format: "markdown"       # markdown, json, junit
+  
+  # Where to save reports
+  reports_dir: ".code-conclave/reviews"
+  
+  # Report options
+  include_evidence: true   # Include code snippets in findings
+  include_remediation: true # Include fix suggestions
+  
+  # Synthesis report options
+  synthesis:
+    enabled: true
+    include_summary_table: true
+    include_agent_links: true
+
+# ============================================================================
+# CI/CD CONFIGURATION
+# ============================================================================
+
+ci:
+  # Exit codes
+  exit_codes:
+    ship: 0                # All clear
+    conditional: 2         # Warnings, can proceed
+    hold: 1                # Blockers found, fail the build
+    
+  # Branch-specific behavior
+  branches:
+    main:
+      fail_on: "high"      # Fail on HIGH or BLOCKER
+      required_standards: true  # Enforce all required standards
+    develop:
+      fail_on: "blocker"   # Only fail on BLOCKER
+      required_standards: true
+    feature/*:
+      fail_on: "blocker"
+      required_standards: false  # Allow faster iteration
+
+# ============================================================================
+# AZURE DEVOPS INTEGRATION
+# ============================================================================
+
+azure_devops:
+  # PR Standard Selection
+  pr_standards:
+    # Show these standards as checkboxes in PR creation
+    show_selector: true
+    
+    # Group standards by category in the UI
+    categories:
+      "Quality Management":
+        - iso-9001-2015
+        - iso-13485-2016
+      "Security & Export Control":
+        - cmmc-l2
+        - itar
+      "Industry-Specific":
+        - as9100-rev-d
+        - fda-820-qsr
+        - iatf-16949-2016
+        
+  # Work item linking
+  work_items:
+    link_findings: true    # Create work items from findings
+    area_path: "FilaOps\\Quality"
+    iteration_path: "@CurrentIteration"
+    
+  # Status check configuration
+  status_check:
+    name: "Code Conclave Review"
+    genre: "code-quality"
+    target_url_template: "$(System.CollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)"
