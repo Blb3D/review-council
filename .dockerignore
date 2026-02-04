@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Node modules
+dashboard/node_modules
+node_modules
+
+# Local config
+*.local.*
+.env
+.env.*
+
+# Build artifacts
+*.log
+*.tmp
+
+# Documentation source (not needed in container)
+docs/*.md
+
+# Examples (not needed in container)
+examples/
+
+# Tests
+tests/
+*.test.ps1
+
+# GitHub workflows
+.github/
