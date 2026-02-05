@@ -8,7 +8,7 @@ on:
       agents:
         description: 'Agents to run (comma-separated, or leave blank for all)'
         required: false
-        default: 'guardian,sentinel'
+        default: 'guardian,sentinel,architect,navigator,herald,operator'
       standard:
         description: 'Compliance standard (e.g., cmmc-l2, itar, or leave blank)'
         required: false
@@ -35,7 +35,7 @@ jobs:
       shell: pwsh
       run: |
         $agents = '${{ github.event.inputs.agents }}'
-        if (-not $agents) { $agents = 'guardian,sentinel' }
+        if (-not $agents) { $agents = 'guardian,sentinel,architect,navigator,herald,operator' }
 
         $params = @{
           Project      = '${{ github.workspace }}'
