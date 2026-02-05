@@ -208,37 +208,66 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
+// Security: Allowed origins for WebSocket connections (localhost only)
+const ALLOWED_ORIGINS = [
+    'http://localhost:3847',
+    'http://127.0.0.1:3847',
+    `http://localhost:${PORT}`,
+    `http://127.0.0.1:${PORT}`,
+];
+
 // Serve static files
 app.use(express.static(__dirname));
 
 // API endpoint to receive updates from PowerShell
-app.use(express.json());
+// Security: Limit JSON body size to prevent DoS
+app.use(express.json({ limit: '100kb' }));
 
 app.post('/api/log', (req, res) => {
     const { message, type } = req.body;
-    if (typeof message !== 'string' || message.length > 1000) {
-        return res.status(400).json({ error: 'Invalid message' });
+
+    // Validate message exists and is a string
+    if (!message || typeof message !== 'string') {
+        return res.status(400).json({ error: 'Message is required and must be a string' });
     }
+
+    if (message.length > 1000) {
+        return res.status(400).json({ error: 'Message too long (max 1000 characters)' });
+    }
+
+    // Validate and sanitize type
     const validTypes = ['info', 'warning', 'error', 'success'];
-    const safeType = validTypes.includes(type) ? type : 'info';
-    addLog(message.slice(0, 1000), safeType);
+    const safeType = (typeof type === 'string' && validTypes.includes(type)) ? type : 'info';
+
+    addLog(message, safeType);
     broadcast(wss);
     res.json({ ok: true });
 });
 
 app.post('/api/agent-status', (req, res) => {
     const { agentId, status, progress } = req.body;
-    if (!AGENTS.includes(agentId)) {
+
+    // Validate agentId exists and is a string
+    if (typeof agentId !== 'string' || !AGENTS.includes(agentId)) {
         return res.status(400).json({ error: 'Invalid agent ID' });
     }
+
+    // Validate status
     const validStatuses = ['pending', 'running', 'complete', 'error'];
-    if (!validStatuses.includes(status)) {
+    if (typeof status !== 'string' || !validStatuses.includes(status)) {
         return res.status(400).json({ error: 'Invalid status' });
     }
+
     state.agents[agentId].status = status;
-    if (typeof progress === 'number' && progress >= 0 && progress <= 100) {
-        state.agents[agentId].progress = progress;
+
+    // Validate progress with strict type checking
+    if (progress !== undefined) {
+        if (typeof progress !== 'number' || isNaN(progress) || progress < 0 || progress > 100) {
+            return res.status(400).json({ error: 'Invalid progress value (must be 0-100)' });
+        }
+        state.agents[agentId].progress = Math.floor(progress);
     }
+
     broadcast(wss);
     res.json({ ok: true });
 });
@@ -250,21 +279,49 @@ app.get('/api/state', (req, res) => {
 // Serve findings content (validated against known agent names)
 app.get('/api/findings/:agentId', (req, res) => {
     const { agentId } = req.params;
-    if (!AGENTS.includes(agentId)) {
-        return res.status(400).send('Invalid agent ID');
-    }
-    const filePath = path.join(reviewsDir, `${agentId}-findings.md`);
 
-    if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        res.type('text/plain').send(content);
-    } else {
-        res.status(404).send('Findings not found');
+    // Security: Sanitize input - remove any path traversal characters
+    const sanitizedId = agentId.replace(/[^a-zA-Z0-9-]/g, '');
+
+    // Validate against whitelist of known agents
+    if (!AGENTS.includes(sanitizedId)) {
+        return res.status(400).json({ error: 'Invalid agent ID' });
+    }
+
+    const filePath = path.join(reviewsDir, `${sanitizedId}-findings.md`);
+
+    // Security: Verify resolved path is within reviewsDir (defense in depth)
+    const resolvedPath = path.resolve(filePath);
+    const resolvedReviewsDir = path.resolve(reviewsDir);
+    if (!resolvedPath.startsWith(resolvedReviewsDir)) {
+        console.error(`Path traversal attempt blocked: ${agentId}`);
+        return res.status(400).json({ error: 'Invalid request' });
+    }
+
+    try {
+        if (fs.existsSync(resolvedPath)) {
+            const content = fs.readFileSync(resolvedPath, 'utf-8');
+            res.type('text/plain').send(content);
+        } else {
+            res.status(404).json({ error: 'Findings not found' });
+        }
+    } catch (err) {
+        // Security: Don't leak internal error details
+        console.error('File read error:', err.message);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// WebSocket connections
-wss.on('connection', (ws) => {
+// WebSocket connections with origin validation
+wss.on('connection', (ws, req) => {
+    // Security: Validate origin to prevent unauthorized WebSocket connections
+    const origin = req.headers.origin;
+    if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+        console.log(`Rejected WebSocket connection from unauthorized origin: ${origin}`);
+        ws.close(1008, 'Unauthorized origin');
+        return;
+    }
+
     console.log('Dashboard client connected');
     ws.send(JSON.stringify({ type: 'state', data: state }));
 
