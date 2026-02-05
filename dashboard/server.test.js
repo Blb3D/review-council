@@ -27,13 +27,15 @@ describe('parseFindings', () => {
 
     test('counts all severity levels correctly', () => {
         const content = `
-### GUARDIAN-001: Test [BLOCKER]
-### GUARDIAN-002: Test [HIGH]
-### GUARDIAN-003: Test [HIGH]
-### GUARDIAN-004: Test [MEDIUM]
-### GUARDIAN-005: Test [LOW]
-### GUARDIAN-006: Test [LOW]
-### GUARDIAN-007: Test [LOW]
+Some intro text here.
+
+Issue 1: Found a critical problem [BLOCKER] that must be fixed.
+Issue 2: This is important [HIGH] priority.
+Issue 3: Another high priority [HIGH] item.
+Issue 4: Consider fixing this [MEDIUM] severity issue.
+Issue 5: Minor suggestion [LOW] for improvement.
+Issue 6: Another minor [LOW] item.
+Issue 7: Small tweak [LOW] recommended.
         `;
         const result = parseFindings(content);
         expect(result.blockers).toBe(1);
@@ -59,8 +61,8 @@ describe('parseFindings', () => {
     });
 
     test('handles case sensitivity correctly', () => {
-        // Should only match exact case
-        const content = '[blocker] [Blocker] [BLOCKER] [HIGH] [high]';
+        // Should only match exact uppercase tags
+        const content = 'Issue: [blocker] wrong case. Issue: [Blocker] wrong. Issue: [BLOCKER] correct. Issue: [HIGH] correct. Issue: [high] wrong.';
         const result = parseFindings(content);
         expect(result.blockers).toBe(1);
         expect(result.high).toBe(1);
