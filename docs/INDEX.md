@@ -30,6 +30,7 @@ Welcome to the Code Conclave documentation. Choose a topic below.
 |----------|-------------|
 | [**CI/CD**](CI-CD.md) | GitHub Actions, Azure DevOps, GitLab, Jenkins |
 | [**Cost Optimization**](COST-OPTIMIZATION.md) | Diff-scoping, prompt caching, model tiering, cost projections |
+| [**Operations**](OPERATIONS.md) | Deployment, rollback procedures, monitoring, troubleshooting |
 
 ---
 
