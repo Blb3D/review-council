@@ -11,6 +11,38 @@
 # Provider directory location
 $Script:ProvidersDir = Join-Path $PSScriptRoot "providers"
 
+function Get-SanitizedError {
+    <#
+    .SYNOPSIS
+        Sanitize error messages to prevent API key and sensitive data leakage.
+    .PARAMETER Message
+        The error message to sanitize.
+    .RETURNS
+        Sanitized error message with sensitive data redacted.
+    #>
+    param([string]$Message)
+
+    if (-not $Message) { return $Message }
+
+    # Redact various API key patterns
+    $sanitized = $Message -replace 'sk-ant-[a-zA-Z0-9_-]+', '[REDACTED_KEY]' `
+                          -replace 'sk-[a-zA-Z0-9_-]{20,}', '[REDACTED_KEY]' `
+                          -replace 'Bearer\s+\S+', 'Bearer [REDACTED]' `
+                          -replace 'api-key:\s*\S+', 'api-key: [REDACTED]' `
+                          -replace 'x-api-key:\s*\S+', 'x-api-key: [REDACTED]' `
+                          -replace 'Authorization:\s*\S+', 'Authorization: [REDACTED]'
+
+    # Redact user paths that might reveal system info
+    if ($env:USERPROFILE) {
+        $sanitized = $sanitized -replace [regex]::Escape($env:USERPROFILE), '[USER_HOME]'
+    }
+    if ($env:HOME) {
+        $sanitized = $sanitized -replace [regex]::Escape($env:HOME), '[USER_HOME]'
+    }
+
+    return $sanitized
+}
+
 function Get-AIProvider {
     <#
     .SYNOPSIS
@@ -212,18 +244,15 @@ function Invoke-AICompletion {
         $effectiveMax = if ($isRateLimit) { $rateLimitMax } else { $maxAttempts }
 
         if (-not $isRetryable -or $attempt -ge $effectiveMax) {
-            # Sanitize error before returning - strip API keys, endpoints, and paths
-            $sanitized = $errorMsg -replace 'sk-ant-[a-zA-Z0-9_-]+', '[REDACTED]' `
-                                   -replace 'sk-[a-zA-Z0-9_-]{20,}', '[REDACTED]' `
-                                   -replace 'Bearer\s+\S+', 'Bearer [REDACTED]'
-            $result.Error = $sanitized
+            # Sanitize error before returning
+            $result.Error = Get-SanitizedError $errorMsg
             return $result
         }
 
         # Rate limits: wait 30s base (survives 60s rate window). Others: standard backoff.
         $baseDelay = if ($isRateLimit) { 30 } else { $delaySeconds }
         $waitTime = $baseDelay * [math]::Min($attempt, 3)
-        $safeMsg = $errorMsg -replace 'sk-ant-[a-zA-Z0-9_-]+', '[REDACTED]' -replace 'sk-[a-zA-Z0-9_-]{20,}', '[REDACTED]'
+        $safeMsg = Get-SanitizedError $errorMsg
         $retryMsg = if ($isRateLimit) { "Rate limited" } else { "AI request failed" }
         Write-Warning "  $retryMsg (attempt $attempt/$effectiveMax): $safeMsg. Retrying in ${waitTime}s..."
         Start-Sleep -Seconds $waitTime
@@ -255,12 +284,13 @@ function Test-AIProvider {
         return $result.Success -and $result.Content -match "OK"
     }
     catch {
-        Write-Warning "Provider test failed: $_"
+        $safeMsg = Get-SanitizedError $_.Exception.Message
+        Write-Warning "Provider test failed: $safeMsg"
         return $false
     }
 }
 
 # Export if running as module
 if ($MyInvocation.MyCommand.ScriptBlock.Module) {
-    Export-ModuleMember -Function Get-AIProvider, Invoke-AICompletion, Test-AIProvider
+    Export-ModuleMember -Function Get-AIProvider, Invoke-AICompletion, Test-AIProvider, Get-SanitizedError
 }
