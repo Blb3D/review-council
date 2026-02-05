@@ -1,6 +1,7 @@
 # Code Conclave .gitignore
 
 # Don't commit review outputs (they're project-specific)
+.code-conclave/
 **/reviews/
 **/*-findings.md
 **/RELEASE-READINESS-REPORT.md
