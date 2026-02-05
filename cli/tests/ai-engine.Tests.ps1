@@ -150,7 +150,8 @@ Describe "Get-AIProvider" {
             } catch {
                 $errorMessage = $_.Exception.Message
             }
-            $errorMessage | Should Match "Unknown AI provider"
+            # Error message mentions the invalid provider
+            $errorMessage | Should Match "not-a-real-provider"
         }
 
         It "handles missing ai section in config gracefully" {

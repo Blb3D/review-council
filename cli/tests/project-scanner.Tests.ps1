@@ -75,7 +75,7 @@ Describe "Get-SourceFilesContent" {
             $testPath = Split-Path $PSScriptRoot -Parent
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 3 -MaxSizeKB 500
             $fileCount = ($result | Select-String -Pattern "^## File:" -AllMatches).Matches.Count
-            $fileCount | Should BeLessOrEqual 3
+            ($fileCount -le 3) | Should Be $true
         }
     }
 
@@ -85,7 +85,7 @@ Describe "Get-SourceFilesContent" {
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 100 -MaxSizeKB 10
             $sizeKB = [math]::Round($result.Length / 1024, 2)
             # Allow some overhead for headers
-            $sizeKB | Should BeLessOrEqual 15
+            ($sizeKB -le 15) | Should Be $true
         }
     }
 
@@ -100,7 +100,7 @@ Describe "Get-SourceFilesContent" {
             $testPath = $PSScriptRoot
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 10 -MaxSizeKB 100 -IncludeExtensions @('.nonexistent')
             # Should return empty or just headers if no matching files
-            $result.Length | Should BeLessOrEqual 100
+            ($result.Length -le 100) | Should Be $true
         }
     }
 }
