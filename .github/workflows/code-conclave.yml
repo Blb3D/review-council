@@ -1,11 +1,17 @@
 name: Code Conclave Review
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      agents:
+        description: 'Agents to run (comma-separated, or leave blank for all)'
+        required: false
+        default: 'guardian,sentinel'
+      standard:
+        description: 'Compliance standard (e.g., cmmc-l2, itar, or leave blank)'
+        required: false
 
 permissions:
   contents: read
@@ -18,10 +24,40 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-    - name: Run Code Conclave (DryRun)
+    # Real API review when ANTHROPIC_API_KEY secret is configured
+    - name: Run Code Conclave Review
+      if: env.ANTHROPIC_API_KEY != ''
       shell: pwsh
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
+        $agents = '${{ github.event.inputs.agents }}'
+        if (-not $agents) { $agents = 'guardian,sentinel' }
+
+        $params = @{
+          Project      = '${{ github.workspace }}'
+          Agents       = ($agents -split ',')
+          OutputFormat  = 'junit'
+          CI           = $true
+        }
+
+        $standard = '${{ github.event.inputs.standard }}'
+        if ($standard) { $params.Standard = $standard }
+
+        .\cli\ccl.ps1 @params
+      continue-on-error: true
+
+    # Fallback: DryRun when no API key is configured
+    - name: Run Code Conclave (DryRun)
+      if: env.ANTHROPIC_API_KEY == ''
+      shell: pwsh
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: |
+        Write-Host "No ANTHROPIC_API_KEY secret configured - running in DryRun mode"
         .\cli\ccl.ps1 `
           -Project ${{ github.workspace }} `
           -Agent guardian `
@@ -36,6 +72,8 @@ jobs:
       with:
         files: .code-conclave/reviews/conclave-results.xml
         check_name: Code Conclave Review
+        comment_title: 'Code Conclave Review Results'
+        comment_mode: 'always'
 
     - name: Upload Reports
       uses: actions/upload-artifact@v4
