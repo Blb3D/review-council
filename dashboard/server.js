@@ -216,18 +216,30 @@ app.use(express.json());
 
 app.post('/api/log', (req, res) => {
     const { message, type } = req.body;
-    addLog(message, type || 'info');
+    if (typeof message !== 'string' || message.length > 1000) {
+        return res.status(400).json({ error: 'Invalid message' });
+    }
+    const validTypes = ['info', 'warning', 'error', 'success'];
+    const safeType = validTypes.includes(type) ? type : 'info';
+    addLog(message.slice(0, 1000), safeType);
     broadcast(wss);
     res.json({ ok: true });
 });
 
 app.post('/api/agent-status', (req, res) => {
     const { agentId, status, progress } = req.body;
-    if (state.agents[agentId]) {
-        state.agents[agentId].status = status;
-        if (progress !== undefined) state.agents[agentId].progress = progress;
-        broadcast(wss);
+    if (!AGENTS.includes(agentId)) {
+        return res.status(400).json({ error: 'Invalid agent ID' });
     }
+    const validStatuses = ['pending', 'running', 'complete', 'error'];
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Invalid status' });
+    }
+    state.agents[agentId].status = status;
+    if (typeof progress === 'number' && progress >= 0 && progress <= 100) {
+        state.agents[agentId].progress = progress;
+    }
+    broadcast(wss);
     res.json({ ok: true });
 });
 
@@ -235,9 +247,12 @@ app.get('/api/state', (req, res) => {
     res.json(state);
 });
 
-// Serve findings content
+// Serve findings content (validated against known agent names)
 app.get('/api/findings/:agentId', (req, res) => {
     const { agentId } = req.params;
+    if (!AGENTS.includes(agentId)) {
+        return res.status(400).send('Invalid agent ID');
+    }
     const filePath = path.join(reviewsDir, `${agentId}-findings.md`);
 
     if (fs.existsSync(filePath)) {
@@ -292,8 +307,8 @@ if (fs.existsSync(reviewsDir)) {
     console.log('Make sure to run: ccl.ps1 -Init -Project "..."');
 }
 
-// Start server
-server.listen(PORT, () => {
+// Start server (bound to localhost only for security)
+server.listen(PORT, '127.0.0.1', () => {
     console.log('');
     console.log('  ================================================');
     console.log('    CODE CONCLAVE - Live Dashboard Server');

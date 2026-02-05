@@ -146,12 +146,18 @@ function Invoke-AICompletion {
                        $errorMsg -notmatch '(400|401|403|404|not found|unauthorized|forbidden|bad request)'
 
         if (-not $isRetryable -or $attempt -eq $maxAttempts) {
+            # Sanitize error before returning - strip API keys, endpoints, and paths
+            $sanitized = $errorMsg -replace 'sk-ant-[a-zA-Z0-9_-]+', '[REDACTED]' `
+                                   -replace 'sk-[a-zA-Z0-9_-]{20,}', '[REDACTED]' `
+                                   -replace 'Bearer\s+\S+', 'Bearer [REDACTED]'
+            $result.Error = $sanitized
             return $result
         }
 
         # Wait before retry with exponential backoff
         $waitTime = $delaySeconds * $attempt
-        Write-Warning "  AI request failed (attempt $attempt/$maxAttempts): $errorMsg. Retrying in ${waitTime}s..."
+        $safeMsg = $errorMsg -replace 'sk-ant-[a-zA-Z0-9_-]+', '[REDACTED]' -replace 'sk-[a-zA-Z0-9_-]{20,}', '[REDACTED]'
+        Write-Warning "  AI request failed (attempt $attempt/$maxAttempts): $safeMsg. Retrying in ${waitTime}s..."
         Start-Sleep -Seconds $waitTime
     }
 

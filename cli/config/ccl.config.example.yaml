@@ -1,5 +1,8 @@
 # Code Conclave Configuration
 # Copy this file to your project's .code-conclave/config.yaml
+#
+# IMPORTANT: Never put actual API keys in this file.
+# Use environment variables and reference them by name below.
 
 project:
   name: "my-project"

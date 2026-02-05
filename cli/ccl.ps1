@@ -250,7 +250,8 @@ output:
   format: "markdown"
 
 # AI Provider Configuration
-# Set your provider and API key environment variable
+# IMPORTANT: Never put actual API keys in this file.
+# Set the environment variable name below; the key itself stays in your environment.
 ai:
   provider: anthropic          # anthropic | azure-openai | openai | ollama
   temperature: 0.3
