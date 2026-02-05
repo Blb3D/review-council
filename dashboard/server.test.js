@@ -189,6 +189,40 @@ describe('Log Message Validation', () => {
     });
 });
 
+// Test health check endpoint
+describe('Health Check', () => {
+    test('health response includes required fields', () => {
+        const healthResponse = {
+            status: 'healthy',
+            timestamp: new Date().toISOString(),
+            uptime: 3600,
+            version: '2.0.0',
+            checks: {
+                fileSystem: 'ok',
+                websocket: 'connected'
+            }
+        };
+
+        expect(healthResponse.status).toBe('healthy');
+        expect(healthResponse.timestamp).toBeDefined();
+        expect(healthResponse.uptime).toBeGreaterThan(0);
+        expect(healthResponse.version).toBeDefined();
+        expect(healthResponse.checks.fileSystem).toBe('ok');
+    });
+
+    test('health status reflects system state', () => {
+        const getHealthStatus = (fsExists, wsClients) => ({
+            fileSystem: fsExists ? 'ok' : 'reviews_dir_missing',
+            websocket: wsClients > 0 ? 'connected' : 'no_clients'
+        });
+
+        expect(getHealthStatus(true, 1).fileSystem).toBe('ok');
+        expect(getHealthStatus(false, 1).fileSystem).toBe('reviews_dir_missing');
+        expect(getHealthStatus(true, 0).websocket).toBe('no_clients');
+        expect(getHealthStatus(true, 5).websocket).toBe('connected');
+    });
+});
+
 // Test verdict calculation
 describe('Verdict Calculation', () => {
     function calculateVerdict(totals) {

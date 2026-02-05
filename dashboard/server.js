@@ -276,6 +276,30 @@ app.get('/api/state', (req, res) => {
     res.json(state);
 });
 
+// Health check endpoint for monitoring and load balancers
+app.get('/health', (req, res) => {
+    const health = {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        version: require('./package.json').version,
+        checks: {
+            fileSystem: fs.existsSync(reviewsDir) ? 'ok' : 'reviews_dir_missing',
+            websocket: wss.clients.size > 0 ? 'connected' : 'no_clients'
+        }
+    };
+    res.status(200).json(health);
+});
+
+// Global error handler - catches unhandled errors in routes
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err.message);
+    res.status(err.status || 500).json({
+        error: 'Internal server error',
+        message: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+});
+
 // Serve findings content (validated against known agent names)
 app.get('/api/findings/:agentId', (req, res) => {
     const { agentId } = req.params;

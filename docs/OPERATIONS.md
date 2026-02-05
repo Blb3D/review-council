@@ -295,6 +295,114 @@ For critical pipeline failures:
 
 ---
 
+## Dashboard Deployment
+
+The Code Conclave dashboard provides real-time visualization of review progress.
+
+### System Requirements
+
+| Component | Requirement |
+|-----------|-------------|
+| Node.js | 14.0+ |
+| Port | 3847 (default) |
+| Memory | 256MB minimum |
+
+### Installation
+
+```bash
+cd dashboard
+npm install --production
+```
+
+### Running the Dashboard
+
+**Development:**
+```bash
+node server.js --project "/path/to/your/project"
+```
+
+**Production with PM2:**
+```bash
+# Install PM2
+npm install -g pm2
+
+# Start dashboard
+pm2 start server.js --name "code-conclave-dashboard" -- --project "/path/to/project"
+
+# Enable startup on boot
+pm2 startup
+pm2 save
+```
+
+**Production with systemd:**
+```ini
+# /etc/systemd/system/code-conclave-dashboard.service
+[Unit]
+Description=Code Conclave Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=conclave
+WorkingDirectory=/opt/code-conclave/dashboard
+ExecStart=/usr/bin/node server.js --project /path/to/project
+Restart=on-failure
+RestartSec=10
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl enable code-conclave-dashboard
+sudo systemctl start code-conclave-dashboard
+```
+
+### Health Check
+
+The dashboard exposes a health endpoint:
+
+```bash
+curl http://localhost:3847/health
+```
+
+Response:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-02-05T12:00:00.000Z",
+  "uptime": 3600,
+  "version": "2.0.0",
+  "checks": {
+    "fileSystem": "ok",
+    "websocket": "connected"
+  }
+}
+```
+
+Use this endpoint for load balancer health checks (recommended interval: 30s).
+
+### Dashboard Security
+
+The dashboard is hardened for localhost-only operation:
+
+| Feature | Description |
+|---------|-------------|
+| Origin Whitelist | Only `localhost:3847` and `127.0.0.1:3847` allowed |
+| Request Size Limit | 100KB max to prevent DoS |
+| Path Traversal Protection | File access restricted to reviews directory |
+| Input Validation | All endpoints validate user input |
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | 3847 | Dashboard server port |
+| `NODE_ENV` | development | Set to `production` in prod |
+
+---
+
 ## Monitoring
 
 ### Token Usage
