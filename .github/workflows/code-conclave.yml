@@ -21,6 +21,8 @@ permissions:
 jobs:
   review:
     runs-on: windows-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
     steps:
     - uses: actions/checkout@v4
@@ -31,8 +33,6 @@ jobs:
     - name: Run Code Conclave Review
       if: env.ANTHROPIC_API_KEY != ''
       shell: pwsh
-      env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         $agents = '${{ github.event.inputs.agents }}'
         if (-not $agents) { $agents = 'guardian,sentinel' }
@@ -54,8 +54,6 @@ jobs:
     - name: Run Code Conclave (DryRun)
       if: env.ANTHROPIC_API_KEY == ''
       shell: pwsh
-      env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         Write-Host "No ANTHROPIC_API_KEY secret configured - running in DryRun mode"
         .\cli\ccl.ps1 `
