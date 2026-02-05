@@ -103,6 +103,41 @@ Check all user inputs are validated:
 - HTTPS enforcement
 - Proper error messages (no stack traces in production)
 
+## False Positive Prevention
+
+Before flagging an issue, check for existing mitigations:
+
+### Already Secured Patterns
+
+**Do NOT flag as BLOCKER if you see:**
+- Input sanitization before use (e.g., `replace(/[^a-zA-Z0-9]/g, '')`)
+- Whitelist validation (e.g., `if (!ALLOWED_LIST.includes(input))`)
+- Path resolution checks (e.g., `resolvedPath.startsWith(baseDir)`)
+- Origin validation on WebSockets (e.g., `ALLOWED_ORIGINS.includes(origin)`)
+- Parameterized queries or ORM usage
+- Error sanitization functions in use
+
+**Downgrade to MEDIUM or LOW if:**
+- The protection exists but could be stronger
+- Defense-in-depth is missing but primary protection works
+- The code is localhost-only or dev-only tooling
+
+### Severity Rules
+
+- **BLOCKER**: Exploitable vulnerability with NO mitigation in place
+- **HIGH**: Vulnerability with weak/partial mitigation
+- **MEDIUM**: Missing best practice, but not directly exploitable
+- **LOW**: Suggestion for improvement, defense-in-depth
+
+**Example:**
+```javascript
+// This is NOT a BLOCKER - it has whitelist + sanitization + path check:
+const sanitizedId = agentId.replace(/[^a-zA-Z0-9-]/g, '');
+if (!AGENTS.includes(sanitizedId)) { return res.status(400); }
+if (!resolvedPath.startsWith(reviewsDir)) { return res.status(400); }
+// Flag as LOW if you want to suggest additional hardening
+```
+
 ## Output Requirements
 
 Follow CONTRACTS.md format exactly. Use finding IDs: `GUARDIAN-001`, `GUARDIAN-002`, etc.

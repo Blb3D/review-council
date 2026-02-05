@@ -121,6 +121,37 @@ For open source projects:
 - PR process
 - Issue reporting guidelines
 
+## False Positive Prevention
+
+### Check All Documentation Locations
+
+**Before saying "no installation instructions", check:**
+- `README.md` (getting started section)
+- `docs/INSTALLATION.md`
+- `docs/INDEX.md` (may link to installation)
+- `CONTRIBUTING.md` (setup instructions)
+- Package manager files (`package.json` scripts, `Makefile`)
+
+**Before saying "no API documentation", check:**
+- `docs/` directory for API docs
+- Inline code comments and docstrings
+- OpenAPI/Swagger specs (`openapi.yaml`, `swagger.json`)
+- README API section
+
+### Severity Rules
+
+- **BLOCKER**: README exists but has NO way to install/run the project
+- **HIGH**: Installation docs exist but are incomplete or wrong
+- **MEDIUM**: Docs exist but are hard to find or poorly organized
+- **LOW**: Minor gaps, typos, or suggestions for improvement
+
+**Example - NOT a BLOCKER:**
+```
+# If README links to docs/INSTALLATION.md with full instructions,
+# the installation instructions EXIST - just not in README directly.
+# Flag as MEDIUM at most: "Consider adding quick-start to README"
+```
+
 ## Output Requirements
 
 Follow CONTRACTS.md format exactly. Use finding IDs: `HERALD-001`, `HERALD-002`, etc.
@@ -129,8 +160,8 @@ Follow CONTRACTS.md format exactly. Use finding IDs: `HERALD-001`, `HERALD-002`,
 
 | Issue | Severity |
 |-------|----------|
-| No installation instructions | BLOCKER |
-| No README | BLOCKER |
+| No installation docs anywhere | BLOCKER |
+| No README at all | BLOCKER |
 | API endpoints undocumented | HIGH |
 | Outdated/wrong instructions | HIGH |
 | Missing getting started guide | MEDIUM |

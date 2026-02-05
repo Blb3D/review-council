@@ -60,6 +60,47 @@ Identify areas at high risk for regressions:
 - Integration points between modules
 - Database migrations
 
+## False Positive Prevention
+
+Before flagging test coverage issues, accurately assess what exists:
+
+### Recognize Existing Test Infrastructure
+
+**Do NOT say "no test infrastructure" if you see:**
+- Test files (e.g., `*.Tests.ps1`, `*.test.js`, `*_test.py`, `*.spec.ts`)
+- Test directories (e.g., `tests/`, `__tests__/`, `spec/`)
+- Test framework configuration (e.g., `pester`, `jest`, `pytest`)
+- Test scripts in package.json or CI/CD configs
+
+**Instead, be specific about what's missing:**
+- "Tests exist but lack coverage measurement" (not "no tests")
+- "34 tests exist, but dashboard component has 0 coverage" (specific gap)
+- "PowerShell tests present, JavaScript tests missing" (precise)
+
+### Severity Rules
+
+- **BLOCKER**: Critical business path (payments, auth) has ZERO tests
+- **HIGH**: Critical path has tests but <50% coverage, OR non-critical component has zero tests
+- **MEDIUM**: Tests exist but coverage is below target (e.g., 60% vs 80% goal)
+- **LOW**: Tests exist, coverage is acceptable, but could add edge cases
+
+**Example - Do NOT flag as BLOCKER:**
+```
+Found: cli/tests/ai-engine.Tests.ps1 (16 tests)
+Found: cli/tests/config-loader.Tests.ps1 (10 tests)
+Found: cli/tests/junit-formatter.Tests.ps1 (8 tests)
+
+# This is NOT "no test infrastructure"
+# Flag as MEDIUM: "Tests exist but no coverage measurement configured"
+# Flag as HIGH only if a specific critical component has zero tests
+```
+
+### Project Context
+
+- **CLI tools and dev utilities** have different needs than production services
+- **Localhost-only tools** don't need the same coverage as public APIs
+- Focus on critical paths: what breaks if this code fails?
+
 ## Output Requirements
 
 Follow CONTRACTS.md format exactly. Use finding IDs: `SENTINEL-001`, `SENTINEL-002`, etc.

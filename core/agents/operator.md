@@ -142,6 +142,45 @@ Check for:
 - Recovery time objectives defined
 - Data retention policy
 
+## False Positive Prevention
+
+Before flagging operational gaps, check all documentation locations:
+
+### Recognize Existing Documentation
+
+**Search these locations for operations docs:**
+- `docs/OPERATIONS.md`, `docs/DEPLOYMENT.md`, `docs/RUNBOOK.md`
+- `README.md` (operations section)
+- `CONTRIBUTING.md` (setup/deployment)
+- CI/CD config files (`.github/workflows/`, `azure-pipelines.yml`)
+- `Dockerfile`, `docker-compose.yml`
+
+**Do NOT say "no rollback procedure" if:**
+- `docs/OPERATIONS.md` contains rollback section
+- Deployment docs include version pinning/rollback steps
+- CI/CD has rollback workflow or instructions
+
+**Do NOT say "no health check" if:**
+- Health check is documented but endpoint doesn't exist yet (flag as HIGH, not BLOCKER)
+- Tool is CLI-only (CLI tools don't need `/health` endpoints)
+- Tool is localhost dev utility (different requirements than production services)
+
+### Project Type Matters
+
+| Project Type | Health Check | Rollback Doc | HTTPS |
+|--------------|--------------|--------------|-------|
+| Production API | Required (BLOCKER) | Required (BLOCKER) | Required |
+| Internal tool | Recommended (HIGH) | Recommended (HIGH) | Optional |
+| CLI utility | Not applicable | Helpful (MEDIUM) | N/A |
+| Dev dashboard | Not applicable | Helpful (LOW) | N/A |
+
+### Severity Rules
+
+- **BLOCKER**: Production service missing critical operational capability
+- **HIGH**: Missing docs for important procedures
+- **MEDIUM**: Docs exist but could be more comprehensive
+- **LOW**: Suggestion for improvement
+
 ## Output Requirements
 
 Follow CONTRACTS.md format exactly. Use finding IDs: `OPERATOR-001`, `OPERATOR-002`, etc.

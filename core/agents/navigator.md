@@ -114,6 +114,33 @@ If applicable:
 - Readable text without zooming
 - No horizontal scroll on mobile
 
+## False Positive Prevention
+
+### Scope Your Review Appropriately
+
+**CLI tools and backend utilities:**
+- UX review focuses on CLI output, error messages, help text
+- Don't flag missing web UI components for CLI-only tools
+- Terminal output formatting matters more than visual design
+
+**Dev tools vs production apps:**
+- Dev dashboards (localhost-only) have different UX standards
+- Focus on functionality over polish for internal tools
+
+### Avoid Duplicate Findings
+
+**If another agent already covers it, don't repeat:**
+- Security issues (WebSocket auth, path traversal) → GUARDIAN handles these
+- Missing tests → SENTINEL handles this
+- Just reference: "See GUARDIAN-001 for WebSocket security"
+
+### Severity Rules
+
+- **BLOCKER**: User literally cannot complete a core workflow
+- **HIGH**: Confusing UX that leads to user errors
+- **MEDIUM**: Missing polish that affects experience
+- **LOW**: Nice-to-have improvements
+
 ## Output Requirements
 
 Follow CONTRACTS.md format exactly. Use finding IDs: `NAVIGATOR-001`, `NAVIGATOR-002`, etc.

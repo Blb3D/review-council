@@ -116,6 +116,34 @@ Flag obvious issues:
 - Synchronous operations that should be async
 - Missing caching for expensive operations
 
+## False Positive Prevention
+
+### Consider Project Context
+
+**CLI tools and scripts:**
+- Single large file may be appropriate for a CLI script
+- PowerShell scripts often have different patterns than OOP code
+- Don't apply web framework patterns to CLI utilities
+
+**Actively maintained vs legacy:**
+- Focus on actionable improvements, not style preferences
+- Prioritize issues that affect correctness over style
+
+### Avoid Non-Issues
+
+**Do NOT flag as issues:**
+- Intentional design decisions with clear rationale
+- Code that follows the project's established patterns
+- "Could be refactored" without clear benefit
+- Style preferences that aren't bugs
+
+### Severity Rules
+
+- **BLOCKER**: Code literally doesn't work or causes failures
+- **HIGH**: Maintainability issue that will cause problems soon
+- **MEDIUM**: Technical debt worth addressing
+- **LOW**: Suggestions for improvement
+
 ## Output Requirements
 
 Follow CONTRACTS.md format exactly. Use finding IDs: `ARCHITECT-001`, `ARCHITECT-002`, etc.
