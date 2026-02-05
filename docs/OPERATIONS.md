@@ -122,6 +122,179 @@ If a config change causes issues:
 
 ---
 
+## Production Rollback Procedures
+
+### GitHub Actions Rollback
+
+If Code Conclave causes issues in your GitHub Actions workflow:
+
+**Step 1: Identify the problem commit**
+```bash
+# Find when the issue started
+gh run list --workflow=code-review.yml --limit=10
+gh run view <run-id> --log-failed
+```
+
+**Step 2: Rollback options**
+
+Option A - Pin to previous working version:
+```yaml
+# .github/workflows/code-review.yml
+- name: Checkout Code Conclave
+  uses: actions/checkout@v4
+  with:
+    repository: Blb3D/review-council
+    ref: v1.0.0  # Pin to last known good version
+    path: .conclave
+```
+
+Option B - Disable temporarily:
+```yaml
+# Add condition to skip
+- name: Run Code Conclave
+  if: github.event.pull_request.draft == false && env.SKIP_CONCLAVE != 'true'
+```
+
+Option C - Revert workflow changes:
+```bash
+git revert <commit-that-broke-workflow>
+git push origin main
+```
+
+**Step 3: Verify rollback**
+```bash
+# Trigger a test run
+gh workflow run code-review.yml --ref main
+
+# Check status
+gh run list --workflow=code-review.yml --limit=1
+```
+
+**Step 4: Notify team**
+```bash
+# Post to PR if applicable
+gh pr comment <pr-number> --body "Code Conclave temporarily disabled due to [issue]. Tracking in #<issue-number>"
+```
+
+### Azure DevOps Rollback
+
+If Code Conclave causes issues in your Azure DevOps pipeline:
+
+**Step 1: Identify the failing build**
+```bash
+# View recent builds
+az pipelines runs list --pipeline-name "Code-Review" --top 10
+
+# Get failure details
+az pipelines runs show --id <run-id>
+```
+
+**Step 2: Rollback options**
+
+Option A - Pin to previous version in pipeline YAML:
+```yaml
+# azure-pipelines.yml
+variables:
+  CONCLAVE_VERSION: 'v1.0.0'  # Pin to last working version
+
+steps:
+- checkout: git://YourProject/review-council@$(CONCLAVE_VERSION)
+  path: conclave
+```
+
+Option B - Disable via pipeline variable:
+```bash
+# Set variable to skip Code Conclave
+az pipelines variable create \
+  --name SKIP_CONCLAVE \
+  --value true \
+  --pipeline-name "Code-Review"
+```
+
+Option C - Use previous pipeline definition:
+```bash
+# Revert pipeline changes in repo
+git log --oneline azure-pipelines.yml
+git checkout <previous-commit> -- azure-pipelines.yml
+git commit -m "Revert: Rollback Code Conclave pipeline changes"
+git push
+```
+
+**Step 3: Verify rollback**
+```bash
+# Queue a new build
+az pipelines run --name "Code-Review" --branch main
+
+# Check status
+az pipelines runs list --pipeline-name "Code-Review" --top 1
+```
+
+**Step 4: Notify team**
+- Update the PR with status
+- Create a work item if needed:
+```bash
+az boards work-item create \
+  --type Bug \
+  --title "Code Conclave pipeline failure" \
+  --description "Rolled back to version X. Root cause: ..."
+```
+
+### Post-Rollback Verification
+
+After any rollback, verify the system is working:
+
+1. **Run a test review**:
+   ```powershell
+   ./cli/ccl.ps1 -Project . -DryRun -CI
+   # Should exit 0 with mock findings
+   ```
+
+2. **Verify API connectivity**:
+   ```powershell
+   ./cli/Test-Providers.ps1 -Provider anthropic
+   # Should return "Provider test successful"
+   ```
+
+3. **Check JUnit output**:
+   ```powershell
+   [xml]$result = Get-Content .code-conclave/reviews/conclave-results.xml
+   $result.testsuites.tests  # Should show finding count
+   ```
+
+4. **Verify CI integration**:
+   - Trigger a test PR or build
+   - Confirm results appear in test tab
+   - Confirm exit codes are correct
+
+### Communication Procedures
+
+**Immediate (within 15 minutes)**:
+- [ ] Post in team chat (Slack/Teams) about the issue
+- [ ] Add comment to affected PRs explaining the situation
+- [ ] Update pipeline status page if applicable
+
+**Short-term (within 1 hour)**:
+- [ ] Create tracking issue/work item with root cause analysis
+- [ ] Identify scope of impact (which PRs/builds affected)
+- [ ] Communicate timeline for fix
+
+**Resolution**:
+- [ ] Document what went wrong in the tracking issue
+- [ ] Update runbook if new failure mode discovered
+- [ ] Consider adding automated checks to prevent recurrence
+
+### Emergency Contacts
+
+For critical pipeline failures:
+
+| Role | Contact |
+|------|---------|
+| Pipeline Owner | Check CODEOWNERS file |
+| AI Provider Issues | Provider status page |
+| Code Conclave Issues | GitHub Issues: Blb3D/review-council |
+
+---
+
 ## Monitoring
 
 ### Token Usage
