@@ -176,12 +176,31 @@ function Get-FindingsForJUnit {
         if (Test-Path $findingsFile) {
             $content = Get-Content $findingsFile -Raw
 
+            # Find all code block regions to exclude from matching
+            # This prevents false positives from code examples that contain finding patterns
+            $codeBlockRanges = @()
+            $codeBlockPattern = '```[\s\S]*?```'
+            $codeMatches = [regex]::Matches($content, $codeBlockPattern)
+            foreach ($cm in $codeMatches) {
+                $codeBlockRanges += @{ Start = $cm.Index; End = $cm.Index + $cm.Length }
+            }
+
             # Pattern: ### AGENT-001: Title [SEVERITY]
             # Also capture the content after each finding header for description
             $pattern = '###\s+([A-Z]+\-\d+):\s*(.+?)\s*\[(BLOCKER|HIGH|MEDIUM|LOW)\]'
             $matches = [regex]::Matches($content, $pattern)
 
             foreach ($match in $matches) {
+                # Skip matches that are inside code blocks
+                $isInCodeBlock = $false
+                foreach ($range in $codeBlockRanges) {
+                    if ($match.Index -ge $range.Start -and $match.Index -lt $range.End) {
+                        $isInCodeBlock = $true
+                        break
+                    }
+                }
+                if ($isInCodeBlock) { continue }
+
                 $findingId = $match.Groups[1].Value
                 $title = $match.Groups[2].Value.Trim()
                 $severity = $match.Groups[3].Value

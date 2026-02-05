@@ -30,21 +30,30 @@ Deploys 6 specialized AI agents to review your codebase from different perspecti
 | **HERALD** | Documentation | Missing docs, outdated guides, setup gaps |
 | **OPERATOR** | Production | Deployment risks, logging, CI/CD issues |
 
+For detailed agent documentation, see [AGENTS.md](docs/AGENTS.md).
+
 ## Quick Start
 
 ```powershell
 # Clone Code Conclave
-git clone https://github.com/yourusername/code-conclave.git
+git clone https://github.com/Blb3D/review-council.git code-conclave
 cd code-conclave
+
+# Set your AI provider API key
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+# Or use: AZURE_OPENAI_KEY, OPENAI_API_KEY
 
 # Review any project
 .\cli\ccl.ps1 -Project "C:\path\to\your\project"
 ```
 
+For detailed setup, see [Installation Guide](docs/INSTALLATION.md).
+
 ## Requirements
 
-- PowerShell 5.1+ (Windows) or PowerShell Core (Mac/Linux)
-- [Claude Code CLI](https://docs.anthropic.com/claude-code) installed and authenticated
+- PowerShell 7.0+ (cross-platform) or 5.1+ (Windows)
+- Git (for diff-scoping features)
+- API key for one of: Anthropic, Azure OpenAI, OpenAI, or Ollama (local, free)
 
 ## Usage
 
@@ -194,6 +203,38 @@ Project-specific overrides take precedence.
 1. **Start with SENTINEL + GUARDIAN** for quick security/quality check
 2. **Run full conclave before releases** for comprehensive review
 3. **Add .code-conclave/reviews/ to .gitignore**
+
+## CI/CD Integration
+
+Code Conclave integrates with your pipelines:
+
+```yaml
+# GitHub Actions
+- name: Run Code Conclave
+  run: |
+    pwsh ./cli/ccl.ps1 -Project . -OutputFormat junit -CI
+  env:
+    ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+- name: Publish Results
+  uses: EnricoMi/publish-unit-test-result-action@v2
+  with:
+    files: .code-conclave/reviews/conclave-results.xml
+```
+
+Exit codes: `0` = SHIP, `1` = HOLD (blockers), `2` = CONDITIONAL
+
+See [CI/CD Guide](docs/CI-CD.md) for Azure DevOps, Jenkins, and more.
+
+## Documentation
+
+| Guide | Description |
+|-------|-------------|
+| [Installation](docs/INSTALLATION.md) | Setup for all platforms and providers |
+| [Configuration](docs/CONFIGURATION.md) | 3-layer config system, all options |
+| [Agents](docs/AGENTS.md) | What each agent reviews and how to customize |
+| [CI/CD](docs/CI-CD.md) | Pipeline integration for GitHub, Azure DevOps |
+| [Operations](docs/OPERATIONS.md) | Production deployment, rollback, monitoring |
 
 ## License
 

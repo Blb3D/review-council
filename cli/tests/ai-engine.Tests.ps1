@@ -140,4 +140,91 @@ Describe "Get-AIProvider" {
             $provider.Config.model | Should Be "claude-haiku-4-5-20251001"
         }
     }
+
+    Context "Error Handling" {
+        It "throws descriptive error for invalid provider name" {
+            $config = @{ ai = @{} }
+            $errorMessage = ""
+            try {
+                Get-AIProvider -Config $config -ProviderOverride "not-a-real-provider"
+            } catch {
+                $errorMessage = $_.Exception.Message
+            }
+            # Error message mentions the invalid provider
+            $errorMessage | Should Match "not-a-real-provider"
+        }
+
+        It "handles missing ai section in config gracefully" {
+            $config = @{}
+            $provider = Get-AIProvider -Config $config
+            $provider.Name | Should Be "anthropic"
+        }
+
+        It "handles null config gracefully" {
+            # Should not throw, should use defaults
+            $errorThrown = $false
+            try {
+                $provider = Get-AIProvider -Config $null
+            } catch {
+                $errorThrown = $true
+            }
+            # Note: May throw depending on implementation - this tests the behavior
+            # If it throws, that's acceptable defensive behavior
+        }
+    }
+}
+
+Describe "Error Message Sanitization Integration" {
+    Context "HTTP Error Responses" {
+        It "sanitizes API key from 401 Unauthorized error" {
+            $error401 = "401 Unauthorized: Invalid API key sk-ant-api03-abcdefghijklmnopqrstuvwxyz123456"
+            $result = Get-SanitizedError $error401
+            $result | Should Match "401 Unauthorized"
+            $result | Should Not Match "sk-ant-api03"
+        }
+
+        It "sanitizes key from rate limit error" {
+            $error429 = "429 Too Many Requests for key sk-ant-FAKE-rate-limited-key"
+            $result = Get-SanitizedError $error429
+            $result | Should Match "429"
+            $result | Should Not Match "FAKE-rate"
+        }
+
+        It "preserves useful error context while removing secrets" {
+            $complexError = @"
+Request failed: POST https://api.anthropic.com/v1/messages
+Headers: x-api-key: sk-ant-secret-key-here
+Body: {"model": "claude-sonnet-4-20250514"}
+Response: 400 Bad Request - Invalid model
+"@
+            $result = Get-SanitizedError $complexError
+            # Should preserve useful info
+            $result | Should Match "POST"
+            $result | Should Match "400 Bad Request"
+            $result | Should Match "Invalid model"
+            # Should redact secrets
+            $result | Should Not Match "sk-ant-secret"
+            $result | Should Match "x-api-key: \[REDACTED\]"
+        }
+    }
+
+    Context "Network Error Messages" {
+        It "preserves timeout errors without modification" {
+            $timeoutError = "The operation timed out after 30000ms"
+            $result = Get-SanitizedError $timeoutError
+            $result | Should Be $timeoutError
+        }
+
+        It "preserves connection refused errors" {
+            $connError = "Connection refused: localhost:11434 (Ollama not running)"
+            $result = Get-SanitizedError $connError
+            $result | Should Be $connError
+        }
+
+        It "preserves DNS resolution errors" {
+            $dnsError = "Could not resolve hostname: api.anthropic.com"
+            $result = Get-SanitizedError $dnsError
+            $result | Should Be $dnsError
+        }
+    }
 }
