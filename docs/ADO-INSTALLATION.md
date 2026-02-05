@@ -436,23 +436,40 @@ steps:
 
 ## Cost Estimates
 
+Code Conclave includes built-in cost optimization (diff-scoped scanning, prompt caching, and model tiering) that dramatically reduces per-review costs in CI/CD pipelines. These optimizations activate automatically -- no pipeline changes are needed.
+
+### Before and After Optimization
+
 Based on real-world testing with a medium-sized TypeScript project (~50 source files):
 
-### Per Review Run
+| Configuration | Before Optimization | After Optimization | Savings |
+|--------------|--------------------|--------------------|---------|
+| 2 agents (Anthropic) | ~$0.12/PR | ~$0.05/PR | 58% |
+| 6 agents (Anthropic) | ~$2.40/PR | ~$0.14/PR | 94% |
+| 6 agents (Azure OpenAI) | ~$1.60/PR | ~$0.07/PR | 95% |
 
-| Configuration | Tokens | Time | Cost (Anthropic) |
-|--------------|--------|------|-------------------|
-| 2 agents (guardian + sentinel) | ~30K in / ~4K out | ~2 min | ~$0.12 |
-| 6 agents (full suite) | ~100K in / ~14K out | ~5 min | ~$0.51 |
+### Monthly Estimates (20 PRs/week, All Optimizations Enabled)
 
-### Monthly Estimates (20 PRs/week)
+| Configuration | Anthropic | Azure OpenAI |
+|--------------|-----------|--------------|
+| 2 agents per PR | ~$4/month | ~$2/month |
+| 6 agents per PR | ~$11/month | ~$6/month |
 
-| Configuration | Monthly Cost | Findings/Month |
-|--------------|-------------|----------------|
-| 2 agents per PR | ~$10 | ~200 issues caught |
-| 6 agents per PR | ~$41 | ~500+ issues caught |
+### Monthly Estimates by Team Size (6 agents, 3 PRs/dev/week)
 
-These costs are approximate and vary with codebase size and AI provider pricing.
+| Team Size | PRs/Month | Anthropic | Azure OpenAI |
+|-----------|----------|-----------|--------------|
+| 10 devs | 130 | ~$18/month | ~$9/month |
+| 30 devs | 390 | ~$55/month | ~$27/month |
+| 65 devs | 845 | ~$118/month | ~$59/month |
+
+### What the Optimizations Do
+
+- **Diff-scoped scanning**: In PR pipelines, only changed files are reviewed (auto-detected from `SYSTEM_PULLREQUEST_TARGETBRANCH`). Reduces token input by ~80%.
+- **Prompt caching**: Project context is shared across agents. After the first agent, subsequent agents read from cache at 50-90% discount.
+- **Model tiering**: NAVIGATOR, HERALD, and OPERATOR use a cheaper model (Haiku 4.5 / GPT-4o-mini) while GUARDIAN, SENTINEL, and ARCHITECT use the full model.
+
+For detailed configuration and cost breakdown, see the [Cost Optimization Guide](COST-OPTIMIZATION.md).
 
 ---
 
@@ -564,4 +581,4 @@ steps:
 
 ---
 
-*Last updated: 2026-02-04*
+*Last updated: 2026-02-05*

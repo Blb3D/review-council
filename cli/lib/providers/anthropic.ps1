@@ -4,14 +4,16 @@
 
 .DESCRIPTION
     Implements direct API calls to the Anthropic Messages API.
-    Uses Invoke-RestMethod instead of the Claude CLI.
+    Supports prompt caching via cache_control for multi-agent cost reduction.
 #>
 
 function Invoke-AnthropicCompletion {
     param(
         [hashtable]$Provider,
+        [string]$SharedContext,
         [string]$SystemPrompt,
         [string]$UserPrompt,
+        [string]$Model,
         [int]$MaxTokens
     )
 
@@ -31,7 +33,10 @@ function Invoke-AnthropicCompletion {
         }
     }
 
-    $model = if ($config.model) { $config.model } else { "claude-sonnet-4-20250514" }
+    # Model override (for tier support), then config, then default
+    $modelName = if ($Model) { $Model }
+                 elseif ($config.model) { $config.model }
+                 else { "claude-sonnet-4-20250514" }
     $maxTok = if ($MaxTokens -gt 0) { $MaxTokens }
               elseif ($config.max_tokens) { $config.max_tokens }
               else { 16000 }
@@ -39,18 +44,34 @@ function Invoke-AnthropicCompletion {
     $timeout = if ($common.timeout_seconds) { $common.timeout_seconds } else { 300 }
 
     $headers = @{
-        "Content-Type"     = "application/json"
-        "x-api-key"        = $apiKey
+        "Content-Type"      = "application/json"
+        "x-api-key"         = $apiKey
         "anthropic-version" = "2023-06-01"
     }
 
-    # Anthropic Messages API uses system as a top-level field
+    # Build system prompt — use array format with cache_control when SharedContext provided
+    if ($SharedContext) {
+        $systemContent = @(
+            @{
+                type = "text"
+                text = $SharedContext
+                cache_control = @{ type = "ephemeral" }
+            },
+            @{
+                type = "text"
+                text = $SystemPrompt
+            }
+        )
+    } else {
+        $systemContent = $SystemPrompt
+    }
+
     $body = @{
-        model      = $model
-        max_tokens = $maxTok
+        model       = $modelName
+        max_tokens  = $maxTok
         temperature = $temperature
-        system     = $SystemPrompt
-        messages   = @(
+        system      = $systemContent
+        messages    = @(
             @{
                 role    = "user"
                 content = $UserPrompt
@@ -73,8 +94,10 @@ function Invoke-AnthropicCompletion {
             Success    = $true
             Content    = $content
             TokensUsed = @{
-                Input  = $response.usage.input_tokens
-                Output = $response.usage.output_tokens
+                Input      = $response.usage.input_tokens
+                Output     = $response.usage.output_tokens
+                CacheRead  = if ($response.usage.cache_read_input_tokens) { $response.usage.cache_read_input_tokens } else { 0 }
+                CacheWrite = if ($response.usage.cache_creation_input_tokens) { $response.usage.cache_creation_input_tokens } else { 0 }
             }
             Error      = $null
         }

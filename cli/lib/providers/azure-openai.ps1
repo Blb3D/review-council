@@ -4,6 +4,8 @@
 
 .DESCRIPTION
     Implements direct API calls to Azure OpenAI Chat Completions endpoint.
+    Supports automatic prompt caching (API version 2024-10-01-preview+)
+    and model tiering via lite_deployment.
 #>
 
 function Invoke-AzureOpenAICompletion {
@@ -11,6 +13,7 @@ function Invoke-AzureOpenAICompletion {
         [hashtable]$Provider,
         [string]$SystemPrompt,
         [string]$UserPrompt,
+        [string]$Deployment,
         [int]$MaxTokens
     )
 
@@ -27,7 +30,7 @@ function Invoke-AzureOpenAICompletion {
         }
     }
 
-    if (-not $config.deployment) {
+    if (-not $config.deployment -and -not $Deployment) {
         return @{
             Success = $false
             Content = $null
@@ -49,7 +52,9 @@ function Invoke-AzureOpenAICompletion {
         }
     }
 
-    $apiVersion = if ($config.api_version) { $config.api_version } else { "2024-02-15-preview" }
+    # Deployment override (for tier support), then config default
+    $deploymentName = if ($Deployment) { $Deployment } else { $config.deployment }
+    $apiVersion = if ($config.api_version) { $config.api_version } else { "2024-10-01-preview" }
     $maxTok = if ($MaxTokens -gt 0) { $MaxTokens }
               elseif ($config.max_tokens) { $config.max_tokens }
               else { 16000 }
@@ -57,7 +62,7 @@ function Invoke-AzureOpenAICompletion {
     $timeout = if ($common.timeout_seconds) { $common.timeout_seconds } else { 300 }
 
     $endpoint = $config.endpoint.TrimEnd('/')
-    $uri = "$endpoint/openai/deployments/$($config.deployment)/chat/completions?api-version=$apiVersion"
+    $uri = "$endpoint/openai/deployments/$deploymentName/chat/completions?api-version=$apiVersion"
 
     $headers = @{
         "Content-Type" = "application/json"
@@ -89,12 +94,20 @@ function Invoke-AzureOpenAICompletion {
 
         $content = $response.choices[0].message.content
 
+        # Extract cache metrics (available with API version 2024-10-01-preview+)
+        $cachedTokens = 0
+        if ($response.usage.prompt_tokens_details -and $response.usage.prompt_tokens_details.cached_tokens) {
+            $cachedTokens = $response.usage.prompt_tokens_details.cached_tokens
+        }
+
         return @{
             Success    = $true
             Content    = $content
             TokensUsed = @{
-                Input  = $response.usage.prompt_tokens
-                Output = $response.usage.completion_tokens
+                Input      = $response.usage.prompt_tokens
+                Output     = $response.usage.completion_tokens
+                CacheRead  = $cachedTokens
+                CacheWrite = 0
             }
             Error      = $null
         }

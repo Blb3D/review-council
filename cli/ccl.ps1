@@ -100,7 +100,10 @@ param(
 
     [string]$AIModel,
 
-    [string]$AIEndpoint
+    [string]$AIEndpoint,
+
+    # Base branch for diff-scoped reviews (auto-detected in CI)
+    [string]$BaseBranch
 )
 
 # ============================================================================
@@ -621,7 +624,9 @@ function Invoke-ReviewAgent {
         [string]$ProjectPath,
         [string]$ReviewsDir,
         [int]$TimeoutMinutes,
-        [hashtable]$AIProvider
+        [hashtable]$AIProvider,
+        [string]$SharedContext,
+        [hashtable]$EffectiveConfig
     )
 
     $agent = $Script:AgentDefs[$AgentKey]
@@ -632,11 +637,6 @@ function Invoke-ReviewAgent {
     $defaultAgentFile = Join-Path $Script:AgentsDir "$AgentKey.md"
 
     $agentSkillFile = if (Test-Path $projectAgentFile) { $projectAgentFile } else { $defaultAgentFile }
-
-    # Look for contracts file
-    $projectContracts = Join-Path $ProjectPath ".code-conclave\CONTRACTS.md"
-    $defaultContracts = Join-Path $Script:ToolRoot "CONTRACTS.md"
-    $contractsFile = if (Test-Path $projectContracts) { $projectContracts } else { $defaultContracts }
 
     Write-AgentHeader $AgentKey
 
@@ -656,23 +656,22 @@ function Invoke-ReviewAgent {
         return $counts
     }
 
-    Write-Status "Deploying $($agent.Name) via $($AIProvider.Name)..." "RUNNING"
+    # Resolve agent tier
+    $agentTier = "primary"
+    if ($EffectiveConfig -and $EffectiveConfig.agents -and $EffectiveConfig.agents[$AgentKey]) {
+        $agentCfg = $EffectiveConfig.agents[$AgentKey]
+        if ($agentCfg.tier) { $agentTier = $agentCfg.tier }
+    }
 
-    # Read agent instructions and contracts
+    $tierLabel = if ($agentTier -eq "lite") { " (lite)" } else { "" }
+    Write-Status "Deploying $($agent.Name) via $($AIProvider.Name)${tierLabel}..." "RUNNING"
+
+    # Read agent instructions
     $agentInstructions = Get-Content $agentSkillFile -Raw -Encoding UTF8
-    $contracts = Get-Content $contractsFile -Raw -Encoding UTF8
 
-    # Build project context
-    Write-Status "Scanning project files..." "INFO"
-    $fileTree = Get-ProjectFileTree -ProjectPath $ProjectPath
-    $sourceFiles = Get-SourceFilesContent -ProjectPath $ProjectPath -MaxFiles 50 -MaxSizeKB 500
-
-    # Build system prompt
-    $systemPrompt = @"
+    # Build agent-specific system prompt (NOT cached — varies per agent)
+    $agentSystemPrompt = @"
 You are the $($agent.Name) agent performing a structured code review.
-
-# CONTRACTS (Severity Definitions & Output Format)
-$contracts
 
 # YOUR SPECIFIC INSTRUCTIONS
 $agentInstructions
@@ -686,45 +685,44 @@ $agentInstructions
 6. Be thorough but concise
 "@
 
-    # Build user prompt with project context
+    # User prompt is minimal — project context is in SharedContext (system prompt block 1)
     $projectName = Split-Path $ProjectPath -Leaf
-    $userPrompt = @"
-# TARGET PROJECT
-Project: $projectName
-Path: $ProjectPath
-
-# FILE STRUCTURE
-$fileTree
-
-# SOURCE FILES
-$sourceFiles
-
----
-
-Execute your $($agent.Name) review now. Analyze the code above and produce your findings report.
-"@
+    $userPrompt = "Execute your $($agent.Name) review of project '$projectName' now. Analyze the code provided in the system context and produce your findings report."
 
     try {
         $startTime = Get-Date
 
-        # Call AI provider
+        # Call AI provider with SharedContext for caching + Tier for model selection
         $aiResult = Invoke-AICompletion `
             -Provider $AIProvider `
-            -SystemPrompt $systemPrompt `
-            -UserPrompt $userPrompt
+            -SharedContext $SharedContext `
+            -SystemPrompt $agentSystemPrompt `
+            -UserPrompt $userPrompt `
+            -Tier $agentTier
 
         $duration = (Get-Date) - $startTime
         $mins = [math]::Round($duration.TotalMinutes, 1)
 
         if (-not $aiResult.Success) {
             Write-Status "Agent failed: $($aiResult.Error)" "ERROR"
-            return @{ Blockers = 0; High = 0; Medium = 0; Low = 0; Total = 0; Error = $aiResult.Error }
+            return @{ Blockers = 0; High = 0; Medium = 0; Low = 0; Total = 0; Error = $aiResult.Error; TokensUsed = $null }
         }
 
         Write-Status "Completed in $mins minutes" "OK"
 
         if ($aiResult.TokensUsed) {
-            Write-Status "Tokens: $($aiResult.TokensUsed.Input) in / $($aiResult.TokensUsed.Output) out" "INFO"
+            $tokenMsg = "Tokens: $($aiResult.TokensUsed.Input) in / $($aiResult.TokensUsed.Output) out"
+            $cacheDetails = @()
+            if ($aiResult.TokensUsed.CacheWrite -gt 0) {
+                $cacheDetails += "cache write: $($aiResult.TokensUsed.CacheWrite)"
+            }
+            if ($aiResult.TokensUsed.CacheRead -gt 0) {
+                $cacheDetails += "cache read: $($aiResult.TokensUsed.CacheRead)"
+            }
+            if ($cacheDetails.Count -gt 0) {
+                $tokenMsg += " ($($cacheDetails -join ', '))"
+            }
+            Write-Status $tokenMsg "INFO"
         }
 
         # Write AI response to findings file
@@ -732,13 +730,14 @@ Execute your $($agent.Name) review now. Analyze the code above and produce your 
 
         # Get findings counts
         $counts = Get-FindingsCounts $outputFile
+        $counts.TokensUsed = $aiResult.TokensUsed
         Write-FindingsSummary $counts
 
         return $counts
     }
     catch {
         Write-Status "Agent execution failed: $_" "ERROR"
-        return @{ Blockers = 0; High = 0; Medium = 0; Low = 0; Total = 0; Error = $_.ToString() }
+        return @{ Blockers = 0; High = 0; Medium = 0; Low = 0; Total = 0; Error = $_.ToString(); TokensUsed = $null }
     }
 }
 
@@ -1050,13 +1049,62 @@ function Main {
 
     Write-Host "  Agents: $($validAgents -join ', ')" -ForegroundColor White
 
+    # Load effective config (always needed for agent tier resolution)
+    $effectiveConfig = Get-EffectiveConfig -ProjectPath $Project -Profile $Profile `
+        -AddStandards $AddStandards -SkipStandards $SkipStandards
+
+    # Build project context ONCE (before agent loop — shared across all agents)
+    Write-Status "Scanning project context..." "INFO"
+    $diffContext = Get-DiffContext -ProjectPath $Project -BaseBranch $BaseBranch
+
+    if ($diffContext) {
+        Write-Status "Diff-scoped: $($diffContext.FileCount) changed files ($($diffContext.TotalSizeKB) KB) against $($diffContext.BaseRef)" "OK"
+        $fileTree = Get-ProjectFileTree -ProjectPath $Project -MaxDepth 3
+        $projectSourceContent = $diffContext.FileContents
+        $diffSection = "`n# GIT DIFF (what changed in this PR)`n``````diff`n$($diffContext.Diff)`n```````n"
+    } else {
+        $fileTree = Get-ProjectFileTree -ProjectPath $Project
+        $projectSourceContent = Get-SourceFilesContent -ProjectPath $Project -MaxFiles 50 -MaxSizeKB 500
+        # Extract file count from the header line: "# Source Files (N files, X KB)"
+        if ($projectSourceContent -match '# Source Files \((\d+) files, ([\d.]+) KB\)') {
+            Write-Status "Full scan: $($Matches[1]) files ($($Matches[2]) KB)" "INFO"
+        } else {
+            Write-Status "Full scan mode (no diff context available)" "INFO"
+        }
+        $diffSection = ""
+    }
+
+    # Build shared context (cacheable — identical across all agents)
+    # This goes in system prompt block 1 for prompt caching
+    $projectContracts = Join-Path $Project ".code-conclave\CONTRACTS.md"
+    $defaultContracts = Join-Path $Script:ToolRoot "CONTRACTS.md"
+    $contractsFile = if (Test-Path $projectContracts) { $projectContracts } else { $defaultContracts }
+    $contracts = Get-Content $contractsFile -Raw -Encoding UTF8
+
+    $projectName = Split-Path $Project -Leaf
+    $sharedContext = @"
+# CONTRACTS (Severity Definitions & Output Format)
+$contracts
+
+# TARGET PROJECT
+Project: $projectName
+
+# FILE STRUCTURE
+$fileTree
+
+# SOURCE FILES
+$projectSourceContent
+$diffSection
+"@
+
+    $contextChars = $sharedContext.Length
+    $estimatedTokens = [math]::Round($contextChars / 4)
+    Write-Status "Project context: ~${estimatedTokens} tokens (shared across all agents)" "INFO"
+
     # Initialize AI Provider (not needed for DryRun)
     $provider = $null
     if (-not $DryRun) {
         try {
-            $effectiveConfig = Get-EffectiveConfig -ProjectPath $Project -Profile $Profile `
-                -AddStandards $AddStandards -SkipStandards $SkipStandards
-
             $provider = Get-AIProvider -Config $effectiveConfig `
                 -ProviderOverride $AIProvider `
                 -ModelOverride $AIModel `
@@ -1086,11 +1134,18 @@ function Main {
 
     # Run agents
     $allFindings = @{}
+    $allTokenUsage = @{}
     $startTime = Get-Date
 
     foreach ($agentKey in $validAgents) {
-        $findings = Invoke-ReviewAgent -AgentKey $agentKey -ProjectPath $Project -ReviewsDir $reviewsDir -TimeoutMinutes $Timeout -AIProvider $provider
+        $findings = Invoke-ReviewAgent -AgentKey $agentKey -ProjectPath $Project `
+            -ReviewsDir $reviewsDir -TimeoutMinutes $Timeout -AIProvider $provider `
+            -SharedContext $sharedContext -EffectiveConfig $effectiveConfig
         $allFindings[$agentKey] = $findings
+
+        if ($findings -and $findings.TokensUsed) {
+            $allTokenUsage[$agentKey] = $findings.TokensUsed
+        }
 
         if ($findings -and $findings.Blockers -gt 0) {
             Write-Host ""
@@ -1111,6 +1166,21 @@ function Main {
 
     Write-Banner "REVIEW COMPLETE" "Green"
     Write-Host "  Duration: $totalMins minutes" -ForegroundColor Gray
+
+    # Cumulative token usage summary
+    if ($allTokenUsage.Count -gt 0) {
+        $totalIn = 0; $totalOut = 0; $totalCached = 0
+        foreach ($t in $allTokenUsage.Values) {
+            if ($t.Input) { $totalIn += $t.Input }
+            if ($t.Output) { $totalOut += $t.Output }
+            if ($t.CacheRead) { $totalCached += $t.CacheRead }
+        }
+        $tokenSummary = "  Tokens: $totalIn input, $totalOut output"
+        if ($totalCached -gt 0) {
+            $tokenSummary += " ($totalCached cached)"
+        }
+        Write-Host $tokenSummary -ForegroundColor Gray
+    }
 
     # Generate synthesis
     if (-not $SkipSynthesis -and $validAgents.Count -gt 1) {

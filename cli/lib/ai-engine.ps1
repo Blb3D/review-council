@@ -4,7 +4,8 @@
 
 .DESCRIPTION
     Provides a unified interface for multiple AI providers.
-    Handles provider loading, dispatch, retry logic, and connectivity testing.
+    Handles provider loading, dispatch, retry logic, connectivity testing,
+    prompt caching (SharedContext), and model tiering.
 #>
 
 # Provider directory location
@@ -90,10 +91,17 @@ function Invoke-AICompletion {
         Send a completion request to the configured AI provider.
     .PARAMETER Provider
         Provider info from Get-AIProvider.
+    .PARAMETER SharedContext
+        Cacheable shared content (CONTRACTS + project context). Placed before
+        SystemPrompt to form a stable prefix for prompt caching.
+        For Anthropic: sent as separate system block with cache_control.
+        For others: concatenated with SystemPrompt (automatic prefix caching).
     .PARAMETER SystemPrompt
-        The system prompt (agent instructions + contracts).
+        Agent-specific system prompt (instructions).
     .PARAMETER UserPrompt
-        The user prompt (project context + task).
+        The user prompt (review task).
+    .PARAMETER Tier
+        Agent tier: "primary" (full model) or "lite" (cheaper model).
     .PARAMETER MaxTokens
         Maximum tokens in response (optional, uses config default).
     .RETURNS
@@ -103,11 +111,15 @@ function Invoke-AICompletion {
         [Parameter(Mandatory)]
         [hashtable]$Provider,
 
+        [string]$SharedContext,
+
         [Parameter(Mandatory)]
         [string]$SystemPrompt,
 
         [Parameter(Mandatory)]
         [string]$UserPrompt,
+
+        [string]$Tier = "primary",
 
         [int]$MaxTokens = 0
     )
@@ -123,14 +135,64 @@ function Invoke-AICompletion {
         . $Provider.ProviderFile
     }
 
-    for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+    # Resolve tier to provider-specific model/deployment
+    $tierModel = $null
+    $tierDeployment = $null
+    if ($Tier -eq "lite") {
+        switch ($Provider.Name) {
+            "anthropic" {
+                $tierModel = if ($Provider.Config.lite_model) { $Provider.Config.lite_model } else { $null }
+            }
+            "azure-openai" {
+                $tierDeployment = if ($Provider.Config.lite_deployment) { $Provider.Config.lite_deployment } else { $null }
+            }
+            "openai" {
+                $tierModel = if ($Provider.Config.lite_model) { $Provider.Config.lite_model } else { $null }
+            }
+            # ollama: ignore tier (local, free)
+        }
+    }
+
+    $rateLimitMax = [math]::Max($maxAttempts, 5)
+    for ($attempt = 1; $attempt -le $rateLimitMax; $attempt++) {
         # Dispatch to provider-specific implementation
         $result = switch ($Provider.Name) {
-            "anthropic"    { Invoke-AnthropicCompletion -Provider $Provider -SystemPrompt $SystemPrompt -UserPrompt $UserPrompt -MaxTokens $MaxTokens }
-            "azure-openai" { Invoke-AzureOpenAICompletion -Provider $Provider -SystemPrompt $SystemPrompt -UserPrompt $UserPrompt -MaxTokens $MaxTokens }
-            "openai"       { Invoke-OpenAICompletion -Provider $Provider -SystemPrompt $SystemPrompt -UserPrompt $UserPrompt -MaxTokens $MaxTokens }
-            "ollama"       { Invoke-OllamaCompletion -Provider $Provider -SystemPrompt $SystemPrompt -UserPrompt $UserPrompt -MaxTokens $MaxTokens }
-            default        { throw "Unknown provider: $($Provider.Name)" }
+            "anthropic" {
+                # Anthropic supports explicit cache_control via SharedContext param
+                Invoke-AnthropicCompletion -Provider $Provider `
+                    -SharedContext $SharedContext `
+                    -SystemPrompt $SystemPrompt `
+                    -UserPrompt $UserPrompt `
+                    -Model $tierModel `
+                    -MaxTokens $MaxTokens
+            }
+            "azure-openai" {
+                # Azure: concatenate shared context into system prompt; caching is automatic
+                $fullSystem = if ($SharedContext) { "$SharedContext`n`n$SystemPrompt" } else { $SystemPrompt }
+                Invoke-AzureOpenAICompletion -Provider $Provider `
+                    -SystemPrompt $fullSystem `
+                    -UserPrompt $UserPrompt `
+                    -Deployment $tierDeployment `
+                    -MaxTokens $MaxTokens
+            }
+            "openai" {
+                # OpenAI: concatenate shared context into system prompt; caching is automatic
+                $fullSystem = if ($SharedContext) { "$SharedContext`n`n$SystemPrompt" } else { $SystemPrompt }
+                Invoke-OpenAICompletion -Provider $Provider `
+                    -SystemPrompt $fullSystem `
+                    -UserPrompt $UserPrompt `
+                    -Model $tierModel `
+                    -MaxTokens $MaxTokens
+            }
+            "ollama" {
+                # Ollama: local/free, no caching or tiering
+                $fullSystem = if ($SharedContext) { "$SharedContext`n`n$SystemPrompt" } else { $SystemPrompt }
+                Invoke-OllamaCompletion -Provider $Provider `
+                    -SystemPrompt $fullSystem `
+                    -UserPrompt $UserPrompt `
+                    -MaxTokens $MaxTokens
+            }
+            default { throw "Unknown provider: $($Provider.Name)" }
         }
 
         $lastResult = $result
@@ -142,10 +204,14 @@ function Invoke-AICompletion {
 
         # Check if error is retryable
         $errorMsg = $result.Error
-        $isRetryable = $errorMsg -match '(429|500|502|503|504|timeout|timed out|request was aborted)' -and
+        $isRateLimit = $errorMsg -match '429'
+        $isRetryable = ($isRateLimit -or $errorMsg -match '(500|502|503|504|timeout|timed out|request was aborted)') -and
                        $errorMsg -notmatch '(400|401|403|404|not found|unauthorized|forbidden|bad request)'
 
-        if (-not $isRetryable -or $attempt -eq $maxAttempts) {
+        # Rate limits get more attempts (up to $rateLimitMax); other errors use $maxAttempts
+        $effectiveMax = if ($isRateLimit) { $rateLimitMax } else { $maxAttempts }
+
+        if (-not $isRetryable -or $attempt -ge $effectiveMax) {
             # Sanitize error before returning - strip API keys, endpoints, and paths
             $sanitized = $errorMsg -replace 'sk-ant-[a-zA-Z0-9_-]+', '[REDACTED]' `
                                    -replace 'sk-[a-zA-Z0-9_-]{20,}', '[REDACTED]' `
@@ -154,10 +220,12 @@ function Invoke-AICompletion {
             return $result
         }
 
-        # Wait before retry with exponential backoff
-        $waitTime = $delaySeconds * $attempt
+        # Rate limits: wait 30s base (survives 60s rate window). Others: standard backoff.
+        $baseDelay = if ($isRateLimit) { 30 } else { $delaySeconds }
+        $waitTime = $baseDelay * [math]::Min($attempt, 3)
         $safeMsg = $errorMsg -replace 'sk-ant-[a-zA-Z0-9_-]+', '[REDACTED]' -replace 'sk-[a-zA-Z0-9_-]{20,}', '[REDACTED]'
-        Write-Warning "  AI request failed (attempt $attempt/$maxAttempts): $safeMsg. Retrying in ${waitTime}s..."
+        $retryMsg = if ($isRateLimit) { "Rate limited" } else { "AI request failed" }
+        Write-Warning "  $retryMsg (attempt $attempt/$effectiveMax): $safeMsg. Retrying in ${waitTime}s..."
         Start-Sleep -Seconds $waitTime
     }
 

@@ -57,8 +57,10 @@ function Invoke-OllamaCompletion {
             Success    = $true
             Content    = $response.message.content
             TokensUsed = @{
-                Input  = $response.prompt_eval_count
-                Output = $response.eval_count
+                Input      = $response.prompt_eval_count
+                Output     = $response.eval_count
+                CacheRead  = 0
+                CacheWrite = 0
             }
             Error      = $null
         }

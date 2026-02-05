@@ -4,6 +4,7 @@
 
 .DESCRIPTION
     Implements direct API calls to the OpenAI Chat Completions endpoint.
+    Supports automatic prompt caching and model tiering via lite_model.
 #>
 
 function Invoke-OpenAICompletion {
@@ -11,6 +12,7 @@ function Invoke-OpenAICompletion {
         [hashtable]$Provider,
         [string]$SystemPrompt,
         [string]$UserPrompt,
+        [string]$Model,
         [int]$MaxTokens
     )
 
@@ -30,7 +32,10 @@ function Invoke-OpenAICompletion {
         }
     }
 
-    $model = if ($config.model) { $config.model } else { "gpt-4o" }
+    # Model override (for tier support), then config, then default
+    $modelName = if ($Model) { $Model }
+                 elseif ($config.model) { $config.model }
+                 else { "gpt-4o" }
     $maxTok = if ($MaxTokens -gt 0) { $MaxTokens }
               elseif ($config.max_tokens) { $config.max_tokens }
               else { 16000 }
@@ -43,7 +48,7 @@ function Invoke-OpenAICompletion {
     }
 
     $body = @{
-        model    = $model
+        model    = $modelName
         messages = @(
             @{
                 role    = "system"
@@ -68,12 +73,20 @@ function Invoke-OpenAICompletion {
 
         $content = $response.choices[0].message.content
 
+        # Extract cache metrics (OpenAI reports cached tokens automatically)
+        $cachedTokens = 0
+        if ($response.usage.prompt_tokens_details -and $response.usage.prompt_tokens_details.cached_tokens) {
+            $cachedTokens = $response.usage.prompt_tokens_details.cached_tokens
+        }
+
         return @{
             Success    = $true
             Content    = $content
             TokensUsed = @{
-                Input  = $response.usage.prompt_tokens
-                Output = $response.usage.completion_tokens
+                Input      = $response.usage.prompt_tokens
+                Output     = $response.usage.completion_tokens
+                CacheRead  = $cachedTokens
+                CacheWrite = 0
             }
             Error      = $null
         }

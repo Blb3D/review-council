@@ -40,12 +40,12 @@ function Get-DefaultConfig {
         agents = @{
             timeout = 40
             parallel = $false
-            sentinel = @{ enabled = $true; coverage_target = 80 }
-            guardian = @{ enabled = $true; scan_dependencies = $true }
-            architect = @{ enabled = $true }
-            navigator = @{ enabled = $true }
-            herald = @{ enabled = $true }
-            operator = @{ enabled = $true }
+            sentinel = @{ enabled = $true; coverage_target = 80; tier = "primary" }
+            guardian = @{ enabled = $true; scan_dependencies = $true; tier = "primary" }
+            architect = @{ enabled = $true; tier = "primary" }
+            navigator = @{ enabled = $true; tier = "lite" }
+            herald = @{ enabled = $true; tier = "lite" }
+            operator = @{ enabled = $true; tier = "lite" }
         }
         output = @{
             format = "markdown"
@@ -67,18 +67,21 @@ function Get-DefaultConfig {
             retry_delay_seconds = 5
             anthropic = @{
                 model = "claude-sonnet-4-20250514"
+                lite_model = "claude-haiku-4-5-20251001"
                 api_key_env = "ANTHROPIC_API_KEY"
                 max_tokens = 16000
             }
             "azure-openai" = @{
                 endpoint = ""
                 deployment = "gpt-4o"
-                api_version = "2024-02-15-preview"
+                lite_deployment = ""
+                api_version = "2024-10-01-preview"
                 api_key_env = "AZURE_OPENAI_KEY"
                 max_tokens = 16000
             }
             openai = @{
                 model = "gpt-4o"
+                lite_model = "gpt-4o-mini"
                 api_key_env = "OPENAI_API_KEY"
                 max_tokens = 16000
             }
