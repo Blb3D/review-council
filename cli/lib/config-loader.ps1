@@ -59,6 +59,35 @@ function Get-DefaultConfig {
                 hold = 1
             }
         }
+        ai = @{
+            provider = "anthropic"
+            temperature = 0.3
+            timeout_seconds = 300
+            retry_attempts = 3
+            retry_delay_seconds = 5
+            anthropic = @{
+                model = "claude-sonnet-4-20250514"
+                api_key_env = "ANTHROPIC_API_KEY"
+                max_tokens = 16000
+            }
+            "azure-openai" = @{
+                endpoint = ""
+                deployment = "gpt-4o"
+                api_version = "2024-02-15-preview"
+                api_key_env = "AZURE_OPENAI_KEY"
+                max_tokens = 16000
+            }
+            openai = @{
+                model = "gpt-4o"
+                api_key_env = "OPENAI_API_KEY"
+                max_tokens = 16000
+            }
+            ollama = @{
+                endpoint = "http://localhost:11434"
+                model = "llama3.1:70b"
+                max_tokens = 8000
+            }
+        }
     }
 }
 

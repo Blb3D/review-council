@@ -92,7 +92,15 @@ param(
     [string[]]$SkipStandards,            # Skip default standards
 
     # CI/CD Mode - enables exit codes for pipeline integration
-    [switch]$CI
+    [switch]$CI,
+
+    # AI Provider Override Parameters
+    [ValidateSet("anthropic", "azure-openai", "openai", "ollama")]
+    [string]$AIProvider,
+
+    [string]$AIModel,
+
+    [string]$AIEndpoint
 )
 
 # ============================================================================
@@ -123,6 +131,16 @@ if (Test-Path $junitFormatterPath) {
 $configLoaderPath = Join-Path $Script:LibDir "config-loader.ps1"
 if (Test-Path $configLoaderPath) {
     . $configLoaderPath
+}
+
+$aiEnginePath = Join-Path $Script:LibDir "ai-engine.ps1"
+if (Test-Path $aiEnginePath) {
+    . $aiEnginePath
+}
+
+$projectScannerPath = Join-Path $Script:LibDir "project-scanner.ps1"
+if (Test-Path $projectScannerPath) {
+    . $projectScannerPath
 }
 
 $Script:AgentDefs = [ordered]@{
@@ -230,6 +248,20 @@ agents:
 
 output:
   format: "markdown"
+
+# AI Provider Configuration
+# Set your provider and API key environment variable
+ai:
+  provider: anthropic          # anthropic | azure-openai | openai | ollama
+  temperature: 0.3
+  anthropic:
+    model: claude-sonnet-4-20250514
+    api_key_env: ANTHROPIC_API_KEY
+    max_tokens: 16000
+  # azure-openai:
+  #   endpoint: https://your-resource.openai.azure.com/
+  #   deployment: gpt-4o
+  #   api_key_env: AZURE_OPENAI_KEY
 "@
         $configContent | Out-File -FilePath $configPath -Encoding UTF8
         Write-Status "Created: $configPath" "OK"
@@ -587,7 +619,8 @@ function Invoke-ReviewAgent {
         [string]$AgentKey,
         [string]$ProjectPath,
         [string]$ReviewsDir,
-        [int]$TimeoutMinutes
+        [int]$TimeoutMinutes,
+        [hashtable]$AIProvider
     )
 
     $agent = $Script:AgentDefs[$AgentKey]
@@ -611,31 +644,7 @@ function Invoke-ReviewAgent {
         return $null
     }
 
-    # Build prompt
-    $prompt = @"
-You are executing a structured code review as the $($agent.Name) agent.
-
-TARGET PROJECT: $ProjectPath
-
-INSTRUCTIONS:
-1. First, read the contracts file for shared rules and severity definitions:
-   $contractsFile
-
-2. Then read your agent-specific instructions:
-   $agentSkillFile
-
-3. Navigate to the target project and execute your review:
-   cd "$ProjectPath"
-
-4. Save findings in the EXACT format specified in CONTRACTS.md to:
-   $outputFile
-
-5. When complete, output a single summary line:
-   COMPLETE: X BLOCKER, Y HIGH, Z MEDIUM, W LOW
-
-Begin the $($agent.Name) review now.
-"@
-
+    # Handle DryRun mode
     if ($DryRun) {
         Write-Status "DRY RUN - Generating mock findings for $($agent.Name)" "WARN"
         $mockContent = Get-MockFindings -AgentKey $AgentKey -AgentName $agent.Name
@@ -646,42 +655,79 @@ Begin the $($agent.Name) review now.
         return $counts
     }
 
-    Write-Status "Deploying $($agent.Name)..." "RUNNING"
+    Write-Status "Deploying $($agent.Name) via $($AIProvider.Name)..." "RUNNING"
+
+    # Read agent instructions and contracts
+    $agentInstructions = Get-Content $agentSkillFile -Raw -Encoding UTF8
+    $contracts = Get-Content $contractsFile -Raw -Encoding UTF8
+
+    # Build project context
+    Write-Status "Scanning project files..." "INFO"
+    $fileTree = Get-ProjectFileTree -ProjectPath $ProjectPath
+    $sourceFiles = Get-SourceFilesContent -ProjectPath $ProjectPath -MaxFiles 50 -MaxSizeKB 500
+
+    # Build system prompt
+    $systemPrompt = @"
+You are the $($agent.Name) agent performing a structured code review.
+
+# CONTRACTS (Severity Definitions & Output Format)
+$contracts
+
+# YOUR SPECIFIC INSTRUCTIONS
+$agentInstructions
+
+# CRITICAL REQUIREMENTS
+1. Output your findings in EXACTLY the format specified in CONTRACTS
+2. Each finding must have: ID, Title, Severity with proper markdown headers
+3. Use the format: ### $($agent.Name)-NNN: Title [SEVERITY]
+4. Include Location, Effort, Issue, Evidence, Recommendation sections
+5. End with a Summary table and Verdict (SHIP/CONDITIONAL/HOLD)
+6. Be thorough but concise
+"@
+
+    # Build user prompt with project context
+    $projectName = Split-Path $ProjectPath -Leaf
+    $userPrompt = @"
+# TARGET PROJECT
+Project: $projectName
+Path: $ProjectPath
+
+# FILE STRUCTURE
+$fileTree
+
+# SOURCE FILES
+$sourceFiles
+
+---
+
+Execute your $($agent.Name) review now. Analyze the code above and produce your findings report.
+"@
 
     try {
         $startTime = Get-Date
 
-        # Execute Claude Code with timeout
-        $job = Start-Job -ScriptBlock {
-            param($p)
-            $p | claude --dangerously-skip-permissions 2>&1
-        } -ArgumentList $prompt
-
-        $completed = Wait-Job $job -Timeout ($TimeoutMinutes * 60)
-
-        if (-not $completed) {
-            Stop-Job $job
-            Remove-Job $job
-            Write-Status "Agent timed out after $TimeoutMinutes minutes" "WARN"
-
-            # BUG FIX: Even on timeout, check if the output file was written
-            # The agent may have completed but the job detection missed it
-            if (Test-Path $outputFile) {
-                Write-Status "Output file exists - parsing findings despite timeout" "INFO"
-                $counts = Get-FindingsCounts $outputFile
-                $counts.TimedOut = $true
-                return $counts
-            }
-
-            return @{ Blockers = 0; High = 0; Medium = 0; Low = 0; Total = 0; TimedOut = $true }
-        }
-
-        $result = Receive-Job $job
-        Remove-Job $job
+        # Call AI provider
+        $aiResult = Invoke-AICompletion `
+            -Provider $AIProvider `
+            -SystemPrompt $systemPrompt `
+            -UserPrompt $userPrompt
 
         $duration = (Get-Date) - $startTime
         $mins = [math]::Round($duration.TotalMinutes, 1)
+
+        if (-not $aiResult.Success) {
+            Write-Status "Agent failed: $($aiResult.Error)" "ERROR"
+            return @{ Blockers = 0; High = 0; Medium = 0; Low = 0; Total = 0; Error = $aiResult.Error }
+        }
+
         Write-Status "Completed in $mins minutes" "OK"
+
+        if ($aiResult.TokensUsed) {
+            Write-Status "Tokens: $($aiResult.TokensUsed.Input) in / $($aiResult.TokensUsed.Output) out" "INFO"
+        }
+
+        # Write AI response to findings file
+        $aiResult.Content | Out-File -FilePath $outputFile -Encoding UTF8
 
         # Get findings counts
         $counts = Get-FindingsCounts $outputFile
@@ -889,14 +935,6 @@ function Main {
         return
     }
 
-    # Check for Claude Code (only needed for reviews)
-    $claudeExists = Get-Command claude -ErrorAction SilentlyContinue
-    if (-not $claudeExists -and -not $DryRun) {
-        Write-Status "Claude Code CLI not found. Install from: https://docs.anthropic.com/claude-code" "ERROR"
-        if ($CI -or $env:TF_BUILD) { exit 10 }
-        return
-    }
-
     # Handle -Init
     if ($Init) {
         if (-not $Project) {
@@ -1010,14 +1048,47 @@ function Main {
     }
 
     Write-Host "  Agents: $($validAgents -join ', ')" -ForegroundColor White
-    Write-Host ""
+
+    # Initialize AI Provider (not needed for DryRun)
+    $provider = $null
+    if (-not $DryRun) {
+        try {
+            $effectiveConfig = Get-EffectiveConfig -ProjectPath $Project -Profile $Profile `
+                -AddStandards $AddStandards -SkipStandards $SkipStandards
+
+            $provider = Get-AIProvider -Config $effectiveConfig `
+                -ProviderOverride $AIProvider `
+                -ModelOverride $AIModel `
+                -EndpointOverride $AIEndpoint
+
+            Write-Host "  AI Provider: $($provider.Name)" -ForegroundColor Magenta
+            Write-Host ""
+
+            Write-Status "Testing AI provider connection..." "INFO"
+            if (-not (Test-AIProvider -Provider $provider)) {
+                Write-Status "Failed to connect to AI provider: $($provider.Name)" "ERROR"
+                Write-Status "Check your API key and configuration" "WARN"
+                if ($CI -or $env:TF_BUILD) { exit 14 }
+                return
+            }
+            Write-Status "AI provider connected" "OK"
+        }
+        catch {
+            Write-Status "AI provider initialization failed: $_" "ERROR"
+            if ($CI -or $env:TF_BUILD) { exit 10 }
+            return
+        }
+    }
+    else {
+        Write-Host ""
+    }
 
     # Run agents
     $allFindings = @{}
     $startTime = Get-Date
 
     foreach ($agentKey in $validAgents) {
-        $findings = Invoke-ReviewAgent -AgentKey $agentKey -ProjectPath $Project -ReviewsDir $reviewsDir -TimeoutMinutes $Timeout
+        $findings = Invoke-ReviewAgent -AgentKey $agentKey -ProjectPath $Project -ReviewsDir $reviewsDir -TimeoutMinutes $Timeout -AIProvider $provider
         $allFindings[$agentKey] = $findings
 
         if ($findings -and $findings.Blockers -gt 0) {
