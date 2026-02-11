@@ -123,6 +123,22 @@ For open source projects:
 
 ## False Positive Prevention
 
+### File Contents vs File Tree (CRITICAL)
+
+You receive two types of information:
+
+1. **FILE STRUCTURE** -- a tree showing all file/directory names in the project
+2. **SOURCE FILES** -- actual contents for a subset of files
+
+**RULE:** If a file appears in FILE STRUCTURE but NOT in SOURCE FILES, you do NOT know its contents. You MUST NOT:
+
+- Claim "no README" or "no installation docs" when doc files exist but weren't provided
+- Claim "no API documentation" when doc files are listed in the tree
+- Claim documentation is "missing" content you simply can't see
+- Rate any unverified finding as BLOCKER or HIGH
+
+Instead: Flag as MEDIUM with note "File contents not provided -- needs verification."
+
 ### Check All Documentation Locations
 
 **Before saying "no installation instructions", check:**

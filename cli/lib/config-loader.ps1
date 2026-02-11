@@ -43,9 +43,9 @@ function Get-DefaultConfig {
             sentinel = @{ enabled = $true; coverage_target = 80; tier = "primary" }
             guardian = @{ enabled = $true; scan_dependencies = $true; tier = "primary" }
             architect = @{ enabled = $true; tier = "primary" }
-            navigator = @{ enabled = $true; tier = "lite" }
-            herald = @{ enabled = $true; tier = "lite" }
-            operator = @{ enabled = $true; tier = "lite" }
+            navigator = @{ enabled = $true; tier = "primary" }
+            herald = @{ enabled = $true; tier = "primary" }
+            operator = @{ enabled = $true; tier = "primary" }
         }
         output = @{
             format = "markdown"
@@ -66,7 +66,7 @@ function Get-DefaultConfig {
             retry_attempts = 3
             retry_delay_seconds = 5
             anthropic = @{
-                model = "claude-sonnet-4-20250514"
+                model = "claude-sonnet-4-5-20250929"
                 lite_model = "claude-haiku-4-5-20251001"
                 api_key_env = "ANTHROPIC_API_KEY"
                 max_tokens = 16000
@@ -106,7 +106,7 @@ function Get-ProjectConfig {
         [string]$ProjectPath
     )
     
-    $configPath = Join-Path $ProjectPath ".code-conclave" "config.yaml"
+    $configPath = Join-Path (Join-Path $ProjectPath ".code-conclave") "config.yaml"
     
     if (-not (Test-Path $configPath)) {
         Write-Verbose "No project config found at: $configPath"

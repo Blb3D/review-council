@@ -8,8 +8,8 @@
 
 # Load dependencies
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-. (Join-Path $here ".." "lib" "yaml-parser.ps1")
-. (Join-Path $here ".." "lib" "config-loader.ps1")
+. (Join-Path (Join-Path (Join-Path $here "..") "lib") "yaml-parser.ps1")
+. (Join-Path (Join-Path (Join-Path $here "..") "lib") "config-loader.ps1")
 
 Describe "Get-DefaultConfig" {
     It "returns a hashtable" {

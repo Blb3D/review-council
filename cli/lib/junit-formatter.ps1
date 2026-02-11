@@ -148,6 +148,44 @@ function Export-JUnitResults {
     }
 }
 
+function ConvertTo-JUnitFindings {
+    <#
+    .SYNOPSIS
+        Convert JSON findings data to the format expected by Export-JUnitResults.
+
+    .PARAMETER JsonFindings
+        Hashtable of parsed JSON findings keyed by agent key. Each value is
+        the output of ConvertFrom-FindingsMarkdown (has .findings array).
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [hashtable]$JsonFindings
+    )
+
+    $junitFindings = @{}
+
+    foreach ($agentKey in $JsonFindings.Keys) {
+        $agentData = $JsonFindings[$agentKey]
+        $junitFindings[$agentKey] = @()
+
+        if ($agentData -and $agentData.findings) {
+            foreach ($f in $agentData.findings) {
+                $junitFindings[$agentKey] += @{
+                    Id          = $f.id
+                    Title       = $f.title
+                    Severity    = $f.severity
+                    File        = $f.file
+                    Line        = $f.line
+                    Description = if ($f.issue) { $f.issue } else { "" }
+                    Remediation = if ($f.recommendation) { $f.recommendation } else { "" }
+                }
+            }
+        }
+    }
+
+    return $junitFindings
+}
+
 function Get-FindingsForJUnit {
     <#
     .SYNOPSIS

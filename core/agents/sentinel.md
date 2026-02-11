@@ -62,6 +62,24 @@ Identify areas at high risk for regressions:
 
 ## False Positive Prevention
 
+### File Contents vs File Tree (CRITICAL)
+
+You receive two types of information:
+
+1. **FILE STRUCTURE** -- a tree showing all file/directory names in the project
+2. **SOURCE FILES** -- actual contents for a subset of files
+
+**RULE:** If a file appears in FILE STRUCTURE but NOT in SOURCE FILES, you do NOT know its contents. You MUST NOT:
+
+- Claim "no tests exist" when test files are listed but contents not provided
+- Claim "zero test coverage" without seeing actual coverage data
+- Claim a critical path is "untested" when test files for it exist but weren't provided
+- Rate any unverified finding as BLOCKER or HIGH
+
+Instead: Flag as MEDIUM with note "File contents not provided -- needs verification."
+
+### Accurately Assess What Exists
+
 Before flagging test coverage issues, accurately assess what exists:
 
 ### Recognize Existing Test Infrastructure

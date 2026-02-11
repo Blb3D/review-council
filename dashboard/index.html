@@ -85,13 +85,48 @@
         ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 4px; }
         .severity-badge { cursor: pointer; transition: all 0.2s; }
         .severity-badge:hover { transform: scale(1.1); }
+        .dropdown-menu {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-council-bg { background: white !important; }
+            .bg-council-card { background: #f8f8f8 !important; border-color: #ddd !important; }
+            .text-white { color: black !important; }
+            .text-gray-400, .text-gray-500, .text-gray-600 { color: #555 !important; }
+            .text-council-accent { color: #0088aa !important; }
+            .text-council-success { color: #008844 !important; }
+            .text-council-warning { color: #aa7700 !important; }
+            .text-council-danger { color: #cc2244 !important; }
+            .text-red-400 { color: #cc2244 !important; }
+            .text-orange-400 { color: #cc6600 !important; }
+            .text-yellow-400 { color: #aa7700 !important; }
+            .border-council-border { border-color: #ddd !important; }
+            .agent-card { break-inside: avoid; }
+            .agent-card:hover { transform: none; }
+            footer { display: none !important; }
+        }
     </style>
 </head>
 <body class="bg-council-bg text-white font-sans min-h-screen">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        // Agent info (matches server)
+        const AGENT_INFO = {
+            sentinel:  { name: 'SENTINEL',  role: 'Quality & Compliance', icon: '\u{1F6E1}\uFE0F', color: '#ffaa00' },
+            guardian:  { name: 'GUARDIAN',  role: 'Security',             icon: '\u{1F512}', color: '#ff4466' },
+            architect: { name: 'ARCHITECT', role: 'Code Health',          icon: '\u{1F3D7}\uFE0F', color: '#00d4ff' },
+            navigator: { name: 'NAVIGATOR', role: 'UX Review',            icon: '\u{1F9ED}', color: '#00ff88' },
+            herald:    { name: 'HERALD',    role: 'Documentation',        icon: '\u{1F4DC}', color: '#aa66ff' },
+            operator:  { name: 'OPERATOR',  role: 'Production Ready',     icon: '\u2699\uFE0F', color: '#ff8844' },
+        };
 
         // Progress Bar
         const ProgressBar = ({ progress, color }) => (
@@ -176,30 +211,63 @@
             );
         };
 
+        // Normalize findings to a consistent format
+        // JSON format: { id, title, severity, file, line, effort, issue, evidence, recommendation }
+        // Regex format: { id, title, severity, location, effort, issue }
+        function normalizeFinding(f) {
+            return {
+                id: f.id || '',
+                title: f.title || '',
+                severity: f.severity || 'LOW',
+                location: f.location || (f.file ? `${f.file}${f.line ? ':' + f.line : ''}` : 'N/A'),
+                file: f.file || null,
+                line: f.line || null,
+                effort: f.effort || '',
+                issue: f.issue || '',
+                evidence: f.evidence || '',
+                recommendation: f.recommendation || '',
+            };
+        }
+
         // Findings Detail Panel
-        const FindingsPanel = ({ agent, findings, content, onClose }) => {
+        const FindingsPanel = ({ agent, findings, parsedFindings: jsonFindings, content, onClose }) => {
             const [filter, setFilter] = useState('all');
 
-            // Parse findings from markdown content
-            const parsedFindings = [];
-            if (content) {
-                const findingRegex = /### ([A-Z]+-\d+): (.+?) \[([A-Z]+)\]\s*\n+\*\*Location:\*\* ([^\n]+)\s*\n\*\*Effort:\*\* ([^\n]+)\s*\n+\*\*Issue:\*\*\s*\n([\s\S]*?)(?=\n\*\*Evidence|\n\*\*Recommendation|\n---|\n###|$)/g;
-                let match;
-                while ((match = findingRegex.exec(content)) !== null) {
-                    parsedFindings.push({
-                        id: match[1],
-                        title: match[2],
-                        severity: match[3],
-                        location: match[4],
-                        effort: match[5],
-                        issue: match[6].trim(),
-                    });
+            // Build findings list: prefer structured JSON, fall back to markdown regex
+            let allFindings = [];
+            if (jsonFindings && jsonFindings.length > 0) {
+                allFindings = jsonFindings.map(normalizeFinding);
+            } else if (content) {
+                // Try to parse as JSON first (API may return JSON content)
+                let jsonParsed = false;
+                try {
+                    const data = JSON.parse(content);
+                    if (data.findings && Array.isArray(data.findings)) {
+                        allFindings = data.findings.map(normalizeFinding);
+                        jsonParsed = true;
+                    }
+                } catch {}
+
+                // Fall back to markdown regex parsing
+                if (!jsonParsed) {
+                    const findingRegex = /### ([A-Z]+-\d+): (.+?) \[([A-Z]+)\]\s*\n+\*\*Location:\*\* ([^\n]+)\s*\n\*\*Effort:\*\* ([^\n]+)\s*\n+\*\*Issue:\*\*\s*\n([\s\S]*?)(?=\n\*\*Evidence|\n\*\*Recommendation|\n---|\n###|$)/g;
+                    let match;
+                    while ((match = findingRegex.exec(content)) !== null) {
+                        allFindings.push(normalizeFinding({
+                            id: match[1],
+                            title: match[2],
+                            severity: match[3],
+                            location: match[4],
+                            effort: match[5],
+                            issue: match[6].trim(),
+                        }));
+                    }
                 }
             }
 
             const filteredFindings = filter === 'all'
-                ? parsedFindings
-                : parsedFindings.filter(f => f.severity === filter);
+                ? allFindings
+                : allFindings.filter(f => f.severity === filter);
 
             const severityColor = {
                 BLOCKER: 'text-red-400 bg-red-500/20 border-red-500/50',
@@ -227,7 +295,7 @@
                                 </div>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 hover:bg-council-card rounded-lg transition"
+                                    className="p-2 hover:bg-council-card rounded-lg transition no-print"
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -236,7 +304,7 @@
                             </div>
 
                             {/* Filter buttons */}
-                            <div className="flex gap-2 mt-4">
+                            <div className="flex gap-2 mt-4 no-print">
                                 {['all', 'BLOCKER', 'HIGH', 'MEDIUM', 'LOW'].map(f => (
                                     <button
                                         key={f}
@@ -258,33 +326,46 @@
                         <div className="flex-1 overflow-y-auto p-6 space-y-4">
                             {filteredFindings.length > 0 ? (
                                 filteredFindings.map((finding, i) => (
-                                    <div key={i} className={`finding-card p-4 rounded-xl border ${severityColor[finding.severity]}`}>
+                                    <div key={i} className={`finding-card p-4 rounded-xl border ${severityColor[finding.severity] || severityColor.LOW}`}>
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <span className="font-mono text-sm text-gray-500">{finding.id}</span>
-                                                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${severityColor[finding.severity]}`}>
+                                                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${severityColor[finding.severity] || severityColor.LOW}`}>
                                                         {finding.severity}
                                                     </span>
-                                                    <span className="text-xs text-gray-500">{finding.effort}</span>
+                                                    {finding.effort && <span className="text-xs text-gray-500">{finding.effort}</span>}
                                                 </div>
                                                 <h3 className="font-semibold text-lg mb-2">{finding.title}</h3>
                                                 <p className="text-sm text-gray-400 mb-2">
                                                     <span className="text-gray-500">Location:</span> <code className="text-council-accent">{finding.location}</code>
                                                 </p>
                                                 <p className="text-sm text-gray-300">{finding.issue}</p>
+                                                {finding.evidence && (
+                                                    <div className="mt-2 p-2 bg-black/30 rounded text-xs font-mono text-gray-400 overflow-x-auto">
+                                                        {finding.evidence}
+                                                    </div>
+                                                )}
+                                                {finding.recommendation && (
+                                                    <p className="mt-2 text-sm text-council-success/80">
+                                                        <span className="text-gray-500">Fix:</span> {finding.recommendation}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
                                 ))
-                            ) : content ? (
+                            ) : allFindings.length > 0 ? (
                                 <div className="text-center py-12">
-                                    <div className="text-gray-500 mb-2">No {filter !== 'all' ? filter : ''} findings</div>
-                                    {filter !== 'all' && (
-                                        <button onClick={() => setFilter('all')} className="text-council-accent text-sm">
-                                            Show all findings
-                                        </button>
-                                    )}
+                                    <div className="text-gray-500 mb-2">No {filter} findings</div>
+                                    <button onClick={() => setFilter('all')} className="text-council-accent text-sm">
+                                        Show all findings
+                                    </button>
+                                </div>
+                            ) : content || (jsonFindings && jsonFindings.length === 0) ? (
+                                <div className="text-center py-12">
+                                    <div className="text-gray-500 mb-2">No findings from this agent</div>
+                                    <div className="text-council-success text-sm">Clean review!</div>
                                 </div>
                             ) : (
                                 <div className="text-center py-12">
@@ -320,7 +401,7 @@
             }, [logs]);
 
             return (
-                <div className="bg-council-card border border-council-border rounded-xl overflow-hidden">
+                <div className="bg-council-card border border-council-border rounded-xl overflow-hidden no-print">
                     <div className="px-4 py-3 border-b border-council-border flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-red-500" />
                         <div className="w-3 h-3 rounded-full bg-yellow-500" />
@@ -352,6 +433,8 @@
                 CONDITIONAL: { color: '#ffaa00', bg: 'bg-yellow-500/10', text: 'CONDITIONAL', subtitle: 'Review HIGH items before release' },
                 HOLD: { color: '#ff4466', bg: 'bg-red-500/10', text: 'HOLD RELEASE', subtitle: 'Blockers must be resolved' },
             }[verdict];
+
+            if (!config) return null;
 
             return (
                 <div className={`${config.bg} border-2 rounded-2xl p-8 text-center`} style={{ borderColor: config.color }}>
@@ -395,22 +478,289 @@
             );
         };
 
+        // History Dropdown
+        const HistoryDropdown = ({ runs, viewMode, selectedRunId, onSelectLive, onSelectRun }) => {
+            const [open, setOpen] = useState(false);
+            const dropdownRef = useRef(null);
+
+            // Close dropdown when clicking outside
+            useEffect(() => {
+                const handleClickOutside = (e) => {
+                    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                        setOpen(false);
+                    }
+                };
+                document.addEventListener('mousedown', handleClickOutside);
+                return () => document.removeEventListener('mousedown', handleClickOutside);
+            }, []);
+
+            const formatRunLabel = (run) => {
+                const date = run.timestamp ? new Date(run.timestamp) : null;
+                const dateStr = date ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : run.id;
+                const timeStr = date ? date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '';
+                const verdictEmoji = run.verdict === 'SHIP' ? '\u2705' : run.verdict === 'HOLD' ? '\u274C' : '\u26A0\uFE0F';
+                const total = run.summary ? run.summary.total : 0;
+                const dryLabel = run.dryRun ? ' [DRY]' : '';
+                return `${dateStr} ${timeStr} ${verdictEmoji} ${total} findings${dryLabel}`;
+            };
+
+            return (
+                <div className="relative no-print" ref={dropdownRef}>
+                    <button
+                        onClick={() => setOpen(!open)}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-council-card border border-council-border hover:border-council-accent transition text-sm"
+                    >
+                        {viewMode === 'live' ? (
+                            <>
+                                <div className="w-2 h-2 rounded-full bg-council-success connection-dot" />
+                                <span className="font-mono text-council-success">LIVE</span>
+                            </>
+                        ) : (
+                            <>
+                                <svg className="w-4 h-4 text-council-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="font-mono text-council-purple">HISTORY</span>
+                            </>
+                        )}
+                        <svg className={`w-3 h-3 text-gray-400 transition ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    {open && (
+                        <div className="absolute right-0 top-full mt-1 w-72 bg-council-card border border-council-border rounded-xl shadow-2xl z-50 overflow-hidden">
+                            {/* LIVE option */}
+                            <div
+                                className={`px-4 py-3 cursor-pointer hover:bg-council-border/50 flex items-center gap-2 transition ${viewMode === 'live' ? 'bg-council-accent/10 border-l-2 border-council-success' : ''}`}
+                                onClick={() => { onSelectLive(); setOpen(false); }}
+                            >
+                                <div className="w-2 h-2 rounded-full bg-council-success" />
+                                <span className="font-mono text-sm text-council-success">LIVE</span>
+                                <span className="text-xs text-gray-500 ml-auto">Current run</span>
+                            </div>
+
+                            {runs.length > 0 && (
+                                <div className="border-t border-council-border">
+                                    <div className="px-4 py-2 text-xs text-gray-500 uppercase tracking-wider">Past Runs</div>
+                                    <div className="dropdown-menu">
+                                        {runs.map(run => (
+                                            <div
+                                                key={run.id}
+                                                className={`px-4 py-2.5 cursor-pointer hover:bg-council-border/50 text-sm transition ${selectedRunId === run.id ? 'bg-council-purple/10 border-l-2 border-council-purple' : ''}`}
+                                                onClick={() => { onSelectRun(run.id); setOpen(false); }}
+                                            >
+                                                <div className="font-mono text-xs text-gray-300">{formatRunLabel(run)}</div>
+                                                {run.summary && (
+                                                    <div className="flex gap-3 mt-1 text-xs">
+                                                        {run.summary.blockers > 0 && <span className="text-red-400">{run.summary.blockers}B</span>}
+                                                        {run.summary.high > 0 && <span className="text-orange-400">{run.summary.high}H</span>}
+                                                        {run.summary.medium > 0 && <span className="text-yellow-400">{run.summary.medium}M</span>}
+                                                        {run.summary.low > 0 && <span className="text-gray-400">{run.summary.low}L</span>}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {runs.length === 0 && (
+                                <div className="px-4 py-3 text-xs text-gray-500 text-center border-t border-council-border">
+                                    No archived runs yet
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Export Button
+        const ExportButton = ({ getExportData }) => {
+            const [open, setOpen] = useState(false);
+            const dropdownRef = useRef(null);
+
+            useEffect(() => {
+                const handleClickOutside = (e) => {
+                    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                        setOpen(false);
+                    }
+                };
+                document.addEventListener('mousedown', handleClickOutside);
+                return () => document.removeEventListener('mousedown', handleClickOutside);
+            }, []);
+
+            const noDataMsg = 'No results to export. Select a past run from the History dropdown first.';
+
+            const exportMarkdown = () => {
+                const data = getExportData();
+                if (!data) { alert(noDataMsg); setOpen(false); return; }
+
+                let md = `# Code Conclave Review Report\n\n`;
+                md += `**Project:** ${data.project}\n`;
+                md += `**Date:** ${data.timestamp || new Date().toISOString()}\n`;
+                md += `**Verdict:** ${data.verdict || 'In Progress'}\n\n`;
+
+                md += `## Summary\n\n`;
+                md += `| Severity | Count |\n|----------|-------|\n`;
+                md += `| Blocker | ${data.totals.blockers} |\n`;
+                md += `| High | ${data.totals.high} |\n`;
+                md += `| Medium | ${data.totals.medium} |\n`;
+                md += `| Low | ${data.totals.low} |\n`;
+                md += `| **Total** | **${data.totals.blockers + data.totals.high + data.totals.medium + data.totals.low}** |\n\n`;
+
+                for (const agent of data.agents) {
+                    if (agent.status !== 'complete') continue;
+                    md += `---\n\n## ${agent.name} - ${agent.role}\n\n`;
+
+                    const findings = agent.allFindings || [];
+                    if (findings.length === 0) {
+                        md += `No findings.\n\n`;
+                        continue;
+                    }
+
+                    for (const f of findings) {
+                        md += `### ${f.id}: ${f.title} [${f.severity}]\n\n`;
+                        md += `**Location:** ${f.location || 'N/A'}\n`;
+                        if (f.effort) md += `**Effort:** ${f.effort}\n`;
+                        md += `\n**Issue:**\n${f.issue}\n\n`;
+                        if (f.evidence) md += `**Evidence:**\n\`\`\`\n${f.evidence}\n\`\`\`\n\n`;
+                        if (f.recommendation) md += `**Recommendation:**\n${f.recommendation}\n\n`;
+                    }
+                }
+
+                downloadFile(`code-conclave-report.md`, md, 'text/markdown');
+                setOpen(false);
+            };
+
+            const exportCSV = () => {
+                const data = getExportData();
+                if (!data) { alert(noDataMsg); setOpen(false); return; }
+
+                const rows = [['Agent', 'ID', 'Title', 'Severity', 'File', 'Line', 'Effort', 'Issue', 'Recommendation']];
+
+                for (const agent of data.agents) {
+                    const findings = agent.allFindings || [];
+                    for (const f of findings) {
+                        rows.push([
+                            agent.name,
+                            f.id,
+                            csvEscape(f.title),
+                            f.severity,
+                            f.file || '',
+                            f.line || '',
+                            f.effort || '',
+                            csvEscape(f.issue),
+                            csvEscape(f.recommendation || ''),
+                        ]);
+                    }
+                }
+
+                const csv = rows.map(r => r.join(',')).join('\n');
+                downloadFile(`code-conclave-report.csv`, csv, 'text/csv');
+                setOpen(false);
+            };
+
+            const exportPDF = () => {
+                const data = getExportData();
+                if (!data) { alert(noDataMsg); setOpen(false); return; }
+                setOpen(false);
+                window.print();
+            };
+
+            function csvEscape(str) {
+                if (!str) return '';
+                str = str.replace(/\n/g, ' ').replace(/\r/g, '');
+                if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                    return '"' + str.replace(/"/g, '""') + '"';
+                }
+                return str;
+            }
+
+            function downloadFile(filename, content, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            return (
+                <div className="relative no-print" ref={dropdownRef}>
+                    <button
+                        onClick={() => setOpen(!open)}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-council-card border border-council-border hover:border-council-accent transition text-sm"
+                        title="Export report"
+                    >
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span className="text-gray-400 text-xs">Export</span>
+                    </button>
+
+                    {open && (
+                        <div className="absolute right-0 top-full mt-1 w-48 bg-council-card border border-council-border rounded-xl shadow-2xl z-50 overflow-hidden">
+                            <div
+                                className="px-4 py-2.5 cursor-pointer hover:bg-council-border/50 text-sm flex items-center gap-2 transition"
+                                onClick={exportMarkdown}
+                            >
+                                <span className="text-gray-400">MD</span>
+                                <span>Markdown</span>
+                            </div>
+                            <div
+                                className="px-4 py-2.5 cursor-pointer hover:bg-council-border/50 text-sm flex items-center gap-2 transition"
+                                onClick={exportCSV}
+                            >
+                                <span className="text-gray-400">CSV</span>
+                                <span>Spreadsheet</span>
+                            </div>
+                            <div className="border-t border-council-border">
+                                <div
+                                    className="px-4 py-2.5 cursor-pointer hover:bg-council-border/50 text-sm flex items-center gap-2 transition"
+                                    onClick={exportPDF}
+                                >
+                                    <span className="text-gray-400">PDF</span>
+                                    <span>Print / PDF</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         // Connection Status
-        const ConnectionStatus = ({ connected, mode }) => (
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-council-card border border-council-border">
+        const ConnectionStatus = ({ connected }) => (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-council-card border border-council-border no-print">
                 <div className={`w-2 h-2 rounded-full connection-dot ${connected ? 'bg-council-success' : 'bg-council-danger'}`} />
-                <span className="text-xs font-mono text-gray-400">{connected ? 'LIVE' : 'OFFLINE'}</span>
+                <span className="text-xs font-mono text-gray-400">{connected ? 'CONNECTED' : 'OFFLINE'}</span>
             </div>
         );
 
         // Main Dashboard
         const Dashboard = () => {
             const [connected, setConnected] = useState(false);
-            const [state, setState] = useState({ project: 'connecting...', agents: {}, logs: [], verdict: null });
+            const [liveState, setLiveState] = useState({ project: 'connecting...', agents: {}, logs: [], verdict: null });
             const [showConfetti, setShowConfetti] = useState(false);
             const [selectedAgent, setSelectedAgent] = useState(null);
             const [findingsContent, setFindingsContent] = useState({});
+            const [viewMode, setViewMode] = useState('live');
+            const [runHistory, setRunHistory] = useState([]);
+            const [selectedRunId, setSelectedRunId] = useState(null);
+            const [historyData, setHistoryData] = useState(null);
             const wsRef = useRef(null);
+            const prevVerdictRef = useRef(null);
+
+            // Fetch run history
+            const fetchHistory = useCallback(() => {
+                fetch('/api/history')
+                    .then(res => res.json())
+                    .then(data => setRunHistory(data))
+                    .catch(() => {});
+            }, []);
 
             // WebSocket connection
             useEffect(() => {
@@ -433,16 +783,20 @@
                                     icon: agent.icon || '?', color: agent.color || '#00d4ff',
                                     status: agent.status || 'pending', progress: agent.progress || 0,
                                     findings: agent.findings,
+                                    parsedFindings: agent.parsedFindings || null,
+                                    tokens: agent.tokens || null,
                                 };
                             });
 
-                            setState({
+                            setLiveState({
                                 project: serverState.project || 'unknown',
                                 agents: transformedAgents,
                                 logs: serverState.logs || [],
                                 verdict: serverState.verdict,
+                                timeEstimate: serverState.timeEstimate,
                             });
 
+                            // Confetti on SHIP
                             if (serverState.verdict === 'SHIP' && !showConfetti) {
                                 setShowConfetti(true);
                                 setTimeout(() => setShowConfetti(false), 4000);
@@ -465,27 +819,121 @@
                 return () => { if (wsRef.current) wsRef.current.close(); };
             }, []);
 
-            // Fetch findings content when agent selected
+            // Fetch history on mount
             useEffect(() => {
-                if (selectedAgent && !findingsContent[selectedAgent.id]) {
+                fetchHistory();
+            }, [fetchHistory]);
+
+            // Refresh history when verdict changes (run completed + archived)
+            useEffect(() => {
+                if (liveState.verdict && liveState.verdict !== prevVerdictRef.current) {
+                    // Delay to allow archive write to complete
+                    setTimeout(fetchHistory, 2000);
+                }
+                prevVerdictRef.current = liveState.verdict;
+            }, [liveState.verdict, fetchHistory]);
+
+            // Also refresh history when all agents go back to pending (run archived)
+            useEffect(() => {
+                const allPending = Object.values(liveState.agents).length > 0 &&
+                    Object.values(liveState.agents).every(a => a.status === 'pending');
+                if (allPending && !liveState.verdict) {
+                    setTimeout(fetchHistory, 1000);
+                }
+            }, [liveState.agents, liveState.verdict, fetchHistory]);
+
+            // Fetch history run data when selected
+            useEffect(() => {
+                if (!selectedRunId) {
+                    setHistoryData(null);
+                    return;
+                }
+
+                fetch(`/api/history/${selectedRunId}`)
+                    .then(res => res.json())
+                    .then(data => setHistoryData(data))
+                    .catch(() => setHistoryData(null));
+            }, [selectedRunId]);
+
+            // Handle selecting LIVE mode
+            const handleSelectLive = () => {
+                setViewMode('live');
+                setSelectedRunId(null);
+                setHistoryData(null);
+                setSelectedAgent(null);
+            };
+
+            // Handle selecting a history run
+            const handleSelectRun = (runId) => {
+                setViewMode('history');
+                setSelectedRunId(runId);
+                setSelectedAgent(null);
+            };
+
+            // Compute display state (either live or from history)
+            let displayAgents = [];
+            let displayVerdict = null;
+            let displayProject = liveState.project;
+            let displayLogs = liveState.logs;
+            let displayTimeEstimate = liveState.timeEstimate;
+            let isHistoryView = false;
+
+            if (viewMode === 'history' && historyData) {
+                isHistoryView = true;
+                displayVerdict = historyData.verdict;
+                displayProject = (historyData.run && historyData.run.project) || 'unknown';
+
+                // Transform archive agent data to display format
+                const archiveAgents = historyData.agents || {};
+                displayAgents = Object.keys(AGENT_INFO).map(id => {
+                    const info = AGENT_INFO[id];
+                    const agentData = archiveAgents[id];
+                    if (agentData) {
+                        return {
+                            id,
+                            name: agentData.name || info.name,
+                            role: agentData.role || info.role,
+                            icon: info.icon,
+                            color: info.color,
+                            status: agentData.status || 'complete',
+                            progress: 100,
+                            findings: agentData.summary || null,
+                            parsedFindings: agentData.findings || null,
+                        };
+                    }
+                    return null;
+                }).filter(Boolean);
+
+                displayLogs = [];
+                displayTimeEstimate = null;
+            } else {
+                displayAgents = Object.values(liveState.agents);
+                displayVerdict = liveState.verdict;
+            }
+
+            // Fetch findings content when agent selected (live mode only)
+            useEffect(() => {
+                if (selectedAgent && viewMode === 'live' && !selectedAgent.parsedFindings && !findingsContent[selectedAgent.id]) {
                     fetch(`/api/findings/${selectedAgent.id}`)
-                        .then(res => res.text())
-                        .then(content => {
-                            setFindingsContent(prev => ({ ...prev, [selectedAgent.id]: content }));
+                        .then(res => {
+                            const ct = res.headers.get('content-type') || '';
+                            return res.text().then(text => ({ text, isJson: ct.includes('application/json') }));
+                        })
+                        .then(({ text, isJson }) => {
+                            setFindingsContent(prev => ({ ...prev, [selectedAgent.id]: text }));
                         })
                         .catch(() => {});
                 }
-            }, [selectedAgent]);
+            }, [selectedAgent, viewMode]);
 
-            const agents = Object.values(state.agents);
-            const totals = agents.reduce((acc, a) => {
+            // Totals
+            const totals = displayAgents.reduce((acc, a) => {
                 const f = a.findings || { blockers: 0, high: 0, medium: 0, low: 0 };
                 return { blockers: acc.blockers + f.blockers, high: acc.high + f.high, medium: acc.medium + f.medium, low: acc.low + f.low };
             }, { blockers: 0, high: 0, medium: 0, low: 0 });
-            const completedCount = agents.filter(a => a.status === 'complete').length;
-            const overallProgress = agents.length ? (completedCount / agents.length) * 100 : 0;
+            const completedCount = displayAgents.filter(a => a.status === 'complete').length;
+            const overallProgress = displayAgents.length ? (completedCount / displayAgents.length) * 100 : 0;
 
-            // Format time estimate
             const formatTime = (seconds) => {
                 if (!seconds) return null;
                 if (seconds < 60) return `${seconds}s`;
@@ -493,7 +941,49 @@
                 const secs = seconds % 60;
                 return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
             };
-            const timeEstimate = formatTime(state.timeEstimate);
+            const timeEstimate = formatTime(displayTimeEstimate);
+
+            // Build export data (returns null if nothing to export)
+            const getExportData = useCallback(() => {
+                const hasCompleted = displayAgents.some(a => a.status === 'complete');
+                if (!hasCompleted) return null;
+
+                const agents = displayAgents.map(a => {
+                    let allFindings = [];
+                    if (a.parsedFindings && a.parsedFindings.length > 0) {
+                        allFindings = a.parsedFindings.map(normalizeFinding);
+                    } else if (findingsContent[a.id]) {
+                        // Try JSON parse
+                        try {
+                            const data = JSON.parse(findingsContent[a.id]);
+                            if (data.findings) allFindings = data.findings.map(normalizeFinding);
+                        } catch {
+                            // Regex fallback
+                            const findingRegex = /### ([A-Z]+-\d+): (.+?) \[([A-Z]+)\]\s*\n+\*\*Location:\*\* ([^\n]+)\s*\n\*\*Effort:\*\* ([^\n]+)\s*\n+\*\*Issue:\*\*\s*\n([\s\S]*?)(?=\n\*\*Evidence|\n\*\*Recommendation|\n---|\n###|$)/g;
+                            let match;
+                            while ((match = findingRegex.exec(findingsContent[a.id])) !== null) {
+                                allFindings.push(normalizeFinding({
+                                    id: match[1], title: match[2], severity: match[3],
+                                    location: match[4], effort: match[5], issue: match[6].trim(),
+                                }));
+                            }
+                        }
+                    }
+                    return { ...a, allFindings };
+                });
+
+                const runInfo = isHistoryView && historyData && historyData.run ? historyData.run : null;
+                return {
+                    project: displayProject,
+                    timestamp: runInfo ? runInfo.timestamp : new Date().toISOString(),
+                    verdict: displayVerdict,
+                    totals,
+                    agents,
+                };
+            }, [displayAgents, displayProject, displayVerdict, totals, findingsContent, isHistoryView, historyData]);
+
+            // History metadata display
+            const historyMeta = isHistoryView && historyData && historyData.run ? historyData.run : null;
 
             return (
                 <div className="min-h-screen p-6">
@@ -503,6 +993,7 @@
                         <FindingsPanel
                             agent={selectedAgent}
                             findings={selectedAgent.findings}
+                            parsedFindings={selectedAgent.parsedFindings}
                             content={findingsContent[selectedAgent.id]}
                             onClose={() => setSelectedAgent(null)}
                         />
@@ -516,36 +1007,70 @@
                                 </h1>
                                 <p className="text-gray-400 mt-1">AI-Powered Code Review Orchestrator</p>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
+                                <ExportButton getExportData={getExportData} />
+                                <HistoryDropdown
+                                    runs={runHistory}
+                                    viewMode={viewMode}
+                                    selectedRunId={selectedRunId}
+                                    onSelectLive={handleSelectLive}
+                                    onSelectRun={handleSelectRun}
+                                />
                                 <ConnectionStatus connected={connected} />
                                 <div className="text-right">
                                     <div className="text-sm text-gray-400">Project</div>
-                                    <div className="font-mono text-council-accent">{state.project}</div>
+                                    <div className="font-mono text-council-accent">{displayProject}</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-6">
-                            <div className="flex justify-between text-sm mb-2">
-                                <span className="text-gray-400">Overall Progress</span>
-                                <div className="flex gap-4">
-                                    {timeEstimate && completedCount < agents.length && (
-                                        <span className="text-council-warning font-mono">~{timeEstimate} remaining</span>
-                                    )}
-                                    <span className="text-council-accent font-mono">{completedCount}/{agents.length} agents</span>
+                        {/* History banner */}
+                        {isHistoryView && historyMeta && (
+                            <div className="mt-4 px-4 py-3 bg-council-purple/10 border border-council-purple/30 rounded-xl flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <svg className="w-5 h-5 text-council-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="text-council-purple text-sm font-medium">
+                                        Viewing archived run from {historyMeta.timestamp ? new Date(historyMeta.timestamp).toLocaleString() : selectedRunId}
+                                    </span>
+                                    {historyMeta.dryRun && <span className="px-2 py-0.5 text-xs rounded bg-yellow-500/20 text-yellow-400 font-mono">DRY RUN</span>}
+                                    {historyMeta.baseBranch && <span className="text-xs text-gray-500">base: {historyMeta.baseBranch}</span>}
+                                    {historyMeta.provider && <span className="text-xs text-gray-500">via {historyMeta.provider}</span>}
+                                </div>
+                                <button
+                                    onClick={handleSelectLive}
+                                    className="px-3 py-1 text-xs bg-council-purple/20 hover:bg-council-purple/30 rounded-lg text-council-purple transition no-print"
+                                >
+                                    Back to Live
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Progress bar (live mode only) */}
+                        {!isHistoryView && (
+                            <div className="mt-6">
+                                <div className="flex justify-between text-sm mb-2">
+                                    <span className="text-gray-400">Overall Progress</span>
+                                    <div className="flex gap-4">
+                                        {timeEstimate && completedCount < displayAgents.length && (
+                                            <span className="text-council-warning font-mono">~{timeEstimate} remaining</span>
+                                        )}
+                                        <span className="text-council-accent font-mono">{completedCount}/{displayAgents.length} agents</span>
+                                    </div>
+                                </div>
+                                <div className="h-3 bg-council-border rounded-full overflow-hidden">
+                                    <div className="h-full bg-gradient-to-r from-council-accent to-council-success transition-all duration-500" style={{ width: `${overallProgress}%` }} />
                                 </div>
                             </div>
-                            <div className="h-3 bg-council-border rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-council-accent to-council-success transition-all duration-500" style={{ width: `${overallProgress}%` }} />
-                            </div>
-                        </div>
+                        )}
                     </header>
 
                     <main className="max-w-7xl mx-auto">
-                        {state.verdict && <div className="mb-8"><VerdictBanner verdict={state.verdict} totals={totals} /></div>}
+                        {displayVerdict && <div className="mb-8"><VerdictBanner verdict={displayVerdict} totals={totals} /></div>}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                            {agents.map(agent => (
+                            {displayAgents.map(agent => (
                                 <AgentCard
                                     key={agent.id}
                                     agent={agent}
@@ -557,7 +1082,7 @@
                             ))}
                         </div>
 
-                        <LiveLog logs={state.logs} />
+                        {!isHistoryView && <LiveLog logs={displayLogs} />}
 
                         {completedCount > 0 && (
                             <div className="mt-8 grid grid-cols-4 gap-4">

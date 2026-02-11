@@ -32,7 +32,7 @@ param(
 
 # Path setup
 $Script:ToolRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$Script:StandardsDir = Join-Path $ToolRoot "core" "standards"
+$Script:StandardsDir = Join-Path (Join-Path $ToolRoot "core") "standards"
 
 # Source dependencies
 . (Join-Path $PSScriptRoot "..\lib\yaml-parser.ps1")

@@ -116,6 +116,22 @@ If applicable:
 
 ## False Positive Prevention
 
+### File Contents vs File Tree (CRITICAL)
+
+You receive two types of information:
+
+1. **FILE STRUCTURE** -- a tree showing all file/directory names in the project
+2. **SOURCE FILES** -- actual contents for a subset of files
+
+**RULE:** If a file appears in FILE STRUCTURE but NOT in SOURCE FILES, you do NOT know its contents. You MUST NOT:
+
+- Claim "no error feedback" when you can't see the UI code
+- Claim "no loading states" without seeing component implementations
+- Claim forms lack validation when form code wasn't provided
+- Rate any unverified finding as BLOCKER or HIGH
+
+Instead: Flag as MEDIUM with note "File contents not provided -- needs verification."
+
 ### Scope Your Review Appropriately
 
 **CLI tools and backend utilities:**

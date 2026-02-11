@@ -103,7 +103,11 @@ param(
     [string]$AIEndpoint,
 
     # Base branch for diff-scoped reviews (auto-detected in CI)
-    [string]$BaseBranch
+    [string]$BaseBranch,
+
+    # Scan depth: light (diff only), standard/deep (tier-based priority scan)
+    [ValidateSet("light", "standard", "deep")]
+    [string]$ScanDepth
 )
 
 # ============================================================================
@@ -144,6 +148,11 @@ if (Test-Path $aiEnginePath) {
 $projectScannerPath = Join-Path $Script:LibDir "project-scanner.ps1"
 if (Test-Path $projectScannerPath) {
     . $projectScannerPath
+}
+
+$findingsParserPath = Join-Path $Script:LibDir "findings-parser.ps1"
+if (Test-Path $findingsParserPath) {
+    . $findingsParserPath
 }
 
 $Script:AgentDefs = [ordered]@{
@@ -259,7 +268,7 @@ ai:
   provider: anthropic          # anthropic | azure-openai | openai | ollama
   temperature: 0.3
   anthropic:
-    model: claude-sonnet-4-20250514
+    model: claude-sonnet-4-5-20250929
     api_key_env: ANTHROPIC_API_KEY
     max_tokens: 16000
   # azure-openai:
@@ -651,8 +660,26 @@ function Invoke-ReviewAgent {
         $mockContent = Get-MockFindings -AgentKey $AgentKey -AgentName $agent.Name
         $mockContent | Out-File -FilePath $outputFile -Encoding UTF8
         Write-Status "Mock findings written: $outputFile" "OK"
+
+        # Parse to JSON for dashboard consumption
+        if (Get-Command ConvertFrom-FindingsMarkdown -ErrorAction SilentlyContinue) {
+            $projectName = Split-Path $ProjectPath -Leaf
+            $jsonFindings = ConvertFrom-FindingsMarkdown `
+                -Content $mockContent `
+                -AgentKey $AgentKey `
+                -AgentName $agent.Name `
+                -AgentRole $agent.Role `
+                -ProjectName $projectName `
+                -ProjectPath $ProjectPath `
+                -DryRun
+            $jsonOutputFile = Join-Path $ReviewsDir "$AgentKey-findings.json"
+            Export-FindingsJson -Findings $jsonFindings -OutputPath $jsonOutputFile | Out-Null
+        }
+
         $counts = Get-FindingsCounts $outputFile
         Write-FindingsSummary $counts
+        # Attach parsed JSON data for archival
+        if ($jsonFindings) { $counts.JsonFindings = $jsonFindings }
         return $counts
     }
 
@@ -685,9 +712,13 @@ $agentInstructions
 6. Be thorough but concise
 "@
 
-    # User prompt is minimal — project context is in SharedContext (system prompt block 1)
+    # User prompt is minimal -- project context is in SharedContext (system prompt block 1)
     $projectName = Split-Path $ProjectPath -Leaf
-    $userPrompt = "Execute your $($agent.Name) review of project '$projectName' now. Analyze the code provided in the system context and produce your findings report."
+    $userPrompt = @"
+Execute your $($agent.Name) review of project '$projectName' now. Analyze the code provided in the system context and produce your findings report.
+
+IMPORTANT: Only rate findings BLOCKER or HIGH when you can cite specific code from the SOURCE FILES provided. If a file appears in the FILE STRUCTURE tree but its contents were not provided in SOURCE FILES, you do NOT know what it contains. Cap any such finding at MEDIUM with a note: "File contents not provided -- needs verification."
+"@
 
     try {
         $startTime = Get-Date
@@ -728,9 +759,29 @@ $agentInstructions
         # Write AI response to findings file
         $aiResult.Content | Out-File -FilePath $outputFile -Encoding UTF8
 
+        # Parse to JSON for dashboard consumption
+        $jsonFindings = $null
+        if (Get-Command ConvertFrom-FindingsMarkdown -ErrorAction SilentlyContinue) {
+            $projectName = Split-Path $ProjectPath -Leaf
+            $jsonFindings = ConvertFrom-FindingsMarkdown `
+                -Content $aiResult.Content `
+                -AgentKey $AgentKey `
+                -AgentName $agent.Name `
+                -AgentRole $agent.Role `
+                -ProjectName $projectName `
+                -ProjectPath $ProjectPath `
+                -DurationSeconds $duration.TotalSeconds `
+                -TokensUsed $aiResult.TokensUsed `
+                -Tier $agentTier
+            $jsonOutputFile = Join-Path $ReviewsDir "$AgentKey-findings.json"
+            Export-FindingsJson -Findings $jsonFindings -OutputPath $jsonOutputFile | Out-Null
+        }
+
         # Get findings counts
         $counts = Get-FindingsCounts $outputFile
         $counts.TokensUsed = $aiResult.TokensUsed
+        # Attach parsed JSON data for archival
+        if ($jsonFindings) { $counts.JsonFindings = $jsonFindings }
         Write-FindingsSummary $counts
 
         return $counts
@@ -758,17 +809,16 @@ function New-SynthesisReport {
     $date = Get-Date -Format "yyyy-MM-dd HH:mm"
     $projectName = Split-Path $ProjectPath -Leaf
 
-    # Calculate totals (BUG FIX: Default $null to 0)
-    $totalBlockers = ($AllFindings.Values | Measure-Object -Property Blockers -Sum).Sum
-    $totalHigh = ($AllFindings.Values | Measure-Object -Property High -Sum).Sum
-    $totalMedium = ($AllFindings.Values | Measure-Object -Property Medium -Sum).Sum
-    $totalLow = ($AllFindings.Values | Measure-Object -Property Low -Sum).Sum
-
-    # PowerShell Measure-Object returns $null for sum of zeros, not 0
-    if ($null -eq $totalBlockers) { $totalBlockers = 0 }
-    if ($null -eq $totalHigh) { $totalHigh = 0 }
-    if ($null -eq $totalMedium) { $totalMedium = 0 }
-    if ($null -eq $totalLow) { $totalLow = 0 }
+    # Calculate totals (sum hashtable values directly for PS 5.1 compatibility)
+    $totalBlockers = 0; $totalHigh = 0; $totalMedium = 0; $totalLow = 0
+    foreach ($val in $AllFindings.Values) {
+        if ($val) {
+            $totalBlockers += [int]$val.Blockers
+            $totalHigh += [int]$val.High
+            $totalMedium += [int]$val.Medium
+            $totalLow += [int]$val.Low
+        }
+    }
 
     # BUG FIX: If we have existing findings files but AllFindings is empty/wrong,
     # re-scan the files directly
@@ -788,14 +838,15 @@ function New-SynthesisReport {
             }
         }
         # Recalculate totals
-        $totalBlockers = ($AllFindings.Values | Measure-Object -Property Blockers -Sum).Sum
-        $totalHigh = ($AllFindings.Values | Measure-Object -Property High -Sum).Sum
-        $totalMedium = ($AllFindings.Values | Measure-Object -Property Medium -Sum).Sum
-        $totalLow = ($AllFindings.Values | Measure-Object -Property Low -Sum).Sum
-        if ($null -eq $totalBlockers) { $totalBlockers = 0 }
-        if ($null -eq $totalHigh) { $totalHigh = 0 }
-        if ($null -eq $totalMedium) { $totalMedium = 0 }
-        if ($null -eq $totalLow) { $totalLow = 0 }
+        $totalBlockers = 0; $totalHigh = 0; $totalMedium = 0; $totalLow = 0
+        foreach ($val in $AllFindings.Values) {
+            if ($val) {
+                $totalBlockers += [int]$val.Blockers
+                $totalHigh += [int]$val.High
+                $totalMedium += [int]$val.Medium
+                $totalLow += [int]$val.Low
+            }
+        }
     }
 
     # Determine verdict
@@ -896,7 +947,7 @@ function Main {
 
     # Handle -Standards command (no Claude required)
     if ($Standards) {
-        $standardsScript = Join-Path $PSScriptRoot "commands" "standards.ps1"
+        $standardsScript = Join-Path (Join-Path $PSScriptRoot "commands") "standards.ps1"
         if (Test-Path $standardsScript) {
             switch ($Standards) {
                 "list" {
@@ -925,7 +976,7 @@ function Main {
             Write-Host "    Example: .\ccl.ps1 -Map `"./project/.code-conclave/reviews`" -Standard cmmc-l2" -ForegroundColor Gray
             return
         }
-        $mapScript = Join-Path $PSScriptRoot "commands" "map.ps1"
+        $mapScript = Join-Path (Join-Path $PSScriptRoot "commands") "map.ps1"
         if (Test-Path $mapScript) {
             & $mapScript -ReviewsPath $Map -StandardId $Standard
         }
@@ -1053,28 +1104,54 @@ function Main {
     $effectiveConfig = Get-EffectiveConfig -ProjectPath $Project -Profile $Profile `
         -AddStandards $AddStandards -SkipStandards $SkipStandards
 
-    # Build project context ONCE (before agent loop — shared across all agents)
-    Write-Status "Scanning project context..." "INFO"
-    $diffContext = Get-DiffContext -ProjectPath $Project -BaseBranch $BaseBranch
-
-    if ($diffContext) {
-        Write-Status "Diff-scoped: $($diffContext.FileCount) changed files ($($diffContext.TotalSizeKB) KB) against $($diffContext.BaseRef)" "OK"
-        $fileTree = Get-ProjectFileTree -ProjectPath $Project -MaxDepth 3
-        $projectSourceContent = $diffContext.FileContents
-        $diffSection = "`n# GIT DIFF (what changed in this PR)`n``````diff`n$($diffContext.Diff)`n```````n"
-    } else {
-        $fileTree = Get-ProjectFileTree -ProjectPath $Project
-        $projectSourceContent = Get-SourceFilesContent -ProjectPath $Project -MaxFiles 50 -MaxSizeKB 500
-        # Extract file count from the header line: "# Source Files (N files, X KB)"
-        if ($projectSourceContent -match '# Source Files \((\d+) files, ([\d.]+) KB\)') {
-            Write-Status "Full scan: $($Matches[1]) files ($($Matches[2]) KB)" "INFO"
+    # Auto-detect ScanDepth if not specified
+    if (-not $ScanDepth) {
+        $ScanDepth = if ($BaseBranch -or $env:GITHUB_BASE_REF -or $env:SYSTEM_PULLREQUEST_TARGETBRANCH) {
+            "light"
         } else {
-            Write-Status "Full scan mode (no diff context available)" "INFO"
+            "deep"
         }
-        $diffSection = ""
+    }
+    Write-Host "  Scan depth: $ScanDepth ($(if ($PSBoundParameters.ContainsKey('ScanDepth')) { 'explicit' } else { 'auto-detected' }))" -ForegroundColor White
+
+    # Build project context ONCE (before agent loop -- shared across all agents)
+    Write-Status "Scanning project context..." "INFO"
+
+    $scanInfo = @{ Depth = $ScanDepth; FileCount = 0; TotalSizeKB = 0; TotalEligible = 0 }
+    $diffSection = ""
+
+    if ($ScanDepth -eq "light") {
+        # Light mode: diff only (existing behavior)
+        $diffContext = Get-DiffContext -ProjectPath $Project -BaseBranch $BaseBranch
+        if ($diffContext) {
+            Write-Status "Diff-scoped: $($diffContext.FileCount) changed files ($($diffContext.TotalSizeKB) KB) against $($diffContext.BaseRef)" "OK"
+            $fileTree = Get-ProjectFileTree -ProjectPath $Project -MaxDepth 3
+            $projectSourceContent = $diffContext.FileContents
+            $diffSection = "`n# GIT DIFF (what changed in this PR)`n``````diff`n$($diffContext.Diff)`n```````n"
+            $scanInfo.FileCount = $diffContext.FileCount
+            $scanInfo.TotalSizeKB = $diffContext.TotalSizeKB
+        } else {
+            # No diff available, fall back to deep scan
+            Write-Status "No diff context available, falling back to deep scan" "WARN"
+            $ScanDepth = "deep"
+            $scanInfo.Depth = "deep"
+        }
     }
 
-    # Build shared context (cacheable — identical across all agents)
+    if ($ScanDepth -in @("standard", "deep")) {
+        # Deep/standard mode: tier-based priority scan
+        $fileTree = Get-ProjectFileTree -ProjectPath $Project
+        # MaxSizeKB: configurable via ai.max_context_kb (default 100KB for Tier 1 API limits)
+        $maxContextKB = if ($effectiveConfig.ai.max_context_kb) { [int]$effectiveConfig.ai.max_context_kb } else { 100 }
+        $scanResult = Get-SourceFilesContent -ProjectPath $Project -MaxFiles 75 -MaxSizeKB $maxContextKB
+        $projectSourceContent = $scanResult.Content
+        $scanInfo.FileCount = $scanResult.FileCount
+        $scanInfo.TotalSizeKB = $scanResult.TotalSizeKB
+        $scanInfo.TotalEligible = $scanResult.TotalEligible
+        Write-Status "Full scan: $($scanResult.FileCount) of $($scanResult.TotalEligible) files ($($scanResult.TotalSizeKB) KB)" "INFO"
+    }
+
+    # Build shared context (cacheable -- identical across all agents)
     # This goes in system prompt block 1 for prompt caching
     $projectContracts = Join-Path $Project ".code-conclave\CONTRACTS.md"
     $defaultContracts = Join-Path $Script:ToolRoot "CONTRACTS.md"
@@ -1082,6 +1159,17 @@ function Main {
     $contracts = Get-Content $contractsFile -Raw -Encoding UTF8
 
     $projectName = Split-Path $Project -Leaf
+
+    # Context summary footer -- tells agents what they can and can't see
+    $contextSummary = @"
+
+--- CONTEXT SUMMARY ---
+Scan depth: $($scanInfo.Depth)
+Source files provided: $($scanInfo.FileCount) of $($scanInfo.TotalEligible) project files ($($scanInfo.TotalSizeKB) KB)
+Files in the FILE STRUCTURE tree but NOT in SOURCE FILES have unknown contents.
+Do NOT assume contents of files you have not been shown.
+"@
+
     $sharedContext = @"
 # CONTRACTS (Severity Definitions & Output Format)
 $contracts
@@ -1095,6 +1183,7 @@ $fileTree
 # SOURCE FILES
 $projectSourceContent
 $diffSection
+$contextSummary
 "@
 
     $contextChars = $sharedContext.Length
@@ -1195,8 +1284,20 @@ $diffSection
         }
         Write-Status "Generating JUnit XML..." "INFO"
 
-        # Parse findings from markdown files for JUnit format
-        $junitFindings = Get-FindingsForJUnit -ReviewsDir $reviewsDir -AgentDefs $Script:AgentDefs
+        # Prefer JSON data if available; fall back to markdown parsing
+        $jsonFindingsForJUnit = @{}
+        foreach ($key in $allFindings.Keys) {
+            if ($allFindings[$key] -and $allFindings[$key].JsonFindings) {
+                $jsonFindingsForJUnit[$key] = $allFindings[$key].JsonFindings
+            }
+        }
+
+        $junitFindings = $null
+        if ($jsonFindingsForJUnit.Count -gt 0 -and (Get-Command ConvertTo-JUnitFindings -ErrorAction SilentlyContinue)) {
+            $junitFindings = ConvertTo-JUnitFindings -JsonFindings $jsonFindingsForJUnit
+        } else {
+            $junitFindings = Get-FindingsForJUnit -ReviewsDir $reviewsDir -AgentDefs $Script:AgentDefs
+        }
 
         $junitPath = Join-Path $reviewsDir "conclave-results.xml"
         $junitResult = Export-JUnitResults `
@@ -1212,7 +1313,7 @@ $diffSection
     # Generate compliance mapping if -Standard was specified
     if ($Standard -and -not $DryRun) {
         Write-Banner "COMPLIANCE MAPPING" "Magenta"
-        $mapScript = Join-Path $PSScriptRoot "commands" "map.ps1"
+        $mapScript = Join-Path (Join-Path $PSScriptRoot "commands") "map.ps1"
         if (Test-Path $mapScript) {
             & $mapScript -ReviewsPath $reviewsDir -StandardId $Standard
         }
@@ -1222,10 +1323,10 @@ $diffSection
     }
 
     # Calculate verdict for exit codes
-    $totalBlockers = ($allFindings.Values | Where-Object { $_ } | Measure-Object -Property Blockers -Sum).Sum
-    $totalHigh = ($allFindings.Values | Where-Object { $_ } | Measure-Object -Property High -Sum).Sum
-    if ($null -eq $totalBlockers) { $totalBlockers = 0 }
-    if ($null -eq $totalHigh) { $totalHigh = 0 }
+    $totalBlockers = 0; $totalHigh = 0
+    foreach ($val in $allFindings.Values) {
+        if ($val) { $totalBlockers += [int]$val.Blockers; $totalHigh += [int]$val.High }
+    }
 
     $verdict = if ($totalBlockers -gt 0) { "HOLD" }
                elseif ($totalHigh -gt 3) { "CONDITIONAL" }
@@ -1237,6 +1338,47 @@ $diffSection
         "CONDITIONAL" { 2 }
         "HOLD"        { 1 }
         default       { 0 }
+    }
+
+    # Archive run results and clean up working files
+    if (Get-Command Export-RunArchive -ErrorAction SilentlyContinue) {
+        try {
+            # Collect JSON findings from agent results
+            $allJsonFindings = @{}
+            foreach ($key in $allFindings.Keys) {
+                if ($allFindings[$key] -and $allFindings[$key].JsonFindings) {
+                    $allJsonFindings[$key] = $allFindings[$key].JsonFindings
+                }
+            }
+
+            if ($allJsonFindings.Count -gt 0) {
+                $providerName = if ($provider) { $provider.Name } else { "dryrun" }
+                $archivePath = Export-RunArchive `
+                    -ReviewsDir $reviewsDir `
+                    -AgentFindings $allJsonFindings `
+                    -RunMetadata @{
+                        Timestamp       = $startTime
+                        Project         = (Split-Path $Project -Leaf)
+                        ProjectPath     = $Project
+                        Duration        = $totalDuration.TotalSeconds
+                        DryRun          = [bool]$DryRun
+                        BaseBranch      = $BaseBranch
+                        Standard        = $Standard
+                        Provider        = $providerName
+                        AgentsRequested = $validAgents
+                        Verdict         = $verdict
+                        ExitCode        = $exitCode
+                    }
+                Write-Status "Run archived: $archivePath" "OK"
+
+                # Clean up working files (dashboard will use archive for history)
+                Remove-WorkingFindings -ReviewsDir $reviewsDir
+                Write-Status "Working files cleaned up" "INFO"
+            }
+        }
+        catch {
+            Write-Status "Archive failed: $_" "WARN"
+        }
     }
 
     # Detect CI environment

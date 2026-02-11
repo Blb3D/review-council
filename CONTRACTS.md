@@ -123,6 +123,30 @@ Agents should NOT:
 
 ---
 
+## Evidence-Based Severity Rules (MANDATORY)
+
+### BLOCKER/HIGH requires verified evidence
+
+A finding may only be rated BLOCKER or HIGH if ALL of these are true:
+
+1. The file's **SOURCE CODE** was provided in the SOURCE FILES section (not just listed in the FILE STRUCTURE tree)
+2. The Evidence section contains a **specific code snippet or direct quote** from the file
+3. The finding describes a **concrete, verified problem** -- not an inference from file names
+
+### Unverified findings cap at MEDIUM
+
+If a file appears in the FILE STRUCTURE tree but its contents were NOT provided in SOURCE FILES:
+
+- Severity **MUST** be capped at MEDIUM
+- The finding must note: *"File contents not provided -- needs verification."*
+- Do NOT claim something is "missing" when you simply cannot see the file's contents
+
+### Hedging language = MEDIUM max
+
+If your finding uses hedging words like "likely", "probably", "may", "appears to", "suggests", "not visible", or "contents not accessible", this indicates you are not certain. Cap the severity at MEDIUM.
+
+---
+
 ## Severity Guidelines by Agent
 
 ### SENTINEL (Quality)

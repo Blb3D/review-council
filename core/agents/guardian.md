@@ -105,6 +105,24 @@ Check all user inputs are validated:
 
 ## False Positive Prevention
 
+### File Contents vs File Tree (CRITICAL)
+
+You receive two types of information:
+
+1. **FILE STRUCTURE** -- a tree showing all file/directory names in the project
+2. **SOURCE FILES** -- actual contents for a subset of files
+
+**RULE:** If a file appears in FILE STRUCTURE but NOT in SOURCE FILES, you do NOT know its contents. You MUST NOT:
+
+- Claim a file is "missing" functionality you haven't verified
+- Claim "no input validation" when you can't see the code
+- Claim "no authentication" when auth files exist but weren't provided
+- Rate any unverified finding as BLOCKER or HIGH
+
+Instead: Flag as MEDIUM with note "File contents not provided -- needs verification."
+
+### Check for Existing Mitigations
+
 Before flagging an issue, check for existing mitigations:
 
 ### Already Secured Patterns
