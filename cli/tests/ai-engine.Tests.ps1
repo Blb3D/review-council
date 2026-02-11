@@ -119,13 +119,13 @@ Describe "Get-AIProvider" {
                 ai = @{
                     provider = "anthropic"
                     anthropic = @{
-                        model = "claude-sonnet-4-20250514"
+                        model = "claude-sonnet-4-5-20250929"
                         max_tokens = 8000
                     }
                 }
             }
             $provider = Get-AIProvider -Config $config
-            $provider.Config.model | Should Be "claude-sonnet-4-20250514"
+            $provider.Config.model | Should Be "claude-sonnet-4-5-20250929"
             $provider.Config.max_tokens | Should Be 8000
         }
 
@@ -133,7 +133,7 @@ Describe "Get-AIProvider" {
             $config = @{
                 ai = @{
                     provider = "anthropic"
-                    anthropic = @{ model = "claude-sonnet-4-20250514" }
+                    anthropic = @{ model = "claude-sonnet-4-5-20250929" }
                 }
             }
             $provider = Get-AIProvider -Config $config -ModelOverride "claude-haiku-4-5-20251001"
@@ -194,7 +194,7 @@ Describe "Error Message Sanitization Integration" {
             $complexError = @"
 Request failed: POST https://api.anthropic.com/v1/messages
 Headers: x-api-key: sk-ant-secret-key-here
-Body: {"model": "claude-sonnet-4-20250514"}
+Body: {"model": "claude-sonnet-4-5-20250929"}
 Response: 400 Bad Request - Invalid model
 "@
             $result = Get-SanitizedError $complexError

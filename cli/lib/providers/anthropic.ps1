@@ -36,7 +36,7 @@ function Invoke-AnthropicCompletion {
     # Model override (for tier support), then config, then default
     $modelName = if ($Model) { $Model }
                  elseif ($config.model) { $config.model }
-                 else { "claude-sonnet-4-20250514" }
+                 else { "claude-sonnet-4-5-20250929" }
     $maxTok = if ($MaxTokens -gt 0) { $MaxTokens }
               elseif ($config.max_tokens) { $config.max_tokens }
               else { 16000 }
@@ -103,11 +103,15 @@ function Invoke-AnthropicCompletion {
         }
     }
     catch {
+        $errMsg = $_.Exception.Message
+        if ($_.ErrorDetails -and $_.ErrorDetails.Message) {
+            $errMsg += " | Details: $($_.ErrorDetails.Message)"
+        }
         return @{
             Success    = $false
             Content    = $null
             TokensUsed = $null
-            Error      = $_.Exception.Message
+            Error      = $errMsg
         }
     }
 }

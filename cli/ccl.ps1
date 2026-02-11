@@ -103,7 +103,11 @@ param(
     [string]$AIEndpoint,
 
     # Base branch for diff-scoped reviews (auto-detected in CI)
-    [string]$BaseBranch
+    [string]$BaseBranch,
+
+    # Scan depth: light (diff only), standard/deep (tier-based priority scan)
+    [ValidateSet("light", "standard", "deep")]
+    [string]$ScanDepth
 )
 
 # ============================================================================
@@ -264,7 +268,7 @@ ai:
   provider: anthropic          # anthropic | azure-openai | openai | ollama
   temperature: 0.3
   anthropic:
-    model: claude-sonnet-4-20250514
+    model: claude-sonnet-4-5-20250929
     api_key_env: ANTHROPIC_API_KEY
     max_tokens: 16000
   # azure-openai:
@@ -708,9 +712,13 @@ $agentInstructions
 6. Be thorough but concise
 "@
 
-    # User prompt is minimal — project context is in SharedContext (system prompt block 1)
+    # User prompt is minimal -- project context is in SharedContext (system prompt block 1)
     $projectName = Split-Path $ProjectPath -Leaf
-    $userPrompt = "Execute your $($agent.Name) review of project '$projectName' now. Analyze the code provided in the system context and produce your findings report."
+    $userPrompt = @"
+Execute your $($agent.Name) review of project '$projectName' now. Analyze the code provided in the system context and produce your findings report.
+
+IMPORTANT: Only rate findings BLOCKER or HIGH when you can cite specific code from the SOURCE FILES provided. If a file appears in the FILE STRUCTURE tree but its contents were not provided in SOURCE FILES, you do NOT know what it contains. Cap any such finding at MEDIUM with a note: "File contents not provided -- needs verification."
+"@
 
     try {
         $startTime = Get-Date
@@ -1096,28 +1104,54 @@ function Main {
     $effectiveConfig = Get-EffectiveConfig -ProjectPath $Project -Profile $Profile `
         -AddStandards $AddStandards -SkipStandards $SkipStandards
 
-    # Build project context ONCE (before agent loop — shared across all agents)
-    Write-Status "Scanning project context..." "INFO"
-    $diffContext = Get-DiffContext -ProjectPath $Project -BaseBranch $BaseBranch
-
-    if ($diffContext) {
-        Write-Status "Diff-scoped: $($diffContext.FileCount) changed files ($($diffContext.TotalSizeKB) KB) against $($diffContext.BaseRef)" "OK"
-        $fileTree = Get-ProjectFileTree -ProjectPath $Project -MaxDepth 3
-        $projectSourceContent = $diffContext.FileContents
-        $diffSection = "`n# GIT DIFF (what changed in this PR)`n``````diff`n$($diffContext.Diff)`n```````n"
-    } else {
-        $fileTree = Get-ProjectFileTree -ProjectPath $Project
-        $projectSourceContent = Get-SourceFilesContent -ProjectPath $Project -MaxFiles 50 -MaxSizeKB 500
-        # Extract file count from the header line: "# Source Files (N files, X KB)"
-        if ($projectSourceContent -match '# Source Files \((\d+) files, ([\d.]+) KB\)') {
-            Write-Status "Full scan: $($Matches[1]) files ($($Matches[2]) KB)" "INFO"
+    # Auto-detect ScanDepth if not specified
+    if (-not $ScanDepth) {
+        $ScanDepth = if ($BaseBranch -or $env:GITHUB_BASE_REF -or $env:SYSTEM_PULLREQUEST_TARGETBRANCH) {
+            "light"
         } else {
-            Write-Status "Full scan mode (no diff context available)" "INFO"
+            "deep"
         }
-        $diffSection = ""
+    }
+    Write-Host "  Scan depth: $ScanDepth ($(if ($PSBoundParameters.ContainsKey('ScanDepth')) { 'explicit' } else { 'auto-detected' }))" -ForegroundColor White
+
+    # Build project context ONCE (before agent loop -- shared across all agents)
+    Write-Status "Scanning project context..." "INFO"
+
+    $scanInfo = @{ Depth = $ScanDepth; FileCount = 0; TotalSizeKB = 0; TotalEligible = 0 }
+    $diffSection = ""
+
+    if ($ScanDepth -eq "light") {
+        # Light mode: diff only (existing behavior)
+        $diffContext = Get-DiffContext -ProjectPath $Project -BaseBranch $BaseBranch
+        if ($diffContext) {
+            Write-Status "Diff-scoped: $($diffContext.FileCount) changed files ($($diffContext.TotalSizeKB) KB) against $($diffContext.BaseRef)" "OK"
+            $fileTree = Get-ProjectFileTree -ProjectPath $Project -MaxDepth 3
+            $projectSourceContent = $diffContext.FileContents
+            $diffSection = "`n# GIT DIFF (what changed in this PR)`n``````diff`n$($diffContext.Diff)`n```````n"
+            $scanInfo.FileCount = $diffContext.FileCount
+            $scanInfo.TotalSizeKB = $diffContext.TotalSizeKB
+        } else {
+            # No diff available, fall back to deep scan
+            Write-Status "No diff context available, falling back to deep scan" "WARN"
+            $ScanDepth = "deep"
+            $scanInfo.Depth = "deep"
+        }
     }
 
-    # Build shared context (cacheable — identical across all agents)
+    if ($ScanDepth -in @("standard", "deep")) {
+        # Deep/standard mode: tier-based priority scan
+        $fileTree = Get-ProjectFileTree -ProjectPath $Project
+        # MaxSizeKB: configurable via ai.max_context_kb (default 100KB for Tier 1 API limits)
+        $maxContextKB = if ($effectiveConfig.ai.max_context_kb) { [int]$effectiveConfig.ai.max_context_kb } else { 100 }
+        $scanResult = Get-SourceFilesContent -ProjectPath $Project -MaxFiles 75 -MaxSizeKB $maxContextKB
+        $projectSourceContent = $scanResult.Content
+        $scanInfo.FileCount = $scanResult.FileCount
+        $scanInfo.TotalSizeKB = $scanResult.TotalSizeKB
+        $scanInfo.TotalEligible = $scanResult.TotalEligible
+        Write-Status "Full scan: $($scanResult.FileCount) of $($scanResult.TotalEligible) files ($($scanResult.TotalSizeKB) KB)" "INFO"
+    }
+
+    # Build shared context (cacheable -- identical across all agents)
     # This goes in system prompt block 1 for prompt caching
     $projectContracts = Join-Path $Project ".code-conclave\CONTRACTS.md"
     $defaultContracts = Join-Path $Script:ToolRoot "CONTRACTS.md"
@@ -1125,6 +1159,17 @@ function Main {
     $contracts = Get-Content $contractsFile -Raw -Encoding UTF8
 
     $projectName = Split-Path $Project -Leaf
+
+    # Context summary footer -- tells agents what they can and can't see
+    $contextSummary = @"
+
+--- CONTEXT SUMMARY ---
+Scan depth: $($scanInfo.Depth)
+Source files provided: $($scanInfo.FileCount) of $($scanInfo.TotalEligible) project files ($($scanInfo.TotalSizeKB) KB)
+Files in the FILE STRUCTURE tree but NOT in SOURCE FILES have unknown contents.
+Do NOT assume contents of files you have not been shown.
+"@
+
     $sharedContext = @"
 # CONTRACTS (Severity Definitions & Output Format)
 $contracts
@@ -1138,6 +1183,7 @@ $fileTree
 # SOURCE FILES
 $projectSourceContent
 $diffSection
+$contextSummary
 "@
 
     $contextChars = $sharedContext.Length

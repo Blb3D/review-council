@@ -59,23 +59,32 @@ Describe "Get-ProjectFileTree" {
 
 Describe "Get-SourceFilesContent" {
     Context "File Reading" {
-        It "returns content from source files" {
+        It "returns a hashtable with Content key" {
             $testPath = $PSScriptRoot
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 5 -MaxSizeKB 100
             $result | Should Not BeNullOrEmpty
+            $result.Content | Should Not BeNullOrEmpty
         }
 
         It "includes file headers with paths" {
             $testPath = $PSScriptRoot
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 5 -MaxSizeKB 100
-            $result | Should Match "\.ps1"
+            $result.Content | Should Match "\.ps1"
         }
 
         It "respects MaxFiles limit" {
             $testPath = Split-Path $PSScriptRoot -Parent
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 3 -MaxSizeKB 500
-            $fileCount = ($result | Select-String -Pattern "^## File:" -AllMatches).Matches.Count
+            $fileCount = ($result.Content | Select-String -Pattern "^## File:" -AllMatches).Matches.Count
             ($fileCount -le 3) | Should Be $true
+        }
+
+        It "returns FileCount and TotalSizeKB metadata" {
+            $testPath = $PSScriptRoot
+            $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 5 -MaxSizeKB 100
+            ($result.FileCount -gt 0) | Should Be $true
+            ($result.TotalSizeKB -gt 0) | Should Be $true
+            ($result.TotalEligible -ge $result.FileCount) | Should Be $true
         }
     }
 
@@ -83,7 +92,7 @@ Describe "Get-SourceFilesContent" {
         It "respects MaxSizeKB limit" {
             $testPath = Split-Path $PSScriptRoot -Parent
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 100 -MaxSizeKB 10
-            $sizeKB = [math]::Round($result.Length / 1024, 2)
+            $sizeKB = [math]::Round($result.Content.Length / 1024, 2)
             # Allow some overhead for headers
             ($sizeKB -le 15) | Should Be $true
         }
@@ -93,14 +102,75 @@ Describe "Get-SourceFilesContent" {
         It "includes PowerShell files by default" {
             $testPath = $PSScriptRoot
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 10 -MaxSizeKB 100
-            $result | Should Match "\.ps1"
+            $result.Content | Should Match "\.ps1"
         }
 
         It "respects custom IncludeExtensions" {
             $testPath = $PSScriptRoot
             $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 10 -MaxSizeKB 100 -IncludeExtensions @('.nonexistent')
-            # Should return empty or just headers if no matching files
-            ($result.Length -le 100) | Should Be $true
+            # Should return empty content when no files match
+            ($result.FileCount -eq 0) | Should Be $true
+        }
+    }
+
+    Context "Priority Tier Selection" {
+        It "skips files smaller than MinFileBytes" {
+            $testPath = $PSScriptRoot
+            # With a very high minimum, should skip small files
+            $result = Get-SourceFilesContent -ProjectPath $testPath -MaxFiles 100 -MaxSizeKB 500 -MinFileBytes 999999
+            ($result.FileCount -eq 0) | Should Be $true
+        }
+    }
+}
+
+Describe "Get-FileTier" {
+    Context "Tier Classification" {
+        It "classifies main.py as Tier 1" {
+            $file = [PSCustomObject]@{ Name = "main.py"; FullName = "C:\project\main.py"; Extension = ".py"; DirectoryName = "C:\project"; Length = 1000 }
+            $tier = Get-FileTier -File $file -ProjectPath "C:\project"
+            $tier | Should Be 1
+        }
+
+        It "classifies Dockerfile as Tier 1" {
+            $file = [PSCustomObject]@{ Name = "Dockerfile"; FullName = "C:\project\Dockerfile"; Extension = ""; DirectoryName = "C:\project"; Length = 500 }
+            $tier = Get-FileTier -File $file -ProjectPath "C:\project"
+            $tier | Should Be 1
+        }
+
+        It "classifies services/ files as Tier 2" {
+            $file = [PSCustomObject]@{ Name = "auth.py"; FullName = "C:\project\services\auth.py"; Extension = ".py"; DirectoryName = "C:\project\services"; Length = 5000 }
+            $tier = Get-FileTier -File $file -ProjectPath "C:\project"
+            $tier | Should Be 2
+        }
+
+        It "classifies test files as Tier 4 even in services/" {
+            $file = [PSCustomObject]@{ Name = "test_auth.py"; FullName = "C:\project\services\test_auth.py"; Extension = ".py"; DirectoryName = "C:\project\services"; Length = 5000 }
+            $tier = Get-FileTier -File $file -ProjectPath "C:\project"
+            $tier | Should Be 4
+        }
+
+        It "classifies models/ files as Tier 3" {
+            $file = [PSCustomObject]@{ Name = "user.py"; FullName = "C:\project\models\user.py"; Extension = ".py"; DirectoryName = "C:\project\models"; Length = 2000 }
+            $tier = Get-FileTier -File $file -ProjectPath "C:\project"
+            $tier | Should Be 3
+        }
+
+        It "classifies README as Tier 5" {
+            $file = [PSCustomObject]@{ Name = "README.md"; FullName = "C:\project\README.md"; Extension = ".md"; DirectoryName = "C:\project"; Length = 3000 }
+            $tier = Get-FileTier -File $file -ProjectPath "C:\project"
+            $tier | Should Be 5
+        }
+
+        It "classifies components/ files as Tier 6" {
+            $file = [PSCustomObject]@{ Name = "Button.tsx"; FullName = "C:\project\components\Button.tsx"; Extension = ".tsx"; DirectoryName = "C:\project\components"; Length = 1000 }
+            $tier = Get-FileTier -File $file -ProjectPath "C:\project"
+            $tier | Should Be 6
+        }
+
+        It "classifies random files as Tier 7" {
+            $file = [PSCustomObject]@{ Name = "helper.py"; FullName = "C:\project\helper.py"; Extension = ".py"; DirectoryName = "C:\project"; Length = 500 }
+            $tier = Get-FileTier -File $file -ProjectPath "C:\project"
+            $tier | Should Be 7
         }
     }
 }
@@ -156,12 +226,13 @@ Describe "Integration" {
         It "can scan the CLI directory" {
             $cliPath = Split-Path $PSScriptRoot -Parent
             $tree = Get-ProjectFileTree -ProjectPath $cliPath -MaxDepth 2
-            $content = Get-SourceFilesContent -ProjectPath $cliPath -MaxFiles 5 -MaxSizeKB 50
+            $scanResult = Get-SourceFilesContent -ProjectPath $cliPath -MaxFiles 5 -MaxSizeKB 50
 
             $tree | Should Not BeNullOrEmpty
-            $content | Should Not BeNullOrEmpty
+            $scanResult | Should Not BeNullOrEmpty
             $tree | Should Match "lib"
-            $content | Should Match "function"
+            $scanResult.Content | Should Match "function"
+            ($scanResult.FileCount -gt 0) | Should Be $true
         }
     }
 }

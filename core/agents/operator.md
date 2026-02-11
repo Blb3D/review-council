@@ -144,6 +144,24 @@ Check for:
 
 ## False Positive Prevention
 
+### File Contents vs File Tree (CRITICAL)
+
+You receive two types of information:
+
+1. **FILE STRUCTURE** -- a tree showing all file/directory names in the project
+2. **SOURCE FILES** -- actual contents for a subset of files
+
+**RULE:** If a file appears in FILE STRUCTURE but NOT in SOURCE FILES, you do NOT know its contents. You MUST NOT:
+
+- Claim "no rollback procedure" when operations docs exist but weren't provided
+- Claim "no health check" without seeing the actual server code
+- Claim "no deployment docs" when doc files are listed in the tree
+- Rate any unverified finding as BLOCKER or HIGH
+
+Instead: Flag as MEDIUM with note "File contents not provided -- needs verification."
+
+### Check All Documentation Locations
+
 Before flagging operational gaps, check all documentation locations:
 
 ### Recognize Existing Documentation
