@@ -48,8 +48,8 @@ function Get-ProjectFileTree {
         for ($i = 0; $i -lt $items.Count; $i++) {
             $item = $items[$i]
             $isLast = ($i -eq $items.Count - 1)
-            $connector = if ($isLast) { "└── " } else { "├── " }
-            $extension = if ($isLast) { "    " } else { "│   " }
+            $connector = if ($isLast) { "+-- " } else { "|-- " }
+            $extension = if ($isLast) { "    " } else { "|   " }
 
             [void]$sb.AppendLine("$Prefix$connector$($item.Name)")
 
@@ -265,7 +265,7 @@ function Get-DiffContext {
         if ($diffBytes -gt ($MaxDiffKB * 1024)) {
             $truncateAt = $MaxDiffKB * 1024
             $diffText = $diffText.Substring(0, [math]::Min($truncateAt, $diffText.Length))
-            $diffText += "`n`n[Diff truncated at ${MaxDiffKB}KB — some files omitted. Full file contents included above.]"
+            $diffText += "`n`n[Diff truncated at ${MaxDiffKB}KB -- some files omitted. Full file contents included above.]"
         }
     } else {
         $diffText = "(diff unavailable)"

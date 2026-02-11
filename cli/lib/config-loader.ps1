@@ -106,7 +106,7 @@ function Get-ProjectConfig {
         [string]$ProjectPath
     )
     
-    $configPath = Join-Path $ProjectPath ".code-conclave" "config.yaml"
+    $configPath = Join-Path (Join-Path $ProjectPath ".code-conclave") "config.yaml"
     
     if (-not (Test-Path $configPath)) {
         Write-Verbose "No project config found at: $configPath"

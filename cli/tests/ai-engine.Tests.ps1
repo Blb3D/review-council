@@ -9,7 +9,7 @@
 
 # Load the module under test
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-. (Join-Path $here ".." "lib" "ai-engine.ps1")
+. (Join-Path (Join-Path (Join-Path $here "..") "lib") "ai-engine.ps1")
 
 Describe "Get-SanitizedError" {
     Context "API Key Redaction" {

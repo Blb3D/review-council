@@ -9,7 +9,7 @@
 
 # Load the module under test
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-. (Join-Path $here ".." "lib" "project-scanner.ps1")
+. (Join-Path (Join-Path (Join-Path $here "..") "lib") "project-scanner.ps1")
 
 Describe "Get-ProjectFileTree" {
     Context "Basic Functionality" {

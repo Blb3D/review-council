@@ -43,8 +43,8 @@ param(
 
 # Path setup
 $Script:ToolRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$Script:TemplatesDir = Join-Path $ToolRoot "core" "templates"
-$Script:StandardsDir = Join-Path $ToolRoot "core" "standards"
+$Script:TemplatesDir = Join-Path (Join-Path $ToolRoot "core") "templates"
+$Script:StandardsDir = Join-Path (Join-Path $ToolRoot "core") "standards"
 
 # Source dependencies
 $libPath = Join-Path $PSScriptRoot "..\lib"

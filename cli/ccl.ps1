@@ -146,6 +146,11 @@ if (Test-Path $projectScannerPath) {
     . $projectScannerPath
 }
 
+$findingsParserPath = Join-Path $Script:LibDir "findings-parser.ps1"
+if (Test-Path $findingsParserPath) {
+    . $findingsParserPath
+}
+
 $Script:AgentDefs = [ordered]@{
     sentinel  = @{ Name = "SENTINEL";  Role = "Quality and Compliance"; Color = "Yellow" }
     guardian  = @{ Name = "GUARDIAN";  Role = "Security";               Color = "Red" }
@@ -651,8 +656,26 @@ function Invoke-ReviewAgent {
         $mockContent = Get-MockFindings -AgentKey $AgentKey -AgentName $agent.Name
         $mockContent | Out-File -FilePath $outputFile -Encoding UTF8
         Write-Status "Mock findings written: $outputFile" "OK"
+
+        # Parse to JSON for dashboard consumption
+        if (Get-Command ConvertFrom-FindingsMarkdown -ErrorAction SilentlyContinue) {
+            $projectName = Split-Path $ProjectPath -Leaf
+            $jsonFindings = ConvertFrom-FindingsMarkdown `
+                -Content $mockContent `
+                -AgentKey $AgentKey `
+                -AgentName $agent.Name `
+                -AgentRole $agent.Role `
+                -ProjectName $projectName `
+                -ProjectPath $ProjectPath `
+                -DryRun
+            $jsonOutputFile = Join-Path $ReviewsDir "$AgentKey-findings.json"
+            Export-FindingsJson -Findings $jsonFindings -OutputPath $jsonOutputFile | Out-Null
+        }
+
         $counts = Get-FindingsCounts $outputFile
         Write-FindingsSummary $counts
+        # Attach parsed JSON data for archival
+        if ($jsonFindings) { $counts.JsonFindings = $jsonFindings }
         return $counts
     }
 
@@ -728,9 +751,29 @@ $agentInstructions
         # Write AI response to findings file
         $aiResult.Content | Out-File -FilePath $outputFile -Encoding UTF8
 
+        # Parse to JSON for dashboard consumption
+        $jsonFindings = $null
+        if (Get-Command ConvertFrom-FindingsMarkdown -ErrorAction SilentlyContinue) {
+            $projectName = Split-Path $ProjectPath -Leaf
+            $jsonFindings = ConvertFrom-FindingsMarkdown `
+                -Content $aiResult.Content `
+                -AgentKey $AgentKey `
+                -AgentName $agent.Name `
+                -AgentRole $agent.Role `
+                -ProjectName $projectName `
+                -ProjectPath $ProjectPath `
+                -DurationSeconds $duration.TotalSeconds `
+                -TokensUsed $aiResult.TokensUsed `
+                -Tier $agentTier
+            $jsonOutputFile = Join-Path $ReviewsDir "$AgentKey-findings.json"
+            Export-FindingsJson -Findings $jsonFindings -OutputPath $jsonOutputFile | Out-Null
+        }
+
         # Get findings counts
         $counts = Get-FindingsCounts $outputFile
         $counts.TokensUsed = $aiResult.TokensUsed
+        # Attach parsed JSON data for archival
+        if ($jsonFindings) { $counts.JsonFindings = $jsonFindings }
         Write-FindingsSummary $counts
 
         return $counts
@@ -758,17 +801,16 @@ function New-SynthesisReport {
     $date = Get-Date -Format "yyyy-MM-dd HH:mm"
     $projectName = Split-Path $ProjectPath -Leaf
 
-    # Calculate totals (BUG FIX: Default $null to 0)
-    $totalBlockers = ($AllFindings.Values | Measure-Object -Property Blockers -Sum).Sum
-    $totalHigh = ($AllFindings.Values | Measure-Object -Property High -Sum).Sum
-    $totalMedium = ($AllFindings.Values | Measure-Object -Property Medium -Sum).Sum
-    $totalLow = ($AllFindings.Values | Measure-Object -Property Low -Sum).Sum
-
-    # PowerShell Measure-Object returns $null for sum of zeros, not 0
-    if ($null -eq $totalBlockers) { $totalBlockers = 0 }
-    if ($null -eq $totalHigh) { $totalHigh = 0 }
-    if ($null -eq $totalMedium) { $totalMedium = 0 }
-    if ($null -eq $totalLow) { $totalLow = 0 }
+    # Calculate totals (sum hashtable values directly for PS 5.1 compatibility)
+    $totalBlockers = 0; $totalHigh = 0; $totalMedium = 0; $totalLow = 0
+    foreach ($val in $AllFindings.Values) {
+        if ($val) {
+            $totalBlockers += [int]$val.Blockers
+            $totalHigh += [int]$val.High
+            $totalMedium += [int]$val.Medium
+            $totalLow += [int]$val.Low
+        }
+    }
 
     # BUG FIX: If we have existing findings files but AllFindings is empty/wrong,
     # re-scan the files directly
@@ -788,14 +830,15 @@ function New-SynthesisReport {
             }
         }
         # Recalculate totals
-        $totalBlockers = ($AllFindings.Values | Measure-Object -Property Blockers -Sum).Sum
-        $totalHigh = ($AllFindings.Values | Measure-Object -Property High -Sum).Sum
-        $totalMedium = ($AllFindings.Values | Measure-Object -Property Medium -Sum).Sum
-        $totalLow = ($AllFindings.Values | Measure-Object -Property Low -Sum).Sum
-        if ($null -eq $totalBlockers) { $totalBlockers = 0 }
-        if ($null -eq $totalHigh) { $totalHigh = 0 }
-        if ($null -eq $totalMedium) { $totalMedium = 0 }
-        if ($null -eq $totalLow) { $totalLow = 0 }
+        $totalBlockers = 0; $totalHigh = 0; $totalMedium = 0; $totalLow = 0
+        foreach ($val in $AllFindings.Values) {
+            if ($val) {
+                $totalBlockers += [int]$val.Blockers
+                $totalHigh += [int]$val.High
+                $totalMedium += [int]$val.Medium
+                $totalLow += [int]$val.Low
+            }
+        }
     }
 
     # Determine verdict
@@ -896,7 +939,7 @@ function Main {
 
     # Handle -Standards command (no Claude required)
     if ($Standards) {
-        $standardsScript = Join-Path $PSScriptRoot "commands" "standards.ps1"
+        $standardsScript = Join-Path (Join-Path $PSScriptRoot "commands") "standards.ps1"
         if (Test-Path $standardsScript) {
             switch ($Standards) {
                 "list" {
@@ -925,7 +968,7 @@ function Main {
             Write-Host "    Example: .\ccl.ps1 -Map `"./project/.code-conclave/reviews`" -Standard cmmc-l2" -ForegroundColor Gray
             return
         }
-        $mapScript = Join-Path $PSScriptRoot "commands" "map.ps1"
+        $mapScript = Join-Path (Join-Path $PSScriptRoot "commands") "map.ps1"
         if (Test-Path $mapScript) {
             & $mapScript -ReviewsPath $Map -StandardId $Standard
         }
@@ -1195,8 +1238,20 @@ $diffSection
         }
         Write-Status "Generating JUnit XML..." "INFO"
 
-        # Parse findings from markdown files for JUnit format
-        $junitFindings = Get-FindingsForJUnit -ReviewsDir $reviewsDir -AgentDefs $Script:AgentDefs
+        # Prefer JSON data if available; fall back to markdown parsing
+        $jsonFindingsForJUnit = @{}
+        foreach ($key in $allFindings.Keys) {
+            if ($allFindings[$key] -and $allFindings[$key].JsonFindings) {
+                $jsonFindingsForJUnit[$key] = $allFindings[$key].JsonFindings
+            }
+        }
+
+        $junitFindings = $null
+        if ($jsonFindingsForJUnit.Count -gt 0 -and (Get-Command ConvertTo-JUnitFindings -ErrorAction SilentlyContinue)) {
+            $junitFindings = ConvertTo-JUnitFindings -JsonFindings $jsonFindingsForJUnit
+        } else {
+            $junitFindings = Get-FindingsForJUnit -ReviewsDir $reviewsDir -AgentDefs $Script:AgentDefs
+        }
 
         $junitPath = Join-Path $reviewsDir "conclave-results.xml"
         $junitResult = Export-JUnitResults `
@@ -1212,7 +1267,7 @@ $diffSection
     # Generate compliance mapping if -Standard was specified
     if ($Standard -and -not $DryRun) {
         Write-Banner "COMPLIANCE MAPPING" "Magenta"
-        $mapScript = Join-Path $PSScriptRoot "commands" "map.ps1"
+        $mapScript = Join-Path (Join-Path $PSScriptRoot "commands") "map.ps1"
         if (Test-Path $mapScript) {
             & $mapScript -ReviewsPath $reviewsDir -StandardId $Standard
         }
@@ -1222,10 +1277,10 @@ $diffSection
     }
 
     # Calculate verdict for exit codes
-    $totalBlockers = ($allFindings.Values | Where-Object { $_ } | Measure-Object -Property Blockers -Sum).Sum
-    $totalHigh = ($allFindings.Values | Where-Object { $_ } | Measure-Object -Property High -Sum).Sum
-    if ($null -eq $totalBlockers) { $totalBlockers = 0 }
-    if ($null -eq $totalHigh) { $totalHigh = 0 }
+    $totalBlockers = 0; $totalHigh = 0
+    foreach ($val in $allFindings.Values) {
+        if ($val) { $totalBlockers += [int]$val.Blockers; $totalHigh += [int]$val.High }
+    }
 
     $verdict = if ($totalBlockers -gt 0) { "HOLD" }
                elseif ($totalHigh -gt 3) { "CONDITIONAL" }
@@ -1237,6 +1292,47 @@ $diffSection
         "CONDITIONAL" { 2 }
         "HOLD"        { 1 }
         default       { 0 }
+    }
+
+    # Archive run results and clean up working files
+    if (Get-Command Export-RunArchive -ErrorAction SilentlyContinue) {
+        try {
+            # Collect JSON findings from agent results
+            $allJsonFindings = @{}
+            foreach ($key in $allFindings.Keys) {
+                if ($allFindings[$key] -and $allFindings[$key].JsonFindings) {
+                    $allJsonFindings[$key] = $allFindings[$key].JsonFindings
+                }
+            }
+
+            if ($allJsonFindings.Count -gt 0) {
+                $providerName = if ($provider) { $provider.Name } else { "dryrun" }
+                $archivePath = Export-RunArchive `
+                    -ReviewsDir $reviewsDir `
+                    -AgentFindings $allJsonFindings `
+                    -RunMetadata @{
+                        Timestamp       = $startTime
+                        Project         = (Split-Path $Project -Leaf)
+                        ProjectPath     = $Project
+                        Duration        = $totalDuration.TotalSeconds
+                        DryRun          = [bool]$DryRun
+                        BaseBranch      = $BaseBranch
+                        Standard        = $Standard
+                        Provider        = $providerName
+                        AgentsRequested = $validAgents
+                        Verdict         = $verdict
+                        ExitCode        = $exitCode
+                    }
+                Write-Status "Run archived: $archivePath" "OK"
+
+                # Clean up working files (dashboard will use archive for history)
+                Remove-WorkingFindings -ReviewsDir $reviewsDir
+                Write-Status "Working files cleaned up" "INFO"
+            }
+        }
+        catch {
+            Write-Status "Archive failed: $_" "WARN"
+        }
     }
 
     # Detect CI environment
