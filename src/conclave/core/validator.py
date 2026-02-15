@@ -254,9 +254,19 @@ async def run_validator(
             "total": len(high_severity),
         }
 
+    # Save validator raw output for debugging
+    val_output_path = project_path / ".code-conclave" / "reviews" / "validator-output.md"
+    val_output_path.write_text(result.content or "", encoding="utf-8")
+
     # Parse and apply adjustments
     adjustments = _parse_validation_results(result.content or "")
     adjusted_findings, stats = _apply_adjustments(all_findings, adjustments)
+
+    if not adjustments and result.content:
+        console.print(
+            f"  [yellow]WARN[/yellow] Validator produced output but no parseable adjustments. "
+            f"See validator-output.md"
+        )
 
     # Report
     console.print(
