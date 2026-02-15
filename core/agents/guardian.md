@@ -132,13 +132,40 @@ Before flagging an issue, check for existing mitigations:
 - Whitelist validation (e.g., `if (!ALLOWED_LIST.includes(input))`)
 - Path resolution checks (e.g., `resolvedPath.startsWith(baseDir)`)
 - Origin validation on WebSockets (e.g., `ALLOWED_ORIGINS.includes(origin)`)
-- Parameterized queries or ORM usage
+- Parameterized queries or ORM usage (SQLAlchemy, Django ORM, Prisma, etc.)
 - Error sanitization functions in use
+
+### Not Actually Vulnerabilities
+
+**Do NOT flag these as SQL injection (they are parameterized):**
+- ORM `.ilike()`, `.like()`, `.contains()`, `.filter()` with user input — the ORM parameterizes these. SQL wildcards (`%`, `_`) in user input affect query *semantics* but are NOT injection.
+- Parameterized queries where user input only flows through bind parameters
+- Template engines with auto-escaping enabled (Jinja2 default, React JSX)
+
+**For ORM wildcard concerns, rate based on access context:**
+- Public endpoint + wildcards could expose sensitive data → HIGH (data disclosure risk)
+- Public endpoint + wildcards could cause DoS via expensive queries → MEDIUM
+- Authenticated endpoint but user can access data beyond their scope → HIGH
+- Admin endpoint where admin already has full read access → LOW (hygiene only)
+- Any endpoint where the fix is trivial (escape wildcards) → note effort as S
+
+### Access Context Analysis (CRITICAL)
+
+**Before assigning severity, determine WHO can reach the affected code:**
+- Admin-only endpoints behind authentication → lower severity (attacker must already be privileged)
+- Public/unauthenticated endpoints → higher severity
+- Internal-only services (not internet-facing) → lower severity
+
+**Severity must reflect actual exploitable risk, not theoretical purity:**
+- If an admin endpoint returns data the admin already has full access to, a wildcard search issue is LOW, not BLOCKER
+- If rate limiting is missing on an internal-only API, that's LOW, not HIGH
+- If CORS is permissive but the endpoint requires auth + serves no secrets, that's LOW
 
 **Downgrade to MEDIUM or LOW if:**
 - The protection exists but could be stronger
 - Defense-in-depth is missing but primary protection works
 - The code is localhost-only or dev-only tooling
+- The "attacker" would need privileges that already grant them the same access
 
 ### Severity Rules
 
@@ -164,15 +191,20 @@ Follow CONTRACTS.md format exactly. Use finding IDs: `GUARDIAN-001`, `GUARDIAN-0
 
 | Issue | Severity |
 |-------|----------|
-| SQL injection possible | BLOCKER |
+| Raw SQL with string interpolation (no parameterization) | BLOCKER |
 | Hardcoded production secret | BLOCKER |
-| Auth bypass possible | BLOCKER |
-| Missing auth on admin endpoint | BLOCKER |
+| Auth bypass on public endpoint | BLOCKER |
+| Missing auth on public-facing endpoint | BLOCKER |
+| ORM wildcards on public endpoint (data exposure) | HIGH |
+| ORM wildcards on admin endpoint (already has access) | LOW |
 | Weak password hashing | HIGH |
 | Critical CVE in dependency | HIGH |
-| Missing input validation | HIGH |
-| CORS allows all origins | MEDIUM |
-| Missing rate limiting | MEDIUM |
+| Missing input validation on public endpoint | HIGH |
+| Missing input validation on admin-only endpoint | MEDIUM |
+| CORS allows all origins (with auth required) | MEDIUM |
+| CORS allows all origins (no auth) | HIGH |
+| Missing rate limiting on public endpoint | MEDIUM |
+| Missing rate limiting on internal endpoint | LOW |
 | Outdated dependency (no CVE) | LOW |
 
 ## Example Finding

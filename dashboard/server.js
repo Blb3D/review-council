@@ -41,11 +41,11 @@ const archiveDir = path.join(reviewsDir, 'archive');
 const PORT = 3847;
 
 // Agent definitions
-const AGENTS = ['sentinel', 'guardian', 'architect', 'navigator', 'herald', 'operator'];
+const AGENTS = ['guardian', 'sentinel', 'architect', 'navigator', 'herald', 'operator'];
 
 const AGENT_INFO = {
-    sentinel:  { name: 'SENTINEL',  role: 'Quality & Compliance', icon: '\u{1F6E1}\uFE0F', color: '#ffaa00' },
     guardian:  { name: 'GUARDIAN',  role: 'Security',             icon: '\u{1F512}', color: '#ff4466' },
+    sentinel:  { name: 'SENTINEL',  role: 'Quality & Compliance', icon: '\u{1F6E1}\uFE0F', color: '#ffaa00' },
     architect: { name: 'ARCHITECT', role: 'Code Health',          icon: '\u{1F3D7}\uFE0F', color: '#00d4ff' },
     navigator: { name: 'NAVIGATOR', role: 'UX Review',            icon: '\u{1F9ED}', color: '#00ff88' },
     herald:    { name: 'HERALD',    role: 'Documentation',        icon: '\u{1F4DC}', color: '#aa66ff' },
