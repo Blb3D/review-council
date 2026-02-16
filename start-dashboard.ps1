@@ -3,7 +3,7 @@
     Launch Code Conclave Dashboard with live monitoring
 
 .EXAMPLE
-    .\start-dashboard.ps1 -Project "C:\repos\filaops"
+    .\start-dashboard.ps1 -Project "C:\path\to\your\project"
 #>
 
 param(

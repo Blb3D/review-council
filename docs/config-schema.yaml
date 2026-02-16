@@ -9,9 +9,9 @@
 
 project:
   # Project identification
-  name: "filaops"                    # Project name (auto-detected from folder)
+  name: "my-project"                  # Project name (auto-detected from folder)
   version: "1.0.0"                   # Project version
-  description: "FilaOps ERP System"  # Optional description
+  description: "My Application"      # Optional description
   
   # Industry classification (helps with default standard selection)
   industry: "manufacturing"          # manufacturing, medical, aerospace, defense, software, etc.
@@ -192,7 +192,7 @@ azure_devops:
   # Work item linking
   work_items:
     link_findings: true    # Create work items from findings
-    area_path: "FilaOps\\Quality"
+    area_path: "MyProject\\Quality"
     iteration_path: "@CurrentIteration"
     
   # Status check configuration
