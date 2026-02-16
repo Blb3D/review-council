@@ -9,6 +9,7 @@
 # Local config overrides
 config.local.yaml
 .claude/
+CODE-CONCLAVE-DEV-PLAN.md
 
 # OS files
 .DS_Store

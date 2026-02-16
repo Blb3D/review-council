@@ -127,7 +127,7 @@ ai:
     model: claude-sonnet-4-20250514
 
     # Model for lite-tier agents (optional, falls back to primary if not set)
-    lite_model: claude-haiku-4-5-20251001
+    lite_model: claude-3-5-haiku-20241022
 
     # Environment variable containing API key
     api_key_env: ANTHROPIC_API_KEY
@@ -452,9 +452,9 @@ Complete configuration file with all options:
 # Complete Code Conclave Configuration
 
 project:
-  name: "filaops"
+  name: "my-project"
   version: "1.0.0"
-  description: "FilaOps ERP System"
+  description: "My Application"
   industry: "manufacturing"
   regulatory_context:
     - "FDA registered facility"
@@ -468,7 +468,7 @@ ai:
 
   anthropic:
     model: claude-sonnet-4-20250514
-    lite_model: claude-haiku-4-5-20251001
+    lite_model: claude-3-5-haiku-20241022
     api_key_env: ANTHROPIC_API_KEY
     max_tokens: 16000
 

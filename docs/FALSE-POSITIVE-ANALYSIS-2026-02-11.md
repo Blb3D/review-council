@@ -1,7 +1,7 @@
-# False Positive Analysis — Full 6-Agent Run on FilaOps
+# False Positive Analysis — Full 6-Agent Run
 
 **Date:** 2026-02-11
-**Target Repo:** `Blb3D/filaops` (commit `15fc8db`)
+**Target Repo:** Sample full-stack Python/React ERP (commit `15fc8db`)
 **Trigger:** `workflow_dispatch` — full codebase, no diff scoping
 **Run ID:** 21888515174 (4m31s)
 **Artifact:** `review-council-reports` attached to that run
@@ -46,7 +46,7 @@ Every BLOCKER was manually verified against the actual codebase:
 | ID | Claim | Reality |
 |----|-------|---------|
 | OPERATOR-003 | "No Health Check Endpoint" | `/health` exists in `main.py` (lines 278-309) AND `/system/health` in `system.py` (lines 140-183). CI pipeline pings `/health` to verify startup. |
-| OPERATOR-008 | "No CI/CD Pipeline" | 4 GitHub Actions workflows exist: `filaops-ci.yml`, `test.yml`, `codeql.yml`, `review-council.yml`. Full pytest + coverage + Codecov + security scanning. |
+| OPERATOR-008 | "No CI/CD Pipeline" | 4 GitHub Actions workflows exist: `app-ci.yml`, `test.yml`, `codeql.yml`, `review-council.yml`. Full pytest + coverage + Codecov + security scanning. |
 | GUARDIAN-005 | "No dependency scanning" | Dependabot active, CodeQL runs on every push, `pip-audit` runs in CI, `npm audit` runs in CI. |
 | GUARDIAN-003 | "Potential SQL Injection" | Entirely speculative — all 40+ services use SQLAlchemy ORM. Zero raw SQL found. Evidence section just lists file names. |
 | SENTINEL-007 | "No coverage measurement" | pytest-cov configured in `test.yml`, coverage uploaded to Codecov via `codecov/codecov-action@v5`, `pyproject.toml` has `[tool.coverage.*]` sections. |
@@ -162,7 +162,7 @@ The release-readiness report should group related findings and count them once a
 
 ## Raw Data
 
-Full agent reports are available as artifacts on GitHub Actions run `21888515174` in `Blb3D/filaops`.
+Full agent reports are available as artifacts on the corresponding GitHub Actions run.
 
 Individual finding files:
 - `sentinel-findings.md` — 2 BLOCKER (both false), 4 HIGH, 3 MEDIUM, 2 LOW

@@ -4,7 +4,7 @@
 
 ```markdown
 # Release Readiness Report
-**Project:** filaops
+**Project:** sample-app
 **Generated:** 2026-01-31 19:21
 **Verdict:** SHIP          # WRONG - Should be HOLD (5 blockers)
 ---
@@ -162,7 +162,7 @@ To fix the corrupted report:
 
 ```powershell
 cd C:\repos\review-council
-.\regenerate-report.ps1 -ProjectPath "C:\repos\filaops"
+.\regenerate-report.ps1 -ProjectPath "C:\repos\your-project"
 ```
 
 ## Lessons Learned
