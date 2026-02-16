@@ -1,0 +1,89 @@
+# Code Conclave - Azure DevOps Pipeline
+#
+# Runs Code Conclave reviews on your codebase.
+# Copy this file to your repo root as azure-pipelines.yml.
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  pythonVersion: "3.12"
+  CONCLAVE_STANDARD: "none"
+
+stages:
+  - stage: Test
+    displayName: "Unit Tests"
+    jobs:
+      - job: PyTest
+        displayName: "Run Python Tests"
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: $(pythonVersion)
+
+          - script: pip install -e ".[dev]"
+            displayName: "Install dependencies"
+
+          - script: pytest tests/ -v --junitxml=test-results.xml
+            displayName: "Run tests"
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "test-results.xml"
+              testRunTitle: "Python Unit Tests"
+            condition: always()
+
+  - stage: CodeReview
+    displayName: "Code Conclave Review"
+    dependsOn: Test
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      - job: Review
+        displayName: "AI Code Review"
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: $(pythonVersion)
+
+          - script: pip install -e .
+            displayName: "Install Code Conclave"
+
+          - script: |
+              rc -p $(Build.SourcesDirectory) \
+                --ci \
+                --dry-run \
+                -f junit
+            displayName: "Run PR Review"
+            continueOnError: true
+
+          - task: PublishTestResults@2
+            displayName: "Publish Review Results"
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "$(Build.SourcesDirectory)/.code-conclave/reviews/conclave-results.xml"
+              testRunTitle: "Code Conclave Review"
+              failTaskOnFailedTests: true
+            condition: always()
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Review Reports"
+            inputs:
+              pathToPublish: "$(Build.SourcesDirectory)/.code-conclave/reviews"
+              artifactName: "CodeConclaveReports"
+            condition: always()
