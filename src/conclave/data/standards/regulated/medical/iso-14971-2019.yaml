@@ -1,0 +1,739 @@
+# ISO 14971:2019 - Medical Devices - Application of Risk Management to Medical Devices
+# Comprehensive Compliance Pack for Code Conclave
+#
+# Standard: ISO 14971:2019 (3rd Edition, December 2019)
+# Publisher: ISO (International Organization for Standardization)
+# Technical Committee: ISO/TC 210 in collaboration with IEC/SC 62A (JWG1)
+# EU Harmonized: ISO 14971:2019+A11:2021 (MDR/IVDR aligned)
+#
+# CRITICAL: This is THE risk management standard for medical devices
+# Referenced by: ISO 13485:2016, FDA 21 CFR 820, EU MDR 2017/745, EU IVDR 2017/746
+
+metadata:
+  standard_id: "ISO 14971:2019"
+  standard_name: "Medical devices — Application of risk management to medical devices"
+  version: "3rd Edition"
+  publication_date: "2019-12"
+  publisher: "ISO"
+  technical_committee: "ISO/TC 210 / IEC/SC 62A JWG1"
+  replaces: "ISO 14971:2007"
+  eu_harmonized_version: "EN ISO 14971:2019+A11:2021"
+  companion_document: "ISO/TR 24971:2020 (Guidance)"
+  document_url: "https://www.iso.org/standard/72704.html"
+
+applicability:
+  scope: |
+    Specifies terminology, principles, and a process for risk management of medical devices,
+    including software as a medical device (SaMD) and in vitro diagnostic medical devices (IVD).
+  applies_to:
+    - "All medical devices regardless of classification"
+    - "Software as a Medical Device (SaMD)"
+    - "In Vitro Diagnostic (IVD) medical devices"
+    - "Accessories to medical devices"
+    - "All stages of device lifecycle"
+  lifecycle_coverage:
+    - "Design and development"
+    - "Production"
+    - "Post-production monitoring"
+    - "Decommissioning/disposal"
+  exclusions:
+    - "Does not specify acceptable risk levels (manufacturer determines)"
+    - "Does not specify how to perform specific risk analysis techniques"
+  regulatory_recognition:
+    fda: "Recognized consensus standard"
+    eu_mdr: "Harmonized standard (with Annex ZA)"
+    eu_ivdr: "Harmonized standard (with Annex ZB)"
+    health_canada: "Referenced"
+    tga_australia: "Referenced"
+
+# ============================================================================
+# KEY DEFINITIONS (Clause 3)
+# ============================================================================
+definitions:
+  accompanying_documentation:
+    definition: "Information accompanying a medical device including installation instructions, instructions for use, technical description, etc."
+    
+  benefit:
+    definition: "Positive impact or desirable outcome of the use of a medical device on the health of an individual, or a positive impact on patient management or public health"
+    note: "NEW definition in 2019 edition - central to benefit-risk analysis"
+    
+  harm:
+    definition: "Injury or damage to the health of people, or damage to property or the environment"
+    note: "Includes unreasonable psychological stress or unwanted pregnancy"
+    
+  hazard:
+    definition: "Potential source of harm"
+    examples:
+      - "Electrical energy"
+      - "Radiation"
+      - "Biological agents"
+      - "Moving parts"
+      - "Chemical agents"
+      - "Usability issues"
+      
+  hazardous_situation:
+    definition: "Circumstance in which people, property, or the environment is/are exposed to one or more hazards"
+    
+  intended_use:
+    definition: "Use for which a product, process, or service is intended according to the specifications, instructions, and information provided by the manufacturer"
+    
+  in_vitro_diagnostic_medical_device:
+    id: "IVD"
+    definition: "Medical device intended by the manufacturer for in vitro examination of specimens derived from the human body"
+    
+  life_cycle:
+    definition: "All phases in the life of a medical device from initial conception to final decommissioning and disposal"
+    
+  manufacturer:
+    definition: "Natural or legal person with responsibility for design and/or manufacture of a medical device with intention of making it available for use under their name"
+    
+  medical_device:
+    definition: "Instrument, apparatus, implement, machine, appliance, implant, reagent for in vitro use, software, material, or other similar or related article intended by the manufacturer to be used for a medical purpose"
+    
+  post_production:
+    definition: "Part of the life cycle of the product after the design has been completed and the medical device has been manufactured"
+    
+  probability_of_occurrence_of_harm:
+    definition: "Combination of the probability of a hazardous situation occurring and the probability that a hazardous situation will result in harm"
+    formula: "P(harm) = P(hazardous situation) × P(hazardous situation leads to harm)"
+    
+  production:
+    definition: "Part of the life cycle in which the medical device is manufactured by the manufacturer"
+    
+  reasonably_foreseeable_misuse:
+    definition: "Use of a product or system in a way not intended by the manufacturer, but which can result from readily predictable human behavior"
+    note: "NEW definition - includes both intentional and unintentional misuse"
+    
+  residual_risk:
+    definition: "Risk remaining after risk control measures have been implemented"
+    
+  risk:
+    definition: "Combination of the probability of occurrence of harm and the severity of that harm"
+    formula: "Risk = Probability × Severity"
+    
+  risk_analysis:
+    definition: "Systematic use of available information to identify hazards and to estimate the risk"
+    
+  risk_assessment:
+    definition: "Overall process comprising a risk analysis and a risk evaluation"
+    
+  risk_control:
+    definition: "Process in which decisions are made and measures are implemented by which risks are reduced to, or maintained within, specified levels"
+    
+  risk_evaluation:
+    definition: "Process of comparing the estimated risk against given risk criteria to determine the acceptability of the risk"
+    
+  risk_management:
+    definition: "Systematic application of management policies, procedures, and practices to the tasks of analyzing, evaluating, controlling, and monitoring risk"
+    
+  risk_management_file:
+    definition: "Set of records and other documents that are produced by risk management"
+    
+  safety:
+    definition: "Freedom from unacceptable risk"
+    
+  severity:
+    definition: "Measure of the possible consequences of a hazard"
+    
+  software_as_a_medical_device:
+    id: "SaMD"
+    definition: "Software intended to be used for one or more medical purposes that perform these purposes without being part of a hardware medical device"
+    
+  state_of_the_art:
+    definition: "Developed stage of technical capability at a given time as regards products, processes, and services, based on the relevant consolidated findings of science, technology, and experience"
+    note: "Aligns with EU MDR/IVDR terminology"
+    
+  top_management:
+    definition: "Person or group of people who directs and controls a manufacturer at the highest level"
+    
+  use_error:
+    definition: "Act or omission of an act that results in a different medical device response than intended by the manufacturer or expected by the user"
+    note: "Use errors can be caused by device design issues"
+    
+  verification:
+    definition: "Confirmation through provision of objective evidence that specified requirements have been fulfilled"
+
+# ============================================================================
+# CLAUSE 4: GENERAL REQUIREMENTS FOR RISK MANAGEMENT SYSTEM
+# ============================================================================
+clause_4:
+  title: "General requirements for risk management system"
+  
+  section_4.1:
+    title: "Risk management process"
+    requirement: "Manufacturer shall establish, document, implement, and maintain an ongoing process for identifying hazards, estimating and evaluating risks, controlling risks, and monitoring effectiveness of controls"
+    documentation: "Provide traceable evidence of conformity to this document"
+    
+  section_4.2:
+    title: "Management responsibilities"
+    requirements:
+      - "Top management shall provide evidence of commitment to risk management process"
+      - "Define and document policy for determining acceptable risk"
+      - "Ensure adequate resources are provided"
+      - "Ensure appropriate qualified personnel are assigned"
+      - "Review suitability of risk management process at planned intervals"
+    critical: true
+    
+  section_4.3:
+    title: "Competence of personnel"
+    requirements:
+      - "Personnel shall be competent based on education, training, skills, and experience"
+      - "Manufacturer shall retain records demonstrating competence"
+      - "Competence applies to risk management activities throughout lifecycle"
+      
+  section_4.4:
+    title: "Risk management plan"
+    requirement: "Establish and maintain a risk management plan for each medical device"
+    plan_shall_include:
+      - "Scope of risk management activities and device identification"
+      - "Assignment of responsibilities and authorities"
+      - "Requirements for review of risk management activities"
+      - "Criteria for risk acceptability based on policy (4.2) including when probability cannot be estimated"
+      - "Verification activities"
+      - "Activities related to collection and review of production and post-production information"
+    critical: true
+    
+  section_4.5:
+    title: "Risk management file"
+    requirement: "Manufacturer shall establish and maintain a risk management file for each medical device"
+    contents:
+      - "Results of risk management process"
+      - "Traceability to risk analysis"
+      - "Traceability to risk evaluation"
+      - "Traceability to risk control measures implementation and verification"
+      - "Assessment of residual risk acceptability"
+    note: "May be a collection of documents and records; physical location may vary"
+
+# ============================================================================
+# CLAUSE 5: RISK ANALYSIS
+# ============================================================================
+clause_5:
+  title: "Risk analysis"
+  
+  section_5.1:
+    title: "Risk analysis process"
+    requirement: "Perform risk analysis for the medical device and document results in the risk management file"
+    
+  section_5.2:
+    title: "Intended use and reasonably foreseeable misuse"
+    requirement: "Document intended use and reasonably foreseeable misuse"
+    includes:
+      - "Intended medical indication(s)"
+      - "Patient population"
+      - "Body part or type of tissue interacted with"
+      - "User profile"
+      - "Use environment"
+      - "Operating principle"
+      - "Reasonably foreseeable misuse scenarios"
+    critical: true
+    
+  section_5.3:
+    title: "Identification of characteristics related to safety"
+    requirement: "Identify and document qualitative and quantitative characteristics that could affect safety"
+    note: "Shall include limits when applicable"
+    annex_reference: "See ISO/TR 24971 and device-specific standards for guidance on characteristics to consider"
+    
+  section_5.4:
+    title: "Identification of hazards and hazardous situations"
+    requirement: "Identify and document known and foreseeable hazards in both normal use and fault conditions"
+    considerations:
+      - "Hazards for all phases of lifecycle"
+      - "Hazardous situations that arise from hazard exposure"
+      - "Foreseeable sequences of events leading to hazardous situations"
+    note: "Consider hazards from normal use AND fault conditions (2019 addition)"
+    critical: true
+    
+  section_5.5:
+    title: "Risk estimation"
+    requirement: "For each identified hazardous situation, estimate the risk(s) using available information or data"
+    components:
+      probability_of_occurrence:
+        - "Probability of hazardous situation occurring"
+        - "Probability of hazardous situation leading to harm"
+      severity_of_harm:
+        - "Consider worst credible harm"
+    quantitative_vs_qualitative: "Quantitative estimation may not always be possible; systematic qualitative approach acceptable when documented"
+
+# ============================================================================
+# CLAUSE 6: RISK EVALUATION
+# ============================================================================
+clause_6:
+  title: "Risk evaluation"
+  
+  section_6:
+    title: "Risk evaluation"
+    requirement: "For each identified hazardous situation, evaluate the estimated risk(s) using the criteria defined in the risk management plan"
+    determine: "Whether risk reduction is required"
+    documentation: "Record results of risk evaluation in risk management file"
+    outputs:
+      - "Risk is acceptable (no further action required)"
+      - "Risk is not acceptable (risk control required)"
+      - "Risk is ALARP but requires benefit-risk analysis"
+
+# ============================================================================
+# CLAUSE 7: RISK CONTROL
+# ============================================================================
+clause_7:
+  title: "Risk control"
+  
+  section_7.1:
+    title: "Risk control option analysis"
+    requirement: "When risk reduction is required, identify and document risk control measures"
+    priority_order:
+      - order: 1
+        measure: "Inherently safe design"
+        description: "Eliminate hazards or reduce associated risks through design"
+        examples: ["Remove sharp edges", "Use biocompatible materials", "Limit energy output"]
+      - order: 2
+        measure: "Protective measures in medical device or manufacturing process"
+        description: "Physical safeguards and barriers"
+        examples: ["Alarms", "Physical barriers", "Automatic shutdown", "Error-proofing"]
+      - order: 3
+        measure: "Information for safety"
+        description: "Warnings, labels, instructions for use, training"
+        examples: ["Warning labels", "IFU instructions", "Contraindications", "Training requirements"]
+    note: "Use measures in priority order; information alone is NOT sufficient for unacceptable risks"
+    critical: true
+    
+  section_7.2:
+    title: "Implementation of risk control measures"
+    requirements:
+      - "Implement risk control measure(s) selected"
+      - "Document implemented measures in risk management file"
+      - "Record rationale if risk control options from 7.1 are not considered practicable"
+      
+  section_7.3:
+    title: "Residual risk evaluation"
+    requirement: "After implementation, evaluate residual risk using criteria from risk management plan"
+    if_unacceptable: "Further risk control measures required or gather data to evaluate benefit-risk"
+    documentation: "Record results in risk management file"
+    
+  section_7.4:
+    title: "Benefit-risk analysis"
+    requirement: "If residual risk is not acceptable and further risk control is not practicable, gather and review data to determine if medical benefits outweigh residual risk"
+    if_benefits_outweigh: "Residual risk may be acceptable"
+    if_benefits_do_not_outweigh: "Risk remains unacceptable - device shall NOT proceed"
+    documentation: "Record results of benefit-risk analysis"
+    critical: true
+    note: "Central concept emphasized in 2019 edition"
+    
+  section_7.5:
+    title: "Risks arising from risk control measures"
+    requirement: "Review each risk control measure for potential to introduce new hazards or hazardous situations"
+    actions:
+      - "Manage any new risks in accordance with this document"
+      - "Document review in risk management file"
+      
+  section_7.6:
+    title: "Completeness of risk control"
+    requirement: "Ensure risk control is complete for all identified hazards"
+    verification:
+      - "All hazards addressed by appropriate risk control measures"
+      - "No gaps in risk control coverage"
+    documentation: "Record completeness assessment"
+
+# ============================================================================
+# CLAUSE 8: EVALUATION OF OVERALL RESIDUAL RISK
+# ============================================================================
+clause_8:
+  title: "Evaluation of overall residual risk"
+  
+  section_8:
+    title: "Evaluation of overall residual risk"
+    requirement: "After all risk control measures implemented and verified, evaluate overall residual risk posed by the medical device"
+    considers:
+      - "Combination of all individual residual risks"
+      - "Cumulative effect of residual risks"
+      - "Risk from combinations of hazards"
+    if_overall_acceptable: "Proceed to risk management review"
+    if_overall_not_acceptable: "Consider additional risk control measures or benefit-risk analysis"
+    documentation: "Record evaluation and conclusion in risk management file"
+    critical: true
+
+# ============================================================================
+# CLAUSE 9: RISK MANAGEMENT REVIEW
+# ============================================================================
+clause_9:
+  title: "Risk management review"
+  
+  section_9:
+    title: "Risk management review"
+    requirement: "Prior to commercial distribution, conduct a review of risk management process"
+    review_shall_verify:
+      - "Risk management plan has been appropriately implemented"
+      - "Overall residual risk is acceptable"
+      - "Appropriate methods are in place to collect and review production and post-production information"
+    reviewers: "Shall be identified in risk management plan (2019 requirement)"
+    documentation: "Record results of review in risk management file"
+    critical: true
+    note: "Title changed from 'Risk management report' to emphasize ongoing review"
+
+# ============================================================================
+# CLAUSE 10: PRODUCTION AND POST-PRODUCTION ACTIVITIES
+# ============================================================================
+clause_10:
+  title: "Production and post-production activities"
+  
+  section_10.1:
+    title: "General"
+    requirement: "Establish, document, and maintain a process to collect and review information about the medical device in production and post-production phases"
+    critical: true
+    note: "Significantly expanded in 2019 edition"
+    
+  section_10.2:
+    title: "Information collection"
+    requirement: "Manufacturer shall collect and review information from production and post-production"
+    information_sources:
+      internal:
+        - "Production monitoring data"
+        - "Internal audits"
+        - "Service records"
+        - "Employee feedback"
+      external:
+        - "Customer complaints"
+        - "Adverse event reports"
+        - "Vigilance reports"
+        - "Published literature"
+        - "Similar devices"
+        - "Regulatory feedback"
+        - "Clinical studies"
+    
+  section_10.3:
+    title: "Information review"
+    requirement: "Review collected information for relevance to safety"
+    consider:
+      - "Previously unrecognized hazards or hazardous situations"
+      - "Estimated risk(s) arising from hazardous situation no longer acceptable"
+      - "Overall residual risk no longer acceptable"
+      - "State of the art has changed"
+    
+  section_10.4:
+    title: "Actions"
+    requirement: "If any criterion in 10.3 is met, take appropriate action"
+    actions_include:
+      - "Review risk management file"
+      - "Implement additional risk control measures if necessary"
+      - "Review benefit-risk analysis if applicable"
+      - "Provide feedback to design and development"
+      - "Notify regulatory authorities (if required)"
+      - "Issue field safety corrective actions (if required)"
+    documentation: "Document actions taken in risk management file"
+
+# ============================================================================
+# ANNEXES (Informative)
+# ============================================================================
+annexes:
+  annex_A:
+    title: "Rationale for requirements"
+    type: "Informative"
+    description: "Explains the intent and reasoning behind each clause"
+    note: "Essential reading for understanding proper application"
+    
+  annex_B:
+    title: "Risk management process for medical devices"
+    type: "Informative"
+    description: "Overview of the entire risk management process"
+    figure: "Process flowchart"
+    
+  annex_C:
+    title: "Fundamental risk concepts"
+    type: "Informative"
+    description: "Foundational risk concepts for interpretation consistency"
+    topics:
+      - "Characteristics related to safety"
+      - "Hazards and hazardous situations"
+      - "Sequences of events"
+      - "Risk estimation"
+      - "Risk acceptability"
+
+# ============================================================================
+# AGENT-TO-CONTROL MAPPINGS
+# ============================================================================
+agent_mappings:
+  GUARDIAN:
+    description: "Security and safety findings map to risk identification, control, and post-production monitoring"
+    primary_controls:
+      - "Clause 5.4"   # Hazard identification
+      - "Clause 7"     # Risk control (all)
+      - "Clause 8"     # Overall residual risk
+      - "Clause 10"    # Post-production monitoring
+    secondary_controls:
+      - "Clause 5.2"   # Intended use / misuse
+      - "Clause 7.5"   # Risks from controls
+      
+  SENTINEL:
+    description: "Monitoring findings map to risk analysis, estimation, and post-production review"
+    primary_controls:
+      - "Clause 5.5"   # Risk estimation
+      - "Clause 10.2"  # Information collection
+      - "Clause 10.3"  # Information review
+      - "Clause 6"     # Risk evaluation
+    secondary_controls:
+      - "Clause 9"     # Risk management review
+      - "Clause 4.2"   # Management review
+      
+  ARCHITECT:
+    description: "Design and structure findings map to planning, process establishment, documentation"
+    primary_controls:
+      - "Clause 4.1"   # Risk management process
+      - "Clause 4.4"   # Risk management plan
+      - "Clause 4.5"   # Risk management file
+      - "Clause 7.1"   # Risk control options (inherent safety design)
+    secondary_controls:
+      - "Clause 5.3"   # Safety characteristics
+      - "Clause 7.6"   # Completeness
+      
+  HERALD:
+    description: "Communication and documentation findings map to file maintenance, labeling controls"
+    primary_controls:
+      - "Clause 4.5"   # Risk management file
+      - "Clause 7.1"   # Information for safety (order 3)
+      - "Clause 10.4"  # Actions (communication)
+    secondary_controls:
+      - "Clause 5.2"   # Documented intended use
+      - "Clause 9"     # Review documentation
+      
+  OPERATOR:
+    description: "Production findings map to production monitoring and control implementation"
+    primary_controls:
+      - "Clause 7.2"   # Implementation of risk controls
+      - "Clause 10.1"  # Production activities
+      - "Clause 10.2"  # Information collection (production)
+    secondary_controls:
+      - "Clause 7.3"   # Residual risk evaluation
+      - "Clause 10.4"  # Actions
+      
+  NAVIGATOR:
+    description: "Strategic findings map to management commitment, planning, and benefit-risk decisions"
+    primary_controls:
+      - "Clause 4.2"   # Management responsibilities
+      - "Clause 4.4"   # Risk management plan
+      - "Clause 7.4"   # Benefit-risk analysis
+      - "Clause 9"     # Risk management review
+    secondary_controls:
+      - "Clause 4.3"   # Personnel competence
+      - "Clause 8"     # Overall residual risk evaluation
+
+# ============================================================================
+# RISK ANALYSIS TECHNIQUES
+# ============================================================================
+risk_analysis_techniques:
+  description: "Common techniques referenced but not mandated by ISO 14971"
+  
+  preliminary_hazard_analysis:
+    id: "PHA"
+    description: "Early-stage hazard identification during concept phase"
+    use_for: "Initial hazard identification"
+    
+  failure_mode_and_effects_analysis:
+    id: "FMEA"
+    types:
+      - "Design FMEA (DFMEA)"
+      - "Process FMEA (PFMEA)"
+      - "Use-related FMEA (uFMEA)"
+    note: "FMEA alone does NOT meet ISO 14971 requirements - must be supplemented"
+    limitation: "Does not address combination failures well"
+    
+  fault_tree_analysis:
+    id: "FTA"
+    description: "Top-down deductive analysis starting from undesired event"
+    use_for: "Understanding failure combinations"
+    
+  hazard_and_operability_study:
+    id: "HAZOP"
+    description: "Systematic examination using guide words"
+    use_for: "Process hazard identification"
+    
+  event_tree_analysis:
+    id: "ETA"
+    description: "Forward analysis from initiating event"
+    use_for: "Sequence of events analysis"
+
+# ============================================================================
+# RISK ACCEPTABILITY MATRIX (Example)
+# ============================================================================
+risk_matrix_example:
+  description: "Example 5x5 risk matrix - manufacturer must define their own criteria"
+  
+  severity_levels:
+    S1: {name: "Negligible", description: "Inconvenience or temporary discomfort"}
+    S2: {name: "Minor", description: "Temporary injury or impairment not requiring professional intervention"}
+    S3: {name: "Serious", description: "Injury requiring professional intervention"}
+    S4: {name: "Critical", description: "Permanent impairment or life-threatening injury"}
+    S5: {name: "Catastrophic", description: "Death"}
+    
+  probability_levels:
+    P1: {name: "Incredible", description: "Almost impossible to occur"}
+    P2: {name: "Improbable", description: "Unlikely but possible"}
+    P3: {name: "Remote", description: "May occur occasionally"}
+    P4: {name: "Occasional", description: "Likely to occur during device lifetime"}
+    P5: {name: "Frequent", description: "Expected to occur multiple times"}
+    
+  acceptability_regions:
+    acceptable: "No additional risk control required"
+    alarp: "As Low As Reasonably Practicable - benefit-risk analysis may apply"
+    unacceptable: "Risk control mandatory"
+    
+  note: "This is illustrative only - each manufacturer must establish their own matrix based on policy"
+
+# ============================================================================
+# RELATED STANDARDS AND GUIDANCE
+# ============================================================================
+related_standards:
+  companion_guidance:
+    - id: "ISO/TR 24971:2020"
+      title: "Guidance on the application of ISO 14971"
+      note: "Essential companion document with detailed implementation guidance"
+      
+  medical_device_qms:
+    - id: "ISO 13485:2016"
+      relationship: "References ISO 14971 for risk management requirements"
+      clause: "7.1 (Planning), 7.3.3 (Design input), 8.2.1 (Feedback)"
+      
+  software_specific:
+    - id: "IEC 62304:2006+A1:2015"
+      title: "Medical device software - Software life cycle processes"
+      relationship: "Software classification based on ISO 14971 risk analysis"
+    - id: "IEC 82304-1:2016"
+      title: "Health software - Part 1: General requirements for product safety"
+      
+  usability:
+    - id: "IEC 62366-1:2015+A1:2020"
+      title: "Medical devices - Application of usability engineering"
+      relationship: "Use-related risk analysis feeds into ISO 14971"
+      
+  biocompatibility:
+    - id: "ISO 10993-1:2018"
+      title: "Biological evaluation of medical devices"
+      relationship: "Risk-based approach to biological evaluation"
+      
+  electrical_safety:
+    - id: "IEC 60601-1:2005+A1:2012+A2:2020"
+      title: "Medical electrical equipment - General requirements"
+      relationship: "Risk management clause references ISO 14971"
+      
+  cybersecurity:
+    - id: "AAMI SW96:2023"
+      title: "Medical device security - Security risk management for medical devices"
+      relationship: "Security risk management within ISO 14971 context"
+
+# ============================================================================
+# COMMON AUDIT FINDINGS
+# ============================================================================
+common_findings:
+  - finding_type: "Risk management plan incomplete"
+    frequency: "Very common"
+    clauses: ["4.4"]
+    description: "Missing risk acceptability criteria, missing post-production activities"
+    
+  - finding_type: "Hazard identification incomplete"
+    frequency: "Very common"
+    clauses: ["5.4"]
+    description: "Missing fault conditions, missing foreseeable misuse scenarios"
+    
+  - finding_type: "Risk control priority not followed"
+    frequency: "Common"
+    clauses: ["7.1"]
+    description: "Relying on information for safety before design controls"
+    
+  - finding_type: "New risks from controls not assessed"
+    frequency: "Common"
+    clauses: ["7.5"]
+    description: "Risk control measures introduce new hazards not analyzed"
+    
+  - finding_type: "Overall residual risk not evaluated"
+    frequency: "Common"
+    clauses: ["8"]
+    description: "Individual risks evaluated but cumulative effect not considered"
+    
+  - finding_type: "Post-production process inadequate"
+    frequency: "Common"
+    clauses: ["10"]
+    description: "No defined process for collecting/reviewing production and post-production information"
+    
+  - finding_type: "Benefit-risk analysis missing"
+    frequency: "Common"
+    clauses: ["7.4"]
+    description: "Residual risk claimed acceptable without documented benefit-risk analysis"
+    
+  - finding_type: "Traceability gaps"
+    frequency: "Common"
+    clauses: ["4.5"]
+    description: "Cannot trace from hazard to control to verification"
+
+# ============================================================================
+# IMPLEMENTATION GUIDANCE
+# ============================================================================
+implementation_guidance:
+  phase_1_planning:
+    activities:
+      - "Obtain management commitment (4.2)"
+      - "Define risk acceptability policy"
+      - "Establish risk management plan (4.4)"
+      - "Assign qualified personnel (4.3)"
+      - "Create risk management file structure (4.5)"
+      
+  phase_2_risk_analysis:
+    activities:
+      - "Document intended use and reasonably foreseeable misuse (5.2)"
+      - "Identify safety-related characteristics (5.3)"
+      - "Identify hazards using systematic techniques (5.4)"
+      - "Identify hazardous situations (5.4)"
+      - "Estimate risks (5.5)"
+      
+  phase_3_risk_evaluation_and_control:
+    activities:
+      - "Evaluate risks against acceptability criteria (6)"
+      - "Select risk control measures following priority (7.1)"
+      - "Implement risk controls (7.2)"
+      - "Verify implementation"
+      - "Evaluate residual risk (7.3)"
+      - "Perform benefit-risk analysis if needed (7.4)"
+      - "Check for new risks from controls (7.5)"
+      - "Verify completeness (7.6)"
+      
+  phase_4_overall_evaluation:
+    activities:
+      - "Evaluate overall residual risk (8)"
+      - "Conduct risk management review (9)"
+      - "Document review results"
+      
+  phase_5_production_and_post_production:
+    activities:
+      - "Implement information collection process (10.1, 10.2)"
+      - "Establish review criteria (10.3)"
+      - "Define action procedures (10.4)"
+      - "Maintain risk management file throughout lifecycle"
+
+# ============================================================================
+# VERSION HISTORY
+# ============================================================================
+version_history:
+  iso_14971_timeline:
+    - version: "ISO 14971:1998"
+      description: "First edition"
+    - version: "ISO 14971:2007"
+      description: "Second edition; widely adopted"
+    - version: "EN ISO 14971:2012"
+      description: "European harmonized version with Z annexes"
+    - version: "ISO 14971:2019"
+      description: "Third edition; benefit-risk emphasis, enhanced post-production"
+      current: true
+    - version: "EN ISO 14971:2019+A11:2021"
+      description: "EU harmonized version with MDR/IVDR Z annexes"
+      
+  compliance_pack_version:
+    - version: "1.0"
+      date: "2026-02-03"
+      author: "Code Conclave AI Agent"
+      changes: "Initial ISO 14971:2019 compliance pack creation"
+
+notes:
+  - "ISO 14971 is THE risk management standard for medical devices - referenced by all major regulations"
+  - "2019 edition emphasizes benefit-risk analysis more than previous versions"
+  - "Clause 10 (post-production) significantly expanded from 2007 edition"
+  - "FMEA alone does NOT satisfy ISO 14971 requirements"
+  - "Manufacturer must define their own risk acceptability criteria"
+  - "Risk control priority order (design > protective measures > information) is mandatory"
+  - "ISO/TR 24971:2020 provides essential implementation guidance"
+  - "EU MDR/IVDR have additional requirements beyond ISO 14971"

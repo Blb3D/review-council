@@ -1,0 +1,2155 @@
+# ISO 13485:2016 - Medical Devices Quality Management Systems
+# Code Conclave Compliance Pack
+# Requirements for Regulatory Purposes
+#
+# Published: March 1, 2016 (Third Edition)
+# Supersedes: ISO 13485:2003 and ISO/TR 14969:2004
+# Technical Committee: ISO/TC 210 - Quality management and corresponding 
+#                      general aspects for products with a health purpose
+#
+# CRITICAL: As of February 2, 2026, ISO 13485:2016 is incorporated by reference
+#           into FDA's Quality Management System Regulation (QMSR), replacing
+#           most of 21 CFR Part 820.
+
+id: iso-13485-2016
+name: ISO 13485:2016 - Medical Devices Quality Management Systems
+version: "1.0.0"
+type: international_standard
+authority: ISO
+jurisdiction: International
+effective_date: "2016-03-01"
+last_updated: "2016-03-01"
+
+description: |
+  ISO 13485:2016 specifies requirements for a quality management system where an 
+  organization needs to demonstrate its ability to provide medical devices and 
+  related services that consistently meet customer and applicable regulatory 
+  requirements. This standard is applicable to organizations regardless of their 
+  size and regardless of their type, except where explicitly stated.
+  
+  The standard takes a process-based approach to quality management and emphasizes:
+  - Risk management throughout the product lifecycle
+  - Meeting customer and regulatory requirements
+  - Maintaining an effective quality management system
+  - Ensuring medical device safety and performance
+
+applicability:
+  industries:
+    - medical_devices
+    - in_vitro_diagnostics
+    - combination_products
+    - active_implantable_devices
+    - sterile_devices
+    - software_as_medical_device
+  organizations:
+    - manufacturers
+    - contract_manufacturers
+    - specification_developers
+    - sterilization_service_providers
+    - distribution_and_storage
+    - servicing_organizations
+    - technical_support_providers
+  lifecycle_stages:
+    - design_and_development
+    - production
+    - storage_and_distribution
+    - installation
+    - servicing
+    - decommissioning_and_disposal
+  regional_adoptions:
+    - name: "EN ISO 13485:2016+A11:2021"
+      region: "European Union"
+      notes: "Includes Annex ZA (MDR) and ZB (IVDR) mappings"
+    - name: "QMSR (21 CFR Part 820)"
+      region: "United States"
+      notes: "Effective February 2, 2026 - incorporates ISO 13485 by reference"
+    - name: "CMDC"
+      region: "Canada"
+      notes: "Canadian Medical Devices Conformity Assessment System"
+    - name: "MDSAP"
+      region: "Multiple"
+      notes: "Medical Device Single Audit Program - recognizes ISO 13485"
+
+# =============================================================================
+# CLAUSES AND REQUIREMENTS
+# =============================================================================
+
+clauses:
+  # ---------------------------------------------------------------------------
+  # CLAUSE 1 - SCOPE
+  # ---------------------------------------------------------------------------
+  - id: "1"
+    title: "Scope"
+    requirement: |
+      This International Standard specifies requirements for a quality management 
+      system that can be used by an organization involved in one or more stages 
+      of the life-cycle of a medical device, including design and development, 
+      production, storage and distribution, installation, servicing and final 
+      decommissioning and disposal of medical devices, and design and development, 
+      or provision of associated activities (e.g., technical support).
+      
+      The requirements in this International Standard can also be used by suppliers 
+      or other external parties that provide product, including quality management 
+      system-related services to such organizations.
+    agents: [architect, herald]
+    finding_patterns: ["ARCHITECT-001"]
+    critical: true
+    notes:
+      - "If any requirement in Clauses 6, 7 or 8 is not applicable, organization does not need to include it"
+      - "Non-applicability must be justified and documented"
+      - "Exclusions do not affect ability or responsibility to provide conforming devices"
+
+  # ---------------------------------------------------------------------------
+  # CLAUSE 2 - NORMATIVE REFERENCES
+  # ---------------------------------------------------------------------------
+  - id: "2"
+    title: "Normative References"
+    requirement: |
+      ISO 9000:2015, Quality management systems — Fundamentals and vocabulary
+    agents: [herald]
+    finding_patterns: ["HERALD-001"]
+    critical: false
+
+  # ---------------------------------------------------------------------------
+  # CLAUSE 3 - TERMS AND DEFINITIONS
+  # ---------------------------------------------------------------------------
+  - id: "3"
+    title: "Terms and Definitions"
+    requirement: |
+      For purposes of this document, the terms and definitions given in ISO 9000:2015 
+      and the following apply.
+    agents: [herald, architect]
+    finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+    critical: true
+    key_definitions:
+      advisory_notice:
+        definition: "Notice issued subsequent to delivery to provide supplementary information or advise action"
+      authorized_representative:
+        definition: "Natural or legal person established within a country/jurisdiction who has written mandate from manufacturer"
+      clinical_evaluation:
+        definition: "Assessment and analysis of clinical data to verify clinical safety and performance"
+      complaint:
+        definition: "Written, electronic, or oral communication alleging deficiencies in identity, quality, durability, reliability, usability, safety, or performance"
+      customer:
+        definition: "Organization or person that receives a product (includes end users, patients, healthcare professionals, purchasing organizations)"
+      design_and_development:
+        definition: "Set of processes that transform requirements into specified characteristics"
+      distributor:
+        definition: "Natural or legal person in supply chain who furthers availability of medical device"
+      implantable_medical_device:
+        definition: "Medical device intended to be totally or partially introduced into human body by surgical intervention and remain after procedure"
+      importer:
+        definition: "Natural or legal person who first makes available a device from third country"
+      labelling:
+        definition: "Label, instructions for use, and any other information related to identification, technical description, intended purpose, and proper use"
+      life_cycle:
+        definition: "All phases in the life of a medical device from initial conception to final decommissioning and disposal"
+      manufacturer:
+        definition: "Natural or legal person with responsibility for design, manufacture, packaging, or labelling, regardless of whether performed by that person or on their behalf"
+      medical_device:
+        definition: "Instrument, apparatus, implement, machine, appliance, implant, reagent, software, material or other article intended for use for medical purposes"
+      medical_device_family:
+        definition: "Group of medical devices manufactured by or for the same organization having same basic design, manufacturing, and intended use"
+      performance_evaluation:
+        definition: "Assessment and analysis of data to establish or verify ability of IVD to achieve intended purpose"
+      post_market_surveillance:
+        definition: "Systematic process to collect and analyze experience from marketed devices"
+      product:
+        definition: "Result of a process (includes services, software, hardware, processed materials)"
+      purchased_product:
+        definition: "Product provided by external party"
+      risk:
+        definition: "Combination of probability of occurrence of harm and severity of that harm"
+      risk_management:
+        definition: "Systematic application of management policies, procedures, and practices to analyzing, evaluating, controlling, and monitoring risk"
+      sterile_barrier_system:
+        definition: "Minimum package that minimizes risk of ingress of microorganisms and allows aseptic presentation"
+      sterile_medical_device:
+        definition: "Medical device intended to meet requirements for sterility"
+      validation:
+        definition: "Confirmation through provision of objective evidence that requirements for specific intended use have been fulfilled"
+      verification:
+        definition: "Confirmation through provision of objective evidence that specified requirements have been fulfilled"
+
+  # ---------------------------------------------------------------------------
+  # CLAUSE 4 - QUALITY MANAGEMENT SYSTEM
+  # ---------------------------------------------------------------------------
+  - id: "4"
+    title: "Quality Management System"
+    sections:
+      - id: "4.1"
+        title: "General requirements"
+        subsections:
+          - id: "4.1.1"
+            title: "QMS establishment"
+            requirement: |
+              The organization shall document a quality management system and maintain 
+              its effectiveness in accordance with the requirements of this International 
+              Standard and applicable regulatory requirements.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            
+          - id: "4.1.2"
+            title: "Process identification"
+            requirement: |
+              The organization shall:
+              a) determine the processes needed for the quality management system 
+                 and their application throughout the organization;
+              b) determine the sequence and interaction of these processes.
+            agents: [architect]
+            finding_patterns: ["ARCHITECT-001", "ARCHITECT-002"]
+            critical: true
+            
+          - id: "4.1.3"
+            title: "Process criteria and methods"
+            requirement: |
+              For each quality management system process, the organization shall:
+              a) determine criteria and methods needed to ensure that both the 
+                 operation and control of these processes are effective;
+              b) ensure the availability of resources and information necessary 
+                 to support the operation and monitoring of these processes;
+              c) implement actions necessary to achieve planned results and maintain 
+                 the effectiveness of these processes;
+              d) monitor, measure as appropriate, and analyze these processes;
+              e) establish and maintain records needed to demonstrate conformity of 
+                 its processes to this International Standard.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-002"]
+            critical: true
+            
+          - id: "4.1.4"
+            title: "Risk-based approach"
+            requirement: |
+              The organization shall apply a risk-based approach to the control of 
+              the appropriate processes needed for the quality management system.
+            agents: [architect, guardian]
+            finding_patterns: ["ARCHITECT-001", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - risk_assessment_records
+              - risk_control_measures
+              - risk_management_file
+              
+          - id: "4.1.5"
+            title: "Outsourced processes"
+            requirement: |
+              Where the organization chooses to outsource any process that affects 
+              product conformity with requirements, it shall ensure control over 
+              such processes. The controls shall be proportionate to the risk 
+              involved and the ability of the external party to meet requirements. 
+              The controls shall include written quality agreements.
+            agents: [architect, operator]
+            finding_patterns: ["ARCHITECT-001", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - quality_agreements
+              - supplier_monitoring_records
+              - outsourced_process_controls
+
+          - id: "4.1.6"
+            title: "Software validation"
+            requirement: |
+              The organization shall document procedures for the validation of the 
+              application of computer software used in the quality management system. 
+              Such software applications shall be validated prior to initial use and, 
+              as appropriate, after changes to such software or its application.
+              
+              The specific approach and activities associated with software validation 
+              and revalidation shall be proportionate to the risk associated with the 
+              use of the software.
+              
+              Records of such activities shall be maintained.
+            agents: [guardian, sentinel]
+            finding_patterns: ["GUARDIAN-*", "SENTINEL-002"]
+            critical: true
+            evidence_types:
+              - software_validation_procedures
+              - validation_protocols_and_reports
+              - csv_records
+
+      - id: "4.2"
+        title: "Documentation requirements"
+        subsections:
+          - id: "4.2.1"
+            title: "General"
+            requirement: |
+              The quality management system documentation shall include:
+              a) documented statements of a quality policy and quality objectives;
+              b) a quality manual;
+              c) documented procedures and records required by this International Standard;
+              d) documents, including records, determined by the organization to be 
+                 necessary to ensure the effective planning, operation, and control 
+                 of its processes;
+              e) other documentation specified by applicable regulatory requirements.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+            critical: true
+            
+          - id: "4.2.2"
+            title: "Quality manual"
+            requirement: |
+              The organization shall document a quality manual that includes:
+              a) the scope of the quality management system, including details of and 
+                 justification for any requirement of this International Standard that 
+                 is not applicable;
+              b) the documented procedures established for the quality management 
+                 system, or reference to them;
+              c) a description of the interaction between the processes of the quality 
+                 management system.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - quality_manual
+              - process_interaction_diagram
+              - exclusion_justifications
+              
+          - id: "4.2.3"
+            title: "Medical device file"
+            requirement: |
+              For each medical device type or medical device family, the organization 
+              shall establish and maintain one or more files either containing or 
+              referencing documents generated to demonstrate conformity to the 
+              requirements of this International Standard and compliance with 
+              applicable regulatory requirements.
+              
+              The content of the file(s) shall include, but is not limited to:
+              a) general description of the medical device, intended use/purpose, 
+                 and labelling, including any instructions for use;
+              b) specifications for product;
+              c) specifications or procedures for manufacturing, packaging, storage, 
+                 handling, and distribution;
+              d) procedures for measuring and monitoring;
+              e) as appropriate, requirements for installation;
+              f) as appropriate, procedures for servicing.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - medical_device_file
+              - technical_documentation
+              - design_history_file
+              
+          - id: "4.2.4"
+            title: "Control of documents"
+            requirement: |
+              Documents required by the quality management system shall be controlled. 
+              A documented procedure shall be established to define the controls needed:
+              a) to review and approve documents for adequacy prior to issue;
+              b) to review and update as necessary, and re-approve documents;
+              c) to ensure that the changes and the current revision status of documents 
+                 are identified;
+              d) to ensure that relevant versions of applicable documents are available 
+                 at points of use;
+              e) to ensure that documents remain legible and readily identifiable;
+              f) to ensure that documents of external origin determined by the 
+                 organization to be necessary for the planning and operation of the 
+                 quality management system are identified and their distribution controlled;
+              g) to prevent deterioration or loss of documents;
+              h) to prevent the unintended use of obsolete documents, and to apply 
+                 suitable identification to them if they are retained for any purpose.
+              
+              The organization shall ensure that changes to documents are reviewed and 
+              approved either by the original approving function or another designated 
+              function that has access to pertinent background information.
+              
+              The organization shall define the period for which at least one copy of 
+              obsolete controlled documents shall be retained. This period shall ensure 
+              that documents to which medical devices have been manufactured and tested 
+              are available for at least the lifetime of the medical device as defined 
+              by the organization, but not less than the retention period of any 
+              resulting record, or as specified by applicable regulatory requirements.
+            agents: [herald, guardian]
+            finding_patterns: ["HERALD-001", "HERALD-002", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - document_control_procedure
+              - master_document_list
+              - revision_history
+              - obsolete_document_controls
+              
+          - id: "4.2.5"
+            title: "Control of records"
+            requirement: |
+              Records shall be established and maintained to provide evidence of 
+              conformity to requirements and of the effective operation of the quality 
+              management system.
+              
+              The organization shall document a procedure to define the controls needed 
+              for the identification, storage, security and integrity, retrieval, 
+              retention time and disposition of records.
+              
+              The organization shall define and implement methods for protecting 
+              confidential health information contained in records in accordance with 
+              the applicable regulatory requirements.
+              
+              Records shall remain legible, readily identifiable, and retrievable. 
+              Changes to a record shall remain identifiable.
+              
+              The organization shall retain the records for at least the lifetime of 
+              the medical device as defined by the organization, or as specified by 
+              applicable regulatory requirements, but not less than two years from the 
+              date of product release by the organization.
+            agents: [herald, sentinel]
+            finding_patterns: ["HERALD-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - record_control_procedure
+              - record_retention_schedule
+              - confidential_information_protection
+
+  # ---------------------------------------------------------------------------
+  # CLAUSE 5 - MANAGEMENT RESPONSIBILITY
+  # ---------------------------------------------------------------------------
+  - id: "5"
+    title: "Management Responsibility"
+    sections:
+      - id: "5.1"
+        title: "Management commitment"
+        requirement: |
+          Top management shall provide evidence of its commitment to the development 
+          and implementation of the quality management system and maintaining its 
+          effectiveness by:
+          a) communicating to the organization the importance of meeting customer 
+             as well as applicable regulatory requirements;
+          b) establishing the quality policy;
+          c) ensuring that quality objectives are established;
+          d) conducting management reviews;
+          e) ensuring the availability of resources.
+        agents: [architect, herald]
+        finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+        critical: true
+        evidence_types:
+          - management_commitment_evidence
+          - resource_allocation_records
+          - communication_records
+
+      - id: "5.2"
+        title: "Customer focus"
+        requirement: |
+          Top management shall ensure that customer requirements and applicable 
+          regulatory requirements are determined and met.
+        agents: [navigator, architect]
+        finding_patterns: ["NAVIGATOR-001", "ARCHITECT-001"]
+        critical: true
+
+      - id: "5.3"
+        title: "Quality policy"
+        requirement: |
+          Top management shall ensure that the quality policy:
+          a) is appropriate to the purpose of the organization;
+          b) includes a commitment to comply with requirements and to maintain the 
+             effectiveness of the quality management system;
+          c) provides a framework for establishing and reviewing quality objectives;
+          d) is communicated and understood within the organization;
+          e) is reviewed for continuing suitability.
+        agents: [herald, architect]
+        finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+        critical: true
+        evidence_types:
+          - quality_policy_document
+          - policy_communication_records
+
+      - id: "5.4"
+        title: "Planning"
+        subsections:
+          - id: "5.4.1"
+            title: "Quality objectives"
+            requirement: |
+              Top management shall ensure that quality objectives, including those 
+              needed to meet applicable regulatory requirements and requirements for 
+              product, are established at relevant functions and levels within the 
+              organization. The quality objectives shall be measurable and consistent 
+              with the quality policy.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            evidence_types:
+              - quality_objectives
+              - objective_metrics
+              
+          - id: "5.4.2"
+            title: "Quality management system planning"
+            requirement: |
+              Top management shall ensure that:
+              a) the planning of the quality management system is carried out in order 
+                 to meet the requirements given in 4.1, as well as the quality objectives;
+              b) the integrity of the quality management system is maintained when 
+                 changes to the quality management system are planned and implemented.
+            agents: [architect]
+            finding_patterns: ["ARCHITECT-001", "ARCHITECT-002"]
+            critical: true
+
+      - id: "5.5"
+        title: "Responsibility, authority and communication"
+        subsections:
+          - id: "5.5.1"
+            title: "Responsibility and authority"
+            requirement: |
+              Top management shall ensure that responsibilities and authorities are 
+              defined, documented, and communicated within the organization.
+              
+              Top management shall document the interrelation of all personnel who 
+              manage, perform, and verify work affecting quality. The independence 
+              and authority necessary to perform these tasks shall be ensured.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            evidence_types:
+              - organizational_chart
+              - job_descriptions
+              - responsibility_matrix
+              
+          - id: "5.5.2"
+            title: "Management representative"
+            requirement: |
+              Top management shall appoint a member of management who, irrespective 
+              of other responsibilities, shall have responsibility and authority that 
+              includes:
+              a) ensuring that processes needed for the quality management system 
+                 are documented;
+              b) reporting to top management on the effectiveness of the quality 
+                 management system and any need for improvement;
+              c) ensuring the promotion of awareness of applicable regulatory 
+                 requirements and quality management system requirements throughout 
+                 the organization.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            evidence_types:
+              - management_representative_appointment
+              - reporting_records
+              
+          - id: "5.5.3"
+            title: "Internal communication"
+            requirement: |
+              Top management shall ensure that appropriate communication processes 
+              are established within the organization and that communication takes 
+              place regarding the effectiveness of the quality management system.
+            agents: [herald]
+            finding_patterns: ["HERALD-001"]
+            critical: false
+
+      - id: "5.6"
+        title: "Management review"
+        subsections:
+          - id: "5.6.1"
+            title: "General"
+            requirement: |
+              Top management shall review the organization's quality management system, 
+              at documented planned intervals, to ensure its continuing suitability, 
+              adequacy, and effectiveness. The review shall include assessing 
+              opportunities for improvement and the need for changes to the quality 
+              management system, including the quality policy and quality objectives.
+              
+              Records from management reviews shall be maintained.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - management_review_records
+              - review_schedule
+              
+          - id: "5.6.2"
+            title: "Review input"
+            requirement: |
+              The input to management review shall include, but is not limited to, 
+              information arising from:
+              a) feedback;
+              b) complaint handling;
+              c) reporting to regulatory authorities;
+              d) audits;
+              e) monitoring and measurement of processes;
+              f) monitoring and measurement of product;
+              g) corrective action;
+              h) preventive action;
+              i) follow-up actions from previous management reviews;
+              j) changes that could affect the quality management system;
+              k) recommendations for improvement;
+              l) applicable new or revised regulatory requirements.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-001", "ARCHITECT-001"]
+            critical: true
+            
+          - id: "5.6.3"
+            title: "Review output"
+            requirement: |
+              The output from management review shall be recorded and include decisions 
+              and actions related to:
+              a) improvement needed to maintain the suitability, adequacy, and 
+                 effectiveness of the quality management system and its processes;
+              b) improvement of product related to customer requirements;
+              c) changes needed to respond to applicable new or revised regulatory 
+                 requirements;
+              d) resource needs.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - management_review_outputs
+              - action_items
+
+  # ---------------------------------------------------------------------------
+  # CLAUSE 6 - RESOURCE MANAGEMENT
+  # ---------------------------------------------------------------------------
+  - id: "6"
+    title: "Resource Management"
+    sections:
+      - id: "6.1"
+        title: "Provision of resources"
+        requirement: |
+          The organization shall determine and provide the resources needed:
+          a) to implement the quality management system and maintain its effectiveness;
+          b) to meet applicable regulatory requirements and customer requirements.
+        agents: [architect, operator]
+        finding_patterns: ["ARCHITECT-001", "OPERATOR-001"]
+        critical: true
+
+      - id: "6.2"
+        title: "Human resources"
+        requirement: |
+          Personnel performing work affecting product quality shall be competent on 
+          the basis of appropriate education, training, skills, and experience.
+          
+          The organization shall document the process(es) for establishing competence, 
+          providing needed training, and ensuring awareness of personnel. The 
+          organization shall:
+          a) determine the necessary competence for personnel performing work 
+             affecting product quality;
+          b) provide training or take other actions to achieve or maintain the 
+             necessary competence;
+          c) evaluate the effectiveness of the actions taken;
+          d) ensure that its personnel are aware of the relevance and importance of 
+             their activities and how they contribute to the achievement of the 
+             quality objectives;
+          e) maintain appropriate records of education, training, skills, and 
+             experience.
+        agents: [herald, architect]
+        finding_patterns: ["HERALD-003", "ARCHITECT-001"]
+        critical: true
+        evidence_types:
+          - training_procedure
+          - training_records
+          - competency_assessments
+          - job_qualifications
+
+      - id: "6.3"
+        title: "Infrastructure"
+        requirement: |
+          The organization shall document the requirements for the infrastructure 
+          needed to achieve conformity to product requirements, prevent product 
+          mix-up, and ensure orderly handling of product.
+          
+          Infrastructure includes, as appropriate:
+          a) buildings, workspace, and associated utilities;
+          b) process equipment (both hardware and software);
+          c) supporting services (such as transport, communication, or information 
+             systems).
+          
+          The organization shall document requirements for maintenance activities, 
+          including the interval of performing such activities, when such maintenance 
+          activities, or lack thereof, can affect product quality. As appropriate, 
+          the requirements shall apply to equipment used in production, the control 
+          of the work environment, and monitoring and measurement.
+          
+          Records of such maintenance shall be maintained.
+        agents: [operator, architect]
+        finding_patterns: ["OPERATOR-001", "ARCHITECT-001"]
+        critical: true
+        evidence_types:
+          - infrastructure_requirements
+          - maintenance_procedures
+          - maintenance_records
+
+      - id: "6.4"
+        title: "Work environment and contamination control"
+        subsections:
+          - id: "6.4.1"
+            title: "Work environment"
+            requirement: |
+              The organization shall document the requirements for the work environment 
+              needed to achieve conformity to product requirements and shall document 
+              procedures to monitor and control these work environment requirements.
+              
+              The organization shall:
+              a) document requirements for health, cleanliness, and clothing of 
+                 personnel if contact between such personnel and the product or 
+                 work environment could affect medical device safety or performance;
+              b) ensure that all personnel who are required to work temporarily under 
+                 special environmental conditions within the work environment are 
+                 competent or supervised by a competent person.
+            agents: [operator, guardian]
+            finding_patterns: ["OPERATOR-001", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - environmental_requirements
+              - environmental_monitoring_records
+              - personnel_hygiene_requirements
+              
+          - id: "6.4.2"
+            title: "Contamination control"
+            requirement: |
+              As appropriate, the organization shall plan and document arrangements 
+              for the control of contaminated or potentially contaminated product in 
+              order to prevent contamination of the work environment, personnel, or 
+              product.
+              
+              For sterile medical devices, the organization shall document requirements 
+              for control of contamination with microorganisms or particulate matter 
+              and maintain the required cleanliness during assembly or packaging 
+              processes.
+            agents: [operator, guardian]
+            finding_patterns: ["OPERATOR-001", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - contamination_control_procedures
+              - cleanroom_monitoring
+              - particulate_monitoring
+
+  # ---------------------------------------------------------------------------
+  # CLAUSE 7 - PRODUCT REALIZATION
+  # ---------------------------------------------------------------------------
+  - id: "7"
+    title: "Product Realization"
+    sections:
+      - id: "7.1"
+        title: "Planning of product realization"
+        requirement: |
+          The organization shall plan and develop the processes needed for product 
+          realization. Planning of product realization shall be consistent with the 
+          requirements of the other processes of the quality management system.
+          
+          The organization shall document one or more processes for risk management 
+          in product realization. Records of risk management activities shall be 
+          maintained.
+          
+          In planning product realization, the organization shall determine the 
+          following, as appropriate:
+          a) quality objectives and requirements for the product;
+          b) the need to establish processes and documents and to provide resources 
+             and infrastructure specific to the product;
+          c) required verification, validation, monitoring, measurement, inspection, 
+             and test and handling, storage, distribution, and traceability 
+             activities specific to the product together with the criteria for 
+             product acceptance;
+          d) records needed to provide evidence that the realization processes and 
+             resulting product meet requirements.
+          
+          The output of this planning shall be documented in a form suitable for 
+          the organization's method of operations.
+        agents: [architect, guardian]
+        finding_patterns: ["ARCHITECT-001", "GUARDIAN-*"]
+        critical: true
+        evidence_types:
+          - product_realization_plan
+          - risk_management_plan
+          - project_plans
+        related_standards:
+          - ISO 14971: "Risk management for medical devices"
+
+      - id: "7.2"
+        title: "Customer-related processes"
+        subsections:
+          - id: "7.2.1"
+            title: "Determination of requirements related to product"
+            requirement: |
+              The organization shall determine:
+              a) requirements specified by the customer, including the requirements 
+                 for delivery and post-delivery activities;
+              b) requirements not stated by the customer but necessary for specified 
+                 or intended use, as known;
+              c) applicable regulatory requirements related to the product;
+              d) any user training needed to ensure specified performance and safe 
+                 use of the medical device;
+              e) any additional requirements determined by the organization.
+            agents: [navigator, architect]
+            finding_patterns: ["NAVIGATOR-001", "ARCHITECT-001"]
+            critical: true
+            
+          - id: "7.2.2"
+            title: "Review of requirements related to product"
+            requirement: |
+              The organization shall review the requirements related to product. This 
+              review shall be conducted prior to the organization's commitment to 
+              provide a product to the customer and shall ensure that:
+              a) product requirements are defined and documented;
+              b) contract or order requirements differing from those previously 
+                 expressed are resolved;
+              c) applicable regulatory requirements are met;
+              d) any user training identified under 7.2.1 d) is available or planned 
+                 to be available;
+              e) the organization has the ability to meet the defined requirements.
+              
+              Records of the results of the review and actions arising from the 
+              review shall be maintained.
+            agents: [navigator, sentinel]
+            finding_patterns: ["NAVIGATOR-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - contract_review_records
+              - order_review_records
+              
+          - id: "7.2.3"
+            title: "Communication"
+            requirement: |
+              The organization shall plan and document arrangements for communicating 
+              with customers in relation to:
+              a) product information;
+              b) enquiries, contracts, or order handling, including amendments;
+              c) customer feedback, including complaints;
+              d) advisory notices.
+            agents: [herald, navigator]
+            finding_patterns: ["HERALD-001", "NAVIGATOR-001"]
+            critical: true
+            evidence_types:
+              - customer_communication_procedures
+              - advisory_notice_procedures
+
+      - id: "7.3"
+        title: "Design and development"
+        subsections:
+          - id: "7.3.1"
+            title: "General"
+            requirement: |
+              The organization shall document procedures for design and development.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            
+          - id: "7.3.2"
+            title: "Design and development planning"
+            requirement: |
+              The organization shall plan and control the design and development of 
+              product. During the design and development planning, the organization 
+              shall document:
+              a) the design and development stages;
+              b) the review(s) needed at each design and development stage;
+              c) the verification, validation, and design transfer activities that 
+                 are appropriate at each design and development stage;
+              d) the responsibilities and authorities for design and development;
+              e) the methods to ensure traceability of design and development outputs 
+                 to design and development inputs;
+              f) the resources needed, including necessary competence of personnel.
+            agents: [architect]
+            finding_patterns: ["ARCHITECT-001", "ARCHITECT-002"]
+            critical: true
+            evidence_types:
+              - design_development_plan
+              - design_phase_definitions
+              - design_review_schedule
+              
+          - id: "7.3.3"
+            title: "Design and development inputs"
+            requirement: |
+              Inputs relating to product requirements shall be determined and records 
+              shall be maintained. These inputs shall include:
+              a) functional, performance, usability, and safety requirements, according 
+                 to the intended use;
+              b) applicable regulatory requirements and standards;
+              c) applicable output(s) of risk management;
+              d) as appropriate, information derived from previous similar designs;
+              e) other requirements essential for design and development of the 
+                 product and processes.
+              
+              These inputs shall be reviewed for adequacy and approved. Requirements 
+              shall be complete, unambiguous, able to be verified or validated, and 
+              not in conflict with each other.
+            agents: [architect, navigator]
+            finding_patterns: ["ARCHITECT-001", "NAVIGATOR-001"]
+            critical: true
+            evidence_types:
+              - design_input_specification
+              - requirements_review_records
+              
+          - id: "7.3.4"
+            title: "Design and development outputs"
+            requirement: |
+              Design and development outputs shall be documented in a form suitable 
+              for verification against the design and development inputs and shall 
+              be approved prior to release.
+              
+              Design and development outputs shall:
+              a) meet the input requirements for design and development;
+              b) provide appropriate information for purchasing, production, and 
+                 service provision;
+              c) contain or reference product acceptance criteria;
+              d) specify the characteristics of the product that are essential for 
+                 its safe and proper use.
+              
+              Records of the design and development outputs shall be maintained.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            evidence_types:
+              - design_output_documentation
+              - drawings_specifications
+              - acceptance_criteria
+              
+          - id: "7.3.5"
+            title: "Design and development review"
+            requirement: |
+              At suitable stages, systematic reviews of design and development shall 
+              be performed in accordance with planned and documented arrangements to:
+              a) evaluate the ability of the results of design and development to 
+                 meet requirements;
+              b) identify and propose necessary actions.
+              
+              Participants in such reviews shall include representatives of functions 
+              concerned with the design and development stage(s) being reviewed, as 
+              well as other specialist personnel.
+              
+              Records of the results of the reviews, including identification of the 
+              design under review, the participants involved, and the date of the 
+              review, and any necessary actions shall be maintained.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - design_review_records
+              - action_items
+              
+          - id: "7.3.6"
+            title: "Design and development verification"
+            requirement: |
+              Design and development verification shall be performed in accordance 
+              with planned and documented arrangements to ensure that the design and 
+              development outputs have met the design and development input requirements. 
+              
+              The organization shall document verification plans that include methods, 
+              acceptance criteria, and, as appropriate, statistical techniques with 
+              rationale for sample size.
+              
+              If the intended use requires that the medical device be connected to, 
+              or have an interface with, other medical device(s), verification shall 
+              include confirmation that the design outputs meet design inputs when 
+              so connected or interfaced.
+              
+              Records of the results and conclusions of verification, including 
+              identification of the design under verification, the methods used, the 
+              date, and the person(s) performing the verification, and any necessary 
+              actions shall be maintained.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-002", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - verification_protocols
+              - verification_reports
+              - test_records
+              
+          - id: "7.3.7"
+            title: "Design and development validation"
+            requirement: |
+              Design and development validation shall be performed in accordance 
+              with planned and documented arrangements to ensure that the resulting 
+              product is capable of meeting the requirements for the specified 
+              application or intended use, where known.
+              
+              The organization shall document validation plans that include methods, 
+              acceptance criteria, and, as appropriate, statistical techniques with 
+              rationale for sample size.
+              
+              Design validation shall be conducted on representative product. 
+              Representative product includes initial production units, batches, or 
+              their equivalents. The rationale for the choice of product used for 
+              validation shall be recorded.
+              
+              As part of design and development validation, the organization shall 
+              perform clinical evaluations or performance evaluations of the medical 
+              device in accordance with applicable regulatory requirements. A medical 
+              device used for clinical evaluation or performance evaluation is not 
+              considered to be released for use.
+              
+              If the intended use requires that the medical device be connected to, 
+              or have an interface with, other medical device(s), validation shall 
+              include confirmation that the requirements for the specified application 
+              or intended use have been met when so connected or interfaced.
+              
+              Validation shall be completed prior to release of the product for use.
+              
+              Records of the results and conclusion of validation, including 
+              identification of the design validated, the methods used, the date, 
+              and the person(s) performing the validation, and any necessary actions 
+              shall be maintained.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-002", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - validation_protocols
+              - validation_reports
+              - clinical_evaluation_report
+              - performance_evaluation_report
+              
+          - id: "7.3.8"
+            title: "Design and development transfer"
+            requirement: |
+              The organization shall document procedures for the transfer of design 
+              and development outputs to manufacturing. These procedures shall ensure 
+              that design and development outputs are verified as suitable for 
+              manufacturing before becoming final production specifications and that 
+              production capability can meet product requirements.
+              
+              Results and conclusions of the transfer shall be recorded.
+            agents: [architect, operator]
+            finding_patterns: ["ARCHITECT-001", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - design_transfer_procedure
+              - transfer_records
+              - manufacturing_readiness_review
+              
+          - id: "7.3.9"
+            title: "Control of design and development changes"
+            requirement: |
+              The organization shall document procedures to control design and 
+              development changes. The organization shall determine the significance 
+              of the change to function, performance, usability, safety, and 
+              applicable regulatory requirements for the medical device and its 
+              intended use.
+              
+              Design and development changes shall be identified and records shall 
+              be maintained. Before implementation, the changes shall be:
+              a) reviewed;
+              b) verified and, as appropriate, validated;
+              c) approved.
+              
+              The review of design and development changes shall include evaluation 
+              of the effect of the changes on constituent parts and product already 
+              delivered, inputs or outputs of risk management, and product realization 
+              processes.
+              
+              Records of the results of the review of changes, including identification 
+              of the change under review, the change authorization, the methods used, 
+              the date, and the person(s) reviewing the change, any necessary actions, 
+              and the verification and authorization personnel, shall be maintained.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-002"]
+            critical: true
+            evidence_types:
+              - design_change_procedure
+              - change_request_records
+              - change_impact_assessments
+              
+          - id: "7.3.10"
+            title: "Design and development files"
+            requirement: |
+              The organization shall maintain a design and development file for each 
+              medical device type or medical device family. This file shall include 
+              or reference records generated to demonstrate conformity to the 
+              requirements for design and development and records for design and 
+              development changes.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - design_history_file
+              - DHF_index
+
+      - id: "7.4"
+        title: "Purchasing"
+        subsections:
+          - id: "7.4.1"
+            title: "Purchasing process"
+            requirement: |
+              The organization shall document procedures to ensure that purchased 
+              product conforms to specified purchase information.
+              
+              The organization shall establish criteria for the evaluation and 
+              selection of suppliers. The criteria shall be:
+              a) based on the supplier's ability to provide product that meets the 
+                 organization's requirements;
+              b) based on the performance of the supplier;
+              c) based on the effect of the purchased product on the quality of the 
+                 medical device;
+              d) proportionate to the risk associated with the medical device.
+              
+              The organization shall plan the monitoring and re-evaluation of 
+              suppliers. Supplier performance in meeting requirements for the 
+              purchased product shall be monitored. The results of monitoring shall 
+              provide an input into the supplier re-evaluation process.
+              
+              Non-fulfilment of purchasing requirements shall be addressed with the 
+              supplier proportionate to the risk associated with the purchased 
+              product and compliance with applicable regulatory requirements.
+              
+              Records of the results of evaluation, selection, monitoring, and 
+              re-evaluation of supplier capability or performance and any necessary 
+              actions arising from these activities shall be maintained.
+            agents: [operator, architect]
+            finding_patterns: ["OPERATOR-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - supplier_evaluation_procedure
+              - approved_supplier_list
+              - supplier_monitoring_records
+              - supplier_audit_records
+              
+          - id: "7.4.2"
+            title: "Purchasing information"
+            requirement: |
+              Purchasing information shall describe or reference the product to be 
+              purchased, including as appropriate:
+              a) product specifications;
+              b) requirements for product acceptance, procedures, processes, and 
+                 equipment;
+              c) requirements for qualification of supplier personnel;
+              d) quality management system requirements.
+              
+              The organization shall ensure the adequacy of specified purchase 
+              requirements prior to their communication to the supplier.
+              
+              Purchasing information shall include, as applicable, a written 
+              agreement that the supplier notify the organization of changes in the 
+              purchased product prior to implementation of any changes that affect 
+              the ability of the purchased product to meet specified purchase 
+              requirements.
+              
+              To the extent needed for traceability, the organization shall maintain 
+              relevant purchasing information in the form of documents and records.
+            agents: [herald, operator]
+            finding_patterns: ["HERALD-001", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - purchase_specifications
+              - supplier_agreements
+              - change_notification_agreements
+              
+          - id: "7.4.3"
+            title: "Verification of purchased product"
+            requirement: |
+              The organization shall establish and implement the inspection or other 
+              activities necessary for ensuring that purchased product meets specified 
+              purchase requirements.
+              
+              The extent of verification activities shall be based on the supplier 
+              evaluation results and proportionate to the risks associated with the 
+              purchased product.
+              
+              Where the organization or its customer intends to perform verification 
+              at the supplier's premises, the organization shall state the intended 
+              verification arrangements and method of product release in the purchasing 
+              information.
+              
+              Records of the verification shall be maintained.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - incoming_inspection_procedures
+              - receiving_inspection_records
+
+      - id: "7.5"
+        title: "Production and service provision"
+        subsections:
+          - id: "7.5.1"
+            title: "Control of production and service provision"
+            requirement: |
+              The organization shall plan and carry out production and service 
+              provision under controlled conditions. Controlled conditions shall 
+              include, as applicable:
+              a) the availability of information that describes the characteristics 
+                 of the product;
+              b) the availability of documented procedures, documented requirements, 
+                 work instructions, and reference materials and reference measurement 
+                 procedures, as necessary;
+              c) the use of suitable equipment;
+              d) the availability and use of monitoring and measuring equipment;
+              e) the implementation of monitoring and measurement;
+              f) the implementation of release, delivery, and post-delivery activities;
+              g) the implementation of defined operations for labelling and packaging.
+              
+              The organization shall establish and maintain a record for each medical 
+              device or batch of medical devices that provides traceability and 
+              identifies the amount manufactured and amount approved for distribution. 
+              The record shall be verified and approved.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-002"]
+            critical: true
+            evidence_types:
+              - production_procedures
+              - work_instructions
+              - batch_records
+              - device_history_records
+              
+          - id: "7.5.2"
+            title: "Cleanliness of product"
+            requirement: |
+              The organization shall document requirements for cleanliness of product 
+              if:
+              a) product is cleaned by the organization prior to sterilization or 
+                 its use; or
+              b) product is supplied non-sterile to be subjected to a cleaning process 
+                 prior to sterilization or its use; or
+              c) product is supplied to be used non-sterile and its cleanliness is 
+                 of significance in use; or
+              d) process agents are to be removed from product during manufacture.
+              
+              If product is cleaned in accordance with a) or b) above, the 
+              requirements contained in 6.4.1 and 6.4.2 do not apply prior to the 
+              cleaning process.
+            agents: [operator]
+            finding_patterns: ["OPERATOR-001"]
+            critical: false
+            evidence_types:
+              - cleanliness_requirements
+              - cleaning_validation
+              
+          - id: "7.5.3"
+            title: "Installation activities"
+            requirement: |
+              The organization shall document requirements for medical device 
+              installation and acceptance criteria for verification of installation, 
+              as appropriate.
+              
+              If the agreed customer requirements allow installation to be performed 
+              by an external party other than the organization or its supplier, the 
+              organization shall provide documented requirements for medical device 
+              installation and for verification of the installation.
+              
+              Records of medical device installation and verification of installation 
+              performed by the organization or its supplier shall be maintained.
+            agents: [operator, herald]
+            finding_patterns: ["OPERATOR-001", "HERALD-001"]
+            critical: false
+            evidence_types:
+              - installation_procedures
+              - installation_records
+              
+          - id: "7.5.4"
+            title: "Servicing activities"
+            requirement: |
+              If servicing is a specified requirement, the organization shall document 
+              servicing procedures, reference materials, and reference measurements, 
+              as necessary, for performing servicing activities and verifying that 
+              product requirements are met.
+              
+              The organization shall analyse records of servicing activities performed 
+              by the organization or its supplier:
+              a) to determine if the information is to be handled as a complaint;
+              b) as appropriate, as input to the improvement process.
+              
+              Records of servicing activities performed by the organization or its 
+              supplier shall be maintained.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+            critical: false
+            evidence_types:
+              - servicing_procedures
+              - service_records
+              
+          - id: "7.5.5"
+            title: "Particular requirements for sterile medical devices"
+            requirement: |
+              The organization shall maintain records of the sterilization process 
+              parameters used for each sterilization batch. Sterilization records 
+              shall be traceable to each production batch of medical devices.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - sterilization_records
+              - batch_traceability
+              
+          - id: "7.5.6"
+            title: "Validation of processes for production and service provision"
+            requirement: |
+              The organization shall validate any processes for production and service 
+              provision where the resulting output cannot be or is not verified by 
+              subsequent monitoring or measurement. This includes any processes where 
+              deficiencies become apparent only after the product is in use or the 
+              service has been delivered.
+              
+              Validation shall demonstrate the ability of these processes to achieve 
+              planned results consistently.
+              
+              The organization shall document procedures for validation of processes 
+              including:
+              a) criteria for review and approval of the processes;
+              b) equipment qualification and qualification of personnel;
+              c) use of specific methods, procedures, and acceptance criteria;
+              d) as appropriate, statistical techniques with rationale for sample sizes;
+              e) requirements for records;
+              f) revalidation, including criteria for revalidation;
+              g) approval of changes to the processes.
+              
+              The organization shall document procedures for the validation of the 
+              application of computer software (and changes to such software and/or 
+              its application) for production and service provision that affects the 
+              ability of the product to conform to specified requirements. Such 
+              software applications shall be validated prior to initial use.
+              
+              Records of validation shall be maintained.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - process_validation_procedures
+              - IQ_OQ_PQ_protocols
+              - validation_reports
+              - software_validation_records
+              
+          - id: "7.5.7"
+            title: "Particular requirements for validation of processes for sterilization and sterile barrier systems"
+            requirement: |
+              The organization shall document procedures for the validation of 
+              processes for sterilization and sterile barrier systems.
+              
+              Processes for sterilization and sterile barrier systems shall be 
+              validated prior to implementation and following product or process 
+              changes, as appropriate.
+              
+              Records of validation and process monitoring results for sterilization 
+              and sterile barrier systems shall be maintained.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - sterilization_validation
+              - sterile_barrier_validation
+              
+          - id: "7.5.8"
+            title: "Identification"
+            requirement: |
+              The organization shall document procedures for product identification 
+              and identify the product by suitable means throughout product realization.
+              
+              The organization shall identify the product with respect to monitoring 
+              and measurement requirements throughout product realization.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - identification_procedures
+              - labeling_procedures
+              
+          - id: "7.5.9"
+            title: "Traceability"
+            subsections:
+              - id: "7.5.9.1"
+                title: "General"
+                requirement: |
+                  The organization shall document procedures for traceability. These 
+                  procedures shall define the extent of traceability in accordance 
+                  with applicable regulatory requirements and the records to be 
+                  maintained.
+                agents: [operator, sentinel]
+                finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+                critical: true
+                evidence_types:
+                  - traceability_procedures
+                  - traceability_records
+                  
+              - id: "7.5.9.2"
+                title: "Particular requirements for implantable medical devices"
+                requirement: |
+                  For implantable medical devices, the required records for traceability 
+                  shall include records of all components, materials, and work 
+                  environment conditions, if these could cause the medical device 
+                  not to meet its specified safety and performance requirements.
+                  
+                  The organization shall require that suppliers of distribution 
+                  services maintain records of the distribution of medical devices 
+                  to allow traceability and that such records are available for 
+                  inspection.
+                  
+                  Records of the name and address of the shipping package consignee 
+                  shall be maintained.
+                agents: [operator, sentinel]
+                finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+                critical: true
+                evidence_types:
+                  - component_traceability
+                  - distribution_records
+                  - consignee_records
+                  
+          - id: "7.5.10"
+            title: "Customer property"
+            requirement: |
+              The organization shall exercise care with customer property while it 
+              is under the organization's control or being used by the organization. 
+              The organization shall identify, verify, protect, and safeguard customer 
+              property provided for use or incorporation into the product. If any 
+              customer property is lost, damaged, or otherwise found to be unsuitable 
+              for use, this shall be reported to the customer and records shall be 
+              maintained.
+            agents: [operator]
+            finding_patterns: ["OPERATOR-001"]
+            critical: false
+            
+          - id: "7.5.11"
+            title: "Preservation of product"
+            requirement: |
+              The organization shall document procedures for preserving the conformity 
+              of product to requirements during processing, storage, handling, and 
+              distribution. Preservation shall apply to the constituent parts of a 
+              medical device.
+              
+              The organization shall protect the product from alteration, contamination, 
+              or damage when exposed to expected conditions and hazards during 
+              processing, storage, handling, and distribution by:
+              a) designing and constructing suitable packaging and shipping containers; or
+              b) documenting requirements for special conditions needed if packaging 
+                 alone cannot provide preservation.
+              
+              If special conditions are required, they shall be controlled and 
+              recorded.
+            agents: [operator]
+            finding_patterns: ["OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - preservation_procedures
+              - storage_conditions
+              - packaging_specifications
+
+      - id: "7.6"
+        title: "Control of monitoring and measuring equipment"
+        requirement: |
+          The organization shall determine the monitoring and measurement to be 
+          undertaken and the monitoring and measuring equipment needed to provide 
+          evidence of conformity of product to determined requirements.
+          
+          The organization shall document procedures to ensure that monitoring and 
+          measurement can be carried out and are carried out in a manner that is 
+          consistent with the monitoring and measurement requirements.
+          
+          Where necessary to ensure valid results, measuring equipment shall:
+          a) be calibrated or verified, or both, at specified intervals, or prior 
+             to use, against measurement standards traceable to international or 
+             national measurement standards; where no such standards exist, the 
+             basis used for calibration or verification shall be recorded;
+          b) be adjusted or re-adjusted as necessary; such adjustment or re-adjustment 
+             shall be recorded;
+          c) have identification in order to determine its calibration status;
+          d) be safeguarded from adjustments that would invalidate the measurement 
+             result;
+          e) be protected from damage and deterioration during handling, maintenance, 
+             and storage.
+          
+          In addition, the organization shall assess and record the validity of the 
+          previous measuring results when the equipment is found not to conform to 
+          requirements. The organization shall take appropriate action on the 
+          equipment and any product affected.
+          
+          Records of the results of calibration and verification shall be maintained.
+          
+          When used in the monitoring and measurement of specified requirements, the 
+          ability of computer software to satisfy the intended application shall be 
+          confirmed. This shall be undertaken prior to initial use and reconfirmed 
+          as necessary.
+        agents: [sentinel, operator]
+        finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+        critical: true
+        evidence_types:
+          - calibration_procedures
+          - calibration_records
+          - equipment_list
+          - software_confirmation_records
+
+  # ---------------------------------------------------------------------------
+  # CLAUSE 8 - MEASUREMENT, ANALYSIS AND IMPROVEMENT
+  # ---------------------------------------------------------------------------
+  - id: "8"
+    title: "Measurement, Analysis and Improvement"
+    sections:
+      - id: "8.1"
+        title: "General"
+        requirement: |
+          The organization shall plan and implement the monitoring, measurement, 
+          analysis, and improvement processes needed:
+          a) to demonstrate conformity of the product;
+          b) to ensure conformity of the quality management system;
+          c) to maintain the effectiveness of the quality management system.
+          
+          This shall include determination of applicable methods, including 
+          statistical techniques, and the extent of their use.
+        agents: [sentinel, architect]
+        finding_patterns: ["SENTINEL-001", "ARCHITECT-001"]
+        critical: true
+
+      - id: "8.2"
+        title: "Monitoring and measurement"
+        subsections:
+          - id: "8.2.1"
+            title: "Feedback"
+            requirement: |
+              As one of the measurements of the effectiveness of the quality 
+              management system, the organization shall gather and monitor information 
+              on whether the organization has met customer requirements. The methods 
+              for obtaining and using this information shall be documented.
+              
+              The organization shall document procedures for the feedback process. 
+              This feedback process shall include provisions to gather data from 
+              production as well as post-production activities.
+              
+              Information gathered in the feedback process shall serve as potential 
+              input into risk management for monitoring and maintaining product 
+              requirements, as well as the product realization or improvement processes.
+              
+              If applicable regulatory requirements require the organization to gain 
+              specific experience from post-production activities, the review of this 
+              experience shall form part of the feedback process.
+            agents: [sentinel, navigator]
+            finding_patterns: ["SENTINEL-001", "NAVIGATOR-001"]
+            critical: true
+            evidence_types:
+              - feedback_procedures
+              - customer_feedback_records
+              - post_market_surveillance_data
+              
+          - id: "8.2.2"
+            title: "Complaint handling"
+            requirement: |
+              The organization shall document procedures for timely complaint handling 
+              in accordance with applicable regulatory requirements.
+              
+              These procedures shall include at a minimum requirements and 
+              responsibilities for:
+              a) receiving and recording information;
+              b) evaluating information to determine if the feedback constitutes a 
+                 complaint;
+              c) investigating complaints;
+              d) determining the need to report the information to the appropriate 
+                 regulatory authorities;
+              e) handling of complaint-related product;
+              f) determining the need to initiate corrections or corrective actions.
+              
+              If any complaint is not investigated, justification shall be documented. 
+              Any correction or corrective action resulting from the complaint handling 
+              process shall be documented.
+              
+              If an investigation determines activities outside the organization 
+              contributed to the complaint, relevant information shall be exchanged 
+              between the organization and the external party involved.
+              
+              Complaint handling records shall be maintained.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-001", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - complaint_handling_procedure
+              - complaint_records
+              - investigation_records
+              
+          - id: "8.2.3"
+            title: "Reporting to regulatory authorities"
+            requirement: |
+              If applicable regulatory requirements require notification of complaints 
+              that meet specified reporting criteria of adverse events or issuance of 
+              advisory notices, the organization shall document procedures for 
+              providing notification to the appropriate regulatory authorities.
+              
+              Records of reporting to regulatory authorities shall be maintained.
+            agents: [herald, sentinel]
+            finding_patterns: ["HERALD-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - regulatory_reporting_procedures
+              - adverse_event_reports
+              - advisory_notice_records
+              
+          - id: "8.2.4"
+            title: "Internal audit"
+            requirement: |
+              The organization shall conduct internal audits at documented planned 
+              intervals to determine whether the quality management system:
+              a) conforms to planned and documented arrangements, to the requirements 
+                 of this International Standard, to the quality management system 
+                 requirements established by the organization, and to applicable 
+                 regulatory requirements;
+              b) is effectively implemented and maintained.
+              
+              The organization shall document a procedure describing the 
+              responsibilities and requirements for planning and conducting audits, 
+              establishing records, and reporting results.
+              
+              The organization shall plan an audit programme, taking into consideration 
+              the status and importance of the processes and areas to be audited, as 
+              well as the results of previous audits. The audit criteria, scope, 
+              interval, methods, and auditors shall be defined and recorded. The 
+              selection of auditors and conduct of audits shall ensure objectivity 
+              and impartiality of the audit process. Auditors shall not audit their 
+              own work.
+              
+              Records of the audits and their results, including identification of 
+              the processes and areas audited and the conclusions, shall be maintained.
+              
+              The management responsible for the area being audited shall ensure that 
+              any necessary corrections and corrective actions are taken without undue 
+              delay to eliminate detected nonconformities and their causes. Follow-up 
+              activities shall include the verification of the actions taken and the 
+              reporting of verification results.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - internal_audit_procedure
+              - audit_schedule
+              - audit_reports
+              - audit_follow_up_records
+              
+          - id: "8.2.5"
+            title: "Monitoring and measurement of processes"
+            requirement: |
+              The organization shall apply suitable methods for monitoring and, where 
+              applicable, measurement of the quality management system processes. 
+              These methods shall demonstrate the ability of the processes to achieve 
+              planned results. When planned results are not achieved, correction and 
+              corrective action shall be taken, as appropriate.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-001", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - process_monitoring_records
+              - process_metrics
+              
+          - id: "8.2.6"
+            title: "Monitoring and measurement of product"
+            requirement: |
+              The organization shall monitor and measure the characteristics of the 
+              product to verify that product requirements have been met. This shall 
+              be carried out at applicable stages of the product realization process 
+              in accordance with documented arrangements and documented procedures.
+              
+              Evidence of conformity with the acceptance criteria shall be maintained. 
+              The identity of the person(s) authorizing release of product shall be 
+              recorded.
+              
+              Product release and service delivery shall not proceed until all the 
+              planned and documented arrangements have been satisfactorily completed, 
+              unless otherwise approved by a relevant authority and, where applicable, 
+              by the customer.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - inspection_records
+              - test_records
+              - release_authorization
+
+      - id: "8.3"
+        title: "Control of nonconforming product"
+        subsections:
+          - id: "8.3.1"
+            title: "General"
+            requirement: |
+              The organization shall ensure that product that does not conform to 
+              product requirements is identified and controlled to prevent its 
+              unintended use or delivery. The organization shall document a procedure 
+              to define the controls and related responsibilities and authorities for 
+              the identification, documentation, segregation, evaluation, and 
+              disposition of nonconforming product.
+              
+              The evaluation of nonconformity shall include a determination of the 
+              need for an investigation and notification of any external party 
+              responsible for the nonconformity.
+              
+              Records of the nature of the nonconformities and any subsequent actions 
+              taken, including the evaluation, any investigation, and the rationale 
+              for decisions shall be maintained.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-001", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - nonconforming_product_procedure
+              - NCR_records
+              - disposition_records
+              
+          - id: "8.3.2"
+            title: "Actions in response to nonconforming product detected before delivery"
+            requirement: |
+              The organization shall deal with nonconforming product by one or more 
+              of the following ways:
+              a) taking action to eliminate the detected nonconformity;
+              b) taking action to preclude its original intended use or application;
+              c) authorizing its use, release, or acceptance under concession.
+              
+              The organization shall ensure that nonconforming product is accepted 
+              by concession only if the justification is provided, approval is 
+              obtained, and applicable regulatory requirements are met. Records of 
+              the acceptance by concession and the identity of the person(s) 
+              authorizing the concession shall be maintained.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - concession_records
+              - disposition_records
+              
+          - id: "8.3.3"
+            title: "Actions in response to nonconforming product detected after delivery"
+            requirement: |
+              When nonconforming product is detected after delivery or use has 
+              started, the organization shall take action appropriate to the effects, 
+              or potential effects, of the nonconformity.
+              
+              Records of actions taken shall be maintained.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - field_action_records
+              - recall_records
+              
+          - id: "8.3.4"
+            title: "Rework"
+            requirement: |
+              The organization shall perform rework in accordance with documented 
+              procedures that take into account the potential adverse effect of the 
+              rework on the product. These procedures shall undergo the same review 
+              and approval as the original procedure.
+              
+              After the completion of rework, product shall be verified to ensure 
+              that it meets applicable acceptance criteria and regulatory requirements.
+              
+              Records of rework shall be maintained.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - rework_procedures
+              - rework_records
+
+      - id: "8.4"
+        title: "Analysis of data"
+        requirement: |
+          The organization shall document procedures to determine, collect, and 
+          analyze appropriate data to demonstrate the suitability and effectiveness 
+          of the quality management system and to evaluate where improvement of the 
+          effectiveness of the quality management system can be made. This shall 
+          include data generated as a result of monitoring and measurement and from 
+          other relevant sources.
+          
+          The analysis of data shall provide information relating to:
+          a) feedback;
+          b) conformity to product requirements;
+          c) characteristics and trends of processes and products, including 
+             opportunities for improvement;
+          d) suppliers;
+          e) audits;
+          f) service reports, as appropriate.
+          
+          If the analysis of data shows that the quality management system is not 
+          suitable, adequate, or effective, the organization shall use this analysis 
+          as input for improvement.
+          
+          Records of the results of analyses shall be maintained.
+        agents: [sentinel, architect]
+        finding_patterns: ["SENTINEL-001", "ARCHITECT-001"]
+        critical: true
+        evidence_types:
+          - data_analysis_procedures
+          - trend_analysis_records
+          - statistical_analysis_records
+
+      - id: "8.5"
+        title: "Improvement"
+        subsections:
+          - id: "8.5.1"
+            title: "General"
+            requirement: |
+              The organization shall identify and implement any changes necessary to 
+              ensure and maintain the continued suitability, adequacy, and 
+              effectiveness of the quality management system as well as medical 
+              device safety and performance through the use of the quality policy, 
+              quality objectives, audit results, post-market surveillance, analysis 
+              of data, corrective actions, preventive actions, and management review.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-001"]
+            critical: true
+            
+          - id: "8.5.2"
+            title: "Corrective action"
+            requirement: |
+              The organization shall take action to eliminate the cause of 
+              nonconformities in order to prevent recurrence. Any necessary corrective 
+              actions shall be taken without undue delay. Corrective actions shall 
+              be proportionate to the effects of the nonconformities encountered.
+              
+              The organization shall document a procedure to define requirements for:
+              a) reviewing nonconformities (including complaints);
+              b) determining the causes of nonconformities;
+              c) evaluating the need for action to ensure that nonconformities do 
+                 not recur;
+              d) planning and documenting action needed and implementing such action, 
+                 including, as appropriate, updating documentation;
+              e) verifying that corrective action does not adversely affect the 
+                 ability to meet applicable regulatory requirements or the safety 
+                 and performance of the medical device;
+              f) reviewing the effectiveness of corrective action taken.
+              
+              Records of the results of any investigation and of action taken shall 
+              be maintained.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - capa_procedure
+              - corrective_action_records
+              - effectiveness_verification
+              
+          - id: "8.5.3"
+            title: "Preventive action"
+            requirement: |
+              The organization shall determine action to eliminate the causes of 
+              potential nonconformities in order to prevent their occurrence. 
+              Preventive actions shall be proportionate to the effects of the 
+              potential problems.
+              
+              The organization shall document a procedure to define requirements for:
+              a) determining potential nonconformities and their causes;
+              b) evaluating the need for action to prevent occurrence of 
+                 nonconformities;
+              c) planning and documenting action needed and implementing such action, 
+                 including, as appropriate, updating documentation;
+              d) verifying that preventive action does not adversely affect the 
+                 ability to meet applicable regulatory requirements or the safety 
+                 and performance of the medical device;
+              e) reviewing the effectiveness of preventive action taken, as appropriate.
+              
+              Records of the results of any investigations and of action taken shall 
+              be maintained.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - preventive_action_procedure
+              - preventive_action_records
+
+# =============================================================================
+# AGENT TO REQUIREMENT MAPPINGS
+# =============================================================================
+
+mappings:
+  # Guardian findings - security and access control focus
+  GUARDIAN-001:
+    title: "Secrets in Source Control"
+    controls:
+      - "4.2.4"          # Document control - security
+      - "4.2.5"          # Record control - security
+    severity: critical
+    
+  GUARDIAN-002:
+    title: "Insecure Dependencies"
+    controls:
+      - "4.1.6"          # Software validation
+      - "7.5.6"          # Process validation (software)
+    severity: high
+    
+  GUARDIAN-003:
+    title: "Missing Authentication"
+    controls:
+      - "4.2.4"          # Document control
+      - "4.2.5"          # Record control - security
+      - "6.4.1"          # Work environment access
+    severity: critical
+    
+  GUARDIAN-004:
+    title: "SQL Injection Vulnerability"
+    controls:
+      - "4.1.6"          # Software validation
+      - "4.2.5"          # Record integrity
+    severity: critical
+
+  # Sentinel findings - monitoring and validation focus
+  SENTINEL-001:
+    title: "Insufficient Logging"
+    controls:
+      - "4.2.5"          # Record control
+      - "8.2.4"          # Internal audit
+      - "8.4"            # Analysis of data
+    severity: critical
+    
+  SENTINEL-002:
+    title: "Missing Validation Evidence"
+    controls:
+      - "4.1.6"          # Software validation
+      - "7.3.6"          # Design verification
+      - "7.3.7"          # Design validation
+      - "7.5.6"          # Process validation
+      - "7.6"            # Monitoring equipment
+    severity: critical
+    
+  SENTINEL-003:
+    title: "Audit Trail Gaps"
+    controls:
+      - "4.2.5"          # Record control
+      - "8.2.4"          # Internal audit
+    severity: critical
+
+  # Architect findings - design and documentation focus
+  ARCHITECT-001:
+    title: "Missing Documentation"
+    controls:
+      - "4.2"            # Documentation requirements
+      - "4.2.2"          # Quality manual
+      - "4.2.3"          # Medical device file
+      - "5.5.1"          # Responsibility and authority
+      - "7.3.10"         # Design files
+    severity: high
+    
+  ARCHITECT-002:
+    title: "Design Control Gaps"
+    controls:
+      - "7.3"            # Design and development
+      - "7.3.2"          # Design planning
+      - "7.3.9"          # Design changes
+    severity: high
+    
+  ARCHITECT-003:
+    title: "System Architecture Issues"
+    controls:
+      - "4.1.2"          # Process identification
+      - "4.1.3"          # Process criteria
+      - "7.1"            # Product realization planning
+    severity: medium
+
+  # Herald findings - documentation and training focus
+  HERALD-001:
+    title: "Documentation Deficiency"
+    controls:
+      - "4.2.4"          # Document control
+      - "4.2.5"          # Record control
+      - "7.2.3"          # Communication
+    severity: medium
+    
+  HERALD-002:
+    title: "Change Control Issues"
+    controls:
+      - "4.2.4"          # Document control - changes
+      - "7.3.9"          # Design changes
+    severity: medium
+    
+  HERALD-003:
+    title: "Training Documentation Gaps"
+    controls:
+      - "6.2"            # Human resources
+    severity: medium
+
+  # Operator findings - operational controls focus
+  OPERATOR-001:
+    title: "Process Control Deficiency"
+    controls:
+      - "6.3"            # Infrastructure
+      - "7.4.1"          # Purchasing process
+      - "7.5.1"          # Production control
+      - "7.5.6"          # Process validation
+    severity: medium
+
+  # Navigator findings - requirements focus
+  NAVIGATOR-001:
+    title: "Requirements Gaps"
+    controls:
+      - "5.2"            # Customer focus
+      - "7.2.1"          # Requirements determination
+      - "7.3.3"          # Design inputs
+    severity: medium
+
+# =============================================================================
+# CROSS-REFERENCE TO FDA 21 CFR PART 820
+# =============================================================================
+
+fda_820_mapping:
+  description: |
+    With QMSR effective February 2, 2026, FDA incorporates ISO 13485:2016 by 
+    reference. This mapping shows the correspondence between ISO 13485 clauses 
+    and the legacy 21 CFR Part 820 requirements.
+    
+  correspondence:
+    - iso_clause: "4.1"
+      legacy_820: "820.5"
+      topic: "Quality system"
+    - iso_clause: "4.2.3"
+      legacy_820: "820.181, 820.186"
+      topic: "Device master record / Quality system record"
+    - iso_clause: "4.2.4"
+      legacy_820: "820.40"
+      topic: "Document controls"
+    - iso_clause: "4.2.5"
+      legacy_820: "820.180"
+      topic: "Records"
+    - iso_clause: "5"
+      legacy_820: "820.20"
+      topic: "Management responsibility"
+    - iso_clause: "5.6"
+      legacy_820: "820.20(c)"
+      topic: "Management review"
+    - iso_clause: "6.2"
+      legacy_820: "820.25"
+      topic: "Personnel"
+    - iso_clause: "6.3"
+      legacy_820: "820.70(f), (g)"
+      topic: "Buildings, Equipment"
+    - iso_clause: "6.4"
+      legacy_820: "820.70(c), (d), (e)"
+      topic: "Environmental control"
+    - iso_clause: "7.1"
+      legacy_820: "820.30(a)"
+      topic: "Design controls (general)"
+    - iso_clause: "7.3"
+      legacy_820: "820.30"
+      topic: "Design controls"
+    - iso_clause: "7.4"
+      legacy_820: "820.50"
+      topic: "Purchasing controls"
+    - iso_clause: "7.5.1"
+      legacy_820: "820.70, 820.184"
+      topic: "Production and process controls, DHR"
+    - iso_clause: "7.5.6"
+      legacy_820: "820.75"
+      topic: "Process validation"
+    - iso_clause: "7.5.8, 7.5.9"
+      legacy_820: "820.60, 820.65"
+      topic: "Identification, Traceability"
+    - iso_clause: "7.6"
+      legacy_820: "820.72"
+      topic: "Inspection, measuring, and test equipment"
+    - iso_clause: "8.2.2"
+      legacy_820: "820.198"
+      topic: "Complaint files"
+    - iso_clause: "8.2.4"
+      legacy_820: "820.22"
+      topic: "Quality audit"
+    - iso_clause: "8.2.5, 8.2.6"
+      legacy_820: "820.80"
+      topic: "Receiving, in-process, and finished device acceptance"
+    - iso_clause: "8.3"
+      legacy_820: "820.90"
+      topic: "Nonconforming product"
+    - iso_clause: "8.5.2, 8.5.3"
+      legacy_820: "820.100"
+      topic: "Corrective and preventive action"
+
+# =============================================================================
+# SCORING AND ASSESSMENT
+# =============================================================================
+
+scoring:
+  methodology: "ISO 13485 Certification Audit Assessment"
+  
+  total_clauses: 8
+  total_sections: 24
+  total_subsections: 67
+  
+  critical_requirements:
+    - "4.1.4"            # Risk-based approach
+    - "4.1.6"            # Software validation
+    - "4.2.3"            # Medical device file
+    - "4.2.4"            # Document control
+    - "4.2.5"            # Record control
+    - "5.6"              # Management review
+    - "6.2"              # Human resources / Training
+    - "7.1"              # Product realization planning
+    - "7.3"              # Design and development
+    - "7.4.1"            # Purchasing process
+    - "7.5.1"            # Production control
+    - "7.5.6"            # Process validation
+    - "7.5.9"            # Traceability
+    - "7.6"              # Monitoring equipment
+    - "8.2.2"            # Complaint handling
+    - "8.2.4"            # Internal audit
+    - "8.3"              # Nonconforming product
+    - "8.5.2"            # Corrective action
+    - "8.5.3"            # Preventive action
+
+  common_audit_findings:
+    - category: "Design Control Deficiencies"
+      frequency: "Most common"
+      clauses: ["7.3"]
+      
+    - category: "CAPA Effectiveness"
+      frequency: "Very common"
+      clauses: ["8.5.2", "8.5.3"]
+      
+    - category: "Risk Management Integration"
+      frequency: "Common"
+      clauses: ["4.1.4", "7.1"]
+      
+    - category: "Supplier Control"
+      frequency: "Common"
+      clauses: ["7.4.1"]
+      
+    - category: "Process Validation"
+      frequency: "Common"
+      clauses: ["7.5.6"]
+
+assessment:
+  type: "Third-party Certification Audit"
+  certification_bodies:
+    - "BSI"
+    - "TÜV"
+    - "SGS"
+    - "Intertek"
+    - "DNV"
+    - "NSF"
+  audit_frequency: "Annual surveillance, 3-year recertification"
+  
+# =============================================================================
+# RELATED STANDARDS AND REGULATIONS
+# =============================================================================
+
+related_standards:
+  - id: "iso_14971"
+    name: "ISO 14971:2019 - Risk Management for Medical Devices"
+    relationship: "Risk management requirements referenced throughout ISO 13485"
+    
+  - id: "iso_9001"
+    name: "ISO 9001:2015 - Quality Management Systems"
+    relationship: "Foundation standard; ISO 13485 is standalone but aligned"
+    
+  - id: "iec_62304"
+    name: "IEC 62304 - Medical Device Software Lifecycle Processes"
+    relationship: "Software design controls for SaMD and embedded software"
+    
+  - id: "iec_62366"
+    name: "IEC 62366-1 - Usability Engineering"
+    relationship: "Human factors requirements for design inputs"
+    
+  - id: "iso_10993"
+    name: "ISO 10993 Series - Biological Evaluation"
+    relationship: "Biocompatibility requirements for design inputs"
+    
+  - id: "iec_60601"
+    name: "IEC 60601 Series - Electrical Medical Equipment"
+    relationship: "Safety requirements for electrical equipment"
+    
+  - id: "fda_21_cfr_820"
+    name: "21 CFR Part 820 - Quality System Regulation"
+    relationship: "US FDA regulation; QMSR incorporates ISO 13485 by reference"
+    
+  - id: "fda_21_cfr_11"
+    name: "21 CFR Part 11 - Electronic Records"
+    relationship: "Electronic records/signatures for QMS software"
+    
+  - id: "eu_mdr"
+    name: "EU MDR 2017/745 - Medical Device Regulation"
+    relationship: "Requires QMS per ISO 13485; mapped in EN ISO 13485 Annex ZA"
+    
+  - id: "eu_ivdr"
+    name: "EU IVDR 2017/746 - In Vitro Diagnostic Regulation"
+    relationship: "Requires QMS per ISO 13485; mapped in EN ISO 13485 Annex ZB"
+
+# =============================================================================
+# METADATA
+# =============================================================================
+
+metadata:
+  pack_version: "1.0.0"
+  created_date: "2026-02-02"
+  created_by: "Code Conclave"
+  last_modified: "2026-02-02"
+  
+  sources:
+    - "ISO 13485:2016 - Medical devices — Quality management systems"
+    - "EN ISO 13485:2016+A11:2021 (EU harmonized version)"
+    - "FDA QMSR Final Rule (Federal Register)"
+    - "FDA Guidance Documents"
+    - "MDSAP Audit Approach Documents"
+    - "GHTF/IMDRF Guidance Documents"
+    
+  notes:
+    - "ISO 13485:2016 is THE international standard for medical device QMS"
+    - "QMSR effective Feb 2, 2026 incorporates ISO 13485 by reference for US market"
+    - "EN ISO 13485 annexes map to EU MDR and IVDR requirements"
+    - "MDSAP recognizes ISO 13485 for multi-market auditing"
+    - "Risk management (ISO 14971) integration is critical"
+    - "Software validation (4.1.6, 7.5.6) increasingly scrutinized"

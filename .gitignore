@@ -24,8 +24,26 @@ Thumbs.db
 *.psm1.bak
 *.ps1.bak
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+
 # Node
 node_modules/
+
+# Temp output / scratch
+.temp-reports/
+tempconclave-reports/
+
+# Git bundles
+*.bundle
 
 #environment files
 .env
