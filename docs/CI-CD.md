@@ -442,7 +442,7 @@ ccl -Project . -CI -FailOn high
 
 ### JUnit XML
 
-Best for CI/CD test reporting.
+Best for CI/CD test reporting. In CI mode (`-CI`), the JUnit XML file (`conclave-results.xml`) is preserved after cleanup so downstream publish steps can read it. Locally, it is removed along with other working files after archival.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -670,11 +670,11 @@ env:
 ccl -Project . -Timeout 60 -CI
 ```
 
-### "No test results to publish"
+### "No test results to publish" / "Could not find any files for conclave-results.xml"
 
-**Cause:** JUnit file not generated (review failed).
+**Cause:** In versions prior to v2.1, the cleanup step deleted `conclave-results.xml` before the publish step could read it. Fixed in [PR #22](https://github.com/Blb3D/review-council/pull/22) — when `-CI` is set, the JUnit XML is preserved for downstream steps.
 
-**Fix:** Check logs for errors. Add `continue-on-error: true` if needed.
+**Fix:** Update to the latest version of review-council. If pinned, update your `ref:` to a commit after the fix. If the review itself failed before generating the file, check logs for API errors.
 
 ### "Cannot connect to AI provider"
 
@@ -702,4 +702,4 @@ continue-on-error: true
 
 ---
 
-*Last updated: 2026-02-05*
+*Last updated: 2026-03-20*
