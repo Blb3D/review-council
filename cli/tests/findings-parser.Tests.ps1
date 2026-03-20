@@ -487,6 +487,25 @@ Describe "Remove-WorkingFindings" {
             Test-Path (Join-Path $testDir "conclave-results.xml") | Should Be $false
         }
 
+        It "preserves JUnit XML when -PreserveJUnit is set" {
+            # Setup
+            if (Test-Path $testDir) { Remove-Item $testDir -Recurse -Force }
+            New-Item -ItemType Directory -Path $testDir -Force | Out-Null
+            "test" | Out-File (Join-Path $testDir "guardian-findings.json")
+            "test" | Out-File (Join-Path $testDir "guardian-findings.md")
+            "test" | Out-File (Join-Path $testDir "RELEASE-READINESS-REPORT.md")
+            "test" | Out-File (Join-Path $testDir "conclave-results.xml")
+
+            Remove-WorkingFindings -ReviewsDir $testDir -PreserveJUnit
+
+            # Findings and report cleaned up
+            Test-Path (Join-Path $testDir "guardian-findings.json") | Should Be $false
+            Test-Path (Join-Path $testDir "guardian-findings.md") | Should Be $false
+            Test-Path (Join-Path $testDir "RELEASE-READINESS-REPORT.md") | Should Be $false
+            # JUnit XML preserved for CI publish step
+            Test-Path (Join-Path $testDir "conclave-results.xml") | Should Be $true
+        }
+
         It "does not remove archive directory" {
             # Setup
             if (Test-Path $testDir) { Remove-Item $testDir -Recurse -Force }
