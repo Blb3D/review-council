@@ -1372,7 +1372,11 @@ $contextSummary
                 Write-Status "Run archived: $archivePath" "OK"
 
                 # Clean up working files (dashboard will use archive for history)
-                Remove-WorkingFindings -ReviewsDir $reviewsDir
+                # In CI, preserve JUnit XML so publish-unit-test-result-action can read it
+                $preserveJUnit = $CI -or $env:TF_BUILD -or $env:GITHUB_ACTIONS -or $env:CI -or $env:JENKINS_URL
+                $cleanupParams = @{ ReviewsDir = $reviewsDir }
+                if ($preserveJUnit) { $cleanupParams.PreserveJUnit = $true }
+                Remove-WorkingFindings @cleanupParams
                 Write-Status "Working files cleaned up" "INFO"
             }
         }

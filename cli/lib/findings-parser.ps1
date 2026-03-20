@@ -398,10 +398,15 @@ function Remove-WorkingFindings {
     <#
     .SYNOPSIS
         Clean up working findings files from the reviews directory after archival.
+    .PARAMETER PreserveJUnit
+        When set, keeps conclave-results.xml so downstream CI steps (e.g.
+        publish-unit-test-result-action) can read it.
     #>
     param(
         [Parameter(Mandatory)]
-        [string]$ReviewsDir
+        [string]$ReviewsDir,
+
+        [switch]$PreserveJUnit
     )
 
     # Remove per-agent JSON and markdown findings files
@@ -419,10 +424,12 @@ function Remove-WorkingFindings {
         Remove-Item $synthesisPath -Force -ErrorAction SilentlyContinue
     }
 
-    # Also remove JUnit XML (regenerated each run)
-    $junitPath = Join-Path $ReviewsDir "conclave-results.xml"
-    if (Test-Path $junitPath) {
-        Remove-Item $junitPath -Force -ErrorAction SilentlyContinue
+    # In CI, keep JUnit XML for the publish step; locally, clean it up
+    if (-not $PreserveJUnit) {
+        $junitPath = Join-Path $ReviewsDir "conclave-results.xml"
+        if (Test-Path $junitPath) {
+            Remove-Item $junitPath -Force -ErrorAction SilentlyContinue
+        }
     }
 }
 
