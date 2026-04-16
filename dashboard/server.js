@@ -6,8 +6,8 @@
  * Provides run history via archive directory.
  *
  * Usage:
- *   node server.js --project "C:\repos\filaops"
- *   node server.js -p "C:\repos\filaops"
+ *   node server.js --project "/path/to/your/project"
+ *   node server.js -p "/path/to/your/project"
  */
 
 const express = require('express');

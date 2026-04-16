@@ -222,13 +222,13 @@ Describe "ConvertFrom-FindingsMarkdown" {
             $result = ConvertFrom-FindingsMarkdown `
                 -Content $script:SampleMarkdown `
                 -AgentKey "guardian" `
-                -ProjectName "filaops" `
-                -ProjectPath "C:\repos\filaops" `
+                -ProjectName "sample-app" `
+                -ProjectPath "C:\repos\sample-app" `
                 -RunTimestamp "2026-02-11T14:30:00" `
                 -DryRun
 
-            $result.run.project | Should Be "filaops"
-            $result.run.projectPath | Should Be "C:\repos\filaops"
+            $result.run.project | Should Be "sample-app"
+            $result.run.projectPath | Should Be "C:\repos\sample-app"
             $result.run.timestamp | Should Be "2026-02-11T14:30:00"
             $result.run.dryRun | Should Be $true
         }
