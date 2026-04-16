@@ -1,0 +1,781 @@
+# ISO 9001:2015 - Quality Management Systems - Requirements
+# Comprehensive Compliance Pack for Code Conclave
+#
+# Standard: ISO 9001:2015 (5th Edition, September 2015)
+# Publisher: International Organization for Standardization (ISO)
+# Technical Committee: ISO/TC 176/SC 2 Quality systems
+#
+# CRITICAL: This is the BASE STANDARD for:
+# - IATF 16949:2016 (Automotive)
+# - AS9100 Rev D (Aerospace)
+# - ISO 13485:2016 (Medical Devices) - aligned but separate
+# Uses "High Level Structure" (HLS) / Annex SL for integration with other ISO standards
+
+metadata:
+  standard_id: "ISO 9001:2015"
+  standard_name: "Quality management systems — Requirements"
+  version: "5th Edition"
+  publication_date: "2015-09-15"
+  publisher: "ISO (International Organization for Standardization)"
+  technical_committee: "ISO/TC 176/SC 2"
+  replaces: "ISO 9001:2008"
+  document_url: "https://www.iso.org/standard/62085.html"
+  certified_organizations: ">1,000,000 worldwide"
+  countries_represented: "189+"
+
+applicability:
+  industries: ["All industries (generic standard)", "Manufacturing", "Services", "Healthcare", "Education", "Government", "Non-profit"]
+  organizations: ["Any organization regardless of size, type, or products/services"]
+  base_for_sector_standards:
+    - "IATF 16949:2016 (Automotive)"
+    - "AS9100 Rev D (Aerospace)"
+    - "TL 9000 (Telecommunications)"
+
+quality_management_principles:
+  - name: "Customer focus"
+  - name: "Leadership"
+  - name: "Engagement of people"
+  - name: "Process approach"
+  - name: "Improvement"
+  - name: "Evidence-based decision making"
+  - name: "Relationship management"
+
+key_concepts:
+  process_approach: "Managing activities as interrelated processes functioning as a coherent system"
+  risk_based_thinking: "Integrated throughout; replaces standalone preventive action"
+  pdca_cycle: "Plan-Do-Check-Act applied at all levels"
+
+# Clauses 0-3: Introductory (non-auditable)
+introductory_clauses:
+  clause_0: {title: "Introduction", note: "Process approach, PDCA, risk-based thinking"}
+  clause_1: {title: "Scope", note: "Generic, applicable to any organization"}
+  clause_2: {title: "Normative references", reference: "ISO 9000:2015"}
+  clause_3: {title: "Terms and definitions", reference: "ISO 9000:2015"}
+
+# Clause 4: Context of the Organization
+clause_4:
+  title: "Context of the Organization"
+  pdca_phase: "Plan"
+  sections:
+    4.1: {title: "Understanding the organization and its context", requirement: "Determine external and internal issues relevant to purpose and strategic direction"}
+    4.2: {title: "Understanding needs and expectations of interested parties", requirement: "Determine interested parties and their requirements"}
+    4.3: {title: "Determining the scope of the QMS", requirement: "Determine boundaries and applicability; document scope"}
+    4.4.1: {title: "QMS and its processes", requirement: "Establish, implement, maintain, continually improve QMS; determine processes, inputs, outputs, sequence, criteria, resources, responsibilities, risks"}
+    4.4.2: {title: "Documented information", requirement: "Maintain documented information to support processes; retain as evidence"}
+
+# Clause 5: Leadership
+clause_5:
+  title: "Leadership"
+  pdca_phase: "Plan"
+  sections:
+    5.1.1: {title: "Leadership and commitment - General", requirement: "Take accountability for QMS effectiveness; ensure policy/objectives; integrate into business processes; promote process approach and risk-based thinking"}
+    5.1.2: {title: "Customer focus", requirement: "Ensure customer and statutory/regulatory requirements met; maintain focus on enhancing customer satisfaction"}
+    5.2.1: {title: "Establishing quality policy", requirement: "Appropriate to purpose; framework for objectives; commitment to requirements and improvement"}
+    5.2.2: {title: "Communicating quality policy", requirement: "Available as documented information; communicated, understood, applied"}
+    5.3: {title: "Organizational roles, responsibilities, authorities", requirement: "Assign, communicate, ensure understanding of roles/responsibilities/authorities"}
+
+# Clause 6: Planning
+clause_6:
+  title: "Planning"
+  pdca_phase: "Plan"
+  sections:
+    6.1.1: {title: "Actions to address risks and opportunities", requirement: "Consider issues (4.1) and requirements (4.2); determine risks/opportunities"}
+    6.1.2: {title: "Planning actions", requirement: "Plan actions to address risks/opportunities; integrate into QMS; evaluate effectiveness"}
+    6.2.1: {title: "Quality objectives", requirement: "Establish at relevant functions/levels/processes; consistent with policy; measurable; monitored; communicated; documented"}
+    6.2.2: {title: "Planning to achieve objectives", requirement: "Determine what, resources, who, when, how to evaluate"}
+    6.3: {title: "Planning of changes", requirement: "Carry out changes in planned manner considering purpose, integrity, resources, responsibilities"}
+
+# Clause 7: Support
+clause_7:
+  title: "Support"
+  pdca_phase: "Do"
+  sections:
+    7.1.1: {title: "Resources - General", requirement: "Determine and provide resources"}
+    7.1.2: {title: "People", requirement: "Determine and provide persons necessary"}
+    7.1.3: {title: "Infrastructure", requirement: "Determine, provide, maintain infrastructure (buildings, equipment, transportation, IT)"}
+    7.1.4: {title: "Environment for operation", requirement: "Determine, provide, maintain environment (social, psychological, physical)"}
+    7.1.5.1: {title: "Monitoring and measuring resources", requirement: "Determine and provide resources for valid and reliable results"}
+    7.1.5.2: {title: "Measurement traceability", requirement: "Calibrate/verify at specified intervals; identify; safeguard; assess validity if not fit"}
+    7.1.6: {title: "Organizational knowledge", requirement: "Determine knowledge necessary; maintain and make available; acquire additional as needed"}
+    7.2: {title: "Competence", requirement: "Determine competence; ensure competent; take actions; evaluate effectiveness; retain evidence"}
+    7.3: {title: "Awareness", requirement: "Aware of policy, objectives, contribution, implications of nonconformity"}
+    7.4: {title: "Communication", requirement: "Determine what, when, with whom, how, who communicates"}
+    7.5.1: {title: "Documented information - General", requirement: "Include information required by standard and determined as necessary"}
+    7.5.2: {title: "Creating and updating", requirement: "Appropriate identification, format, review and approval"}
+    7.5.3: {title: "Control of documented information", requirement: "Available, suitable, protected; distribution, access, storage, changes, retention"}
+# ISO 9001:2015 - Part 2: Clauses 8-10, Mappings, Implementation
+
+# ============================================================================
+# CLAUSE 8: OPERATION (Continued)
+# ============================================================================
+clause_8:
+  title: "Operation"
+  pdca_phase: "Do"
+  note: "Only clause where requirements may be excluded if not applicable"
+  
+  section_8.1:
+    title: "Operational planning and control"
+    requirements:
+      - "Plan, implement, and control processes needed for provision of products and services"
+      - "Determine requirements for products and services"
+      - "Establish criteria for processes and acceptance of products/services"
+      - "Determine resources needed to achieve conformity"
+      - "Implement control of processes in accordance with criteria"
+      - "Determine, maintain, retain documented information as needed"
+    control_includes:
+      - "Planned changes"
+      - "Review consequences of unintended changes"
+      - "Mitigate adverse effects"
+      - "Outsourced processes"
+      
+  section_8.2:
+    title: "Requirements for products and services"
+    subsections:
+      - id: "8.2.1"
+        title: "Customer communication"
+        requirements:
+          - "Providing information relating to products and services"
+          - "Handling enquiries, contracts, or orders, including changes"
+          - "Obtaining customer feedback including complaints"
+          - "Handling or controlling customer property"
+          - "Establishing specific requirements for contingency actions, when relevant"
+      - id: "8.2.2"
+        title: "Determining the requirements for products and services"
+        requirements:
+          - "Requirements including applicable statutory and regulatory requirements"
+          - "Those considered necessary by the organization"
+          - "Organization can meet claims for products and services it offers"
+      - id: "8.2.3"
+        title: "Review of the requirements for products and services"
+        subsections:
+          - id: "8.2.3.1"
+            requirements:
+              - "Ensure ability to meet requirements for products and services to be offered"
+              - "Review before committing to supply"
+            review_includes:
+              - "Requirements specified by customer, including delivery and post-delivery"
+              - "Requirements not stated by customer but necessary for specified/intended use"
+              - "Requirements specified by organization"
+              - "Statutory and regulatory requirements"
+              - "Contract or order requirements differing from those previously expressed"
+          - id: "8.2.3.2"
+            documentation:
+              - "Results of review"
+              - "Any new requirements for products and services"
+      - id: "8.2.4"
+        title: "Changes to requirements for products and services"
+        requirement: "Ensure relevant documented information is amended and relevant persons are aware of changed requirements"
+        
+  section_8.3:
+    title: "Design and development of products and services"
+    note: "May be excluded if organization does not design"
+    subsections:
+      - id: "8.3.1"
+        title: "General"
+        requirement: "Establish, implement, maintain a design and development process appropriate to ensure subsequent provision"
+      - id: "8.3.2"
+        title: "Design and development planning"
+        considerations:
+          - "Nature, duration, and complexity of activities"
+          - "Required process stages, including applicable reviews"
+          - "Required verification and validation activities"
+          - "Responsibilities and authorities"
+          - "Internal and external resource needs"
+          - "Need to control interfaces between persons involved"
+          - "Need for involvement of customers and users"
+          - "Requirements for subsequent provision"
+          - "Level of control expected by customers and interested parties"
+          - "Documented information needed to demonstrate requirements have been met"
+      - id: "8.3.3"
+        title: "Design and development inputs"
+        requirements:
+          - "Functional and performance requirements"
+          - "Information derived from previous similar activities"
+          - "Statutory and regulatory requirements"
+          - "Standards or codes of practice the organization has committed to implement"
+          - "Potential consequences of failure due to nature of products and services"
+        note: "Inputs shall be adequate, complete, and unambiguous; conflicts shall be resolved"
+        documentation: "Retain documented information on inputs"
+      - id: "8.3.4"
+        title: "Design and development controls"
+        purpose: "Ensure results to be achieved are defined"
+        controls:
+          - "Reviews to evaluate ability to meet requirements"
+          - "Verification to ensure outputs meet inputs"
+          - "Validation to ensure products/services meet requirements for intended use"
+          - "Actions taken on problems identified during reviews, verification, validation"
+        documentation: "Retain documented information on these activities"
+      - id: "8.3.5"
+        title: "Design and development outputs"
+        requirements:
+          - "Meet input requirements"
+          - "Adequate for subsequent processes for provision"
+          - "Include or reference monitoring and measuring requirements, acceptance criteria"
+          - "Specify characteristics essential for intended purpose, safe and proper provision"
+        documentation: "Retain documented information on outputs"
+      - id: "8.3.6"
+        title: "Design and development changes"
+        requirements:
+          - "Identify, review, and control changes to prevent adverse impact"
+        documentation: "Retain documented information on changes, review results, authorization, and actions to prevent adverse impacts"
+        
+  section_8.4:
+    title: "Control of externally provided processes, products and services"
+    subsections:
+      - id: "8.4.1"
+        title: "General"
+        requirement: "Ensure externally provided processes, products, and services conform to requirements"
+        applies_when:
+          - "Products and services from external providers are intended for incorporation"
+          - "Products and services are provided directly to customers on organization's behalf"
+          - "Process or part of process is provided by external provider as result of organization's decision"
+        requirements:
+          - "Determine and apply criteria for evaluation, selection, monitoring, re-evaluation"
+        documentation: "Retain documented information on these activities and necessary actions"
+      - id: "8.4.2"
+        title: "Type and extent of control"
+        requirements:
+          - "Ensure externally provided processes remain within control of QMS"
+          - "Define controls to apply to external provider and resulting outputs"
+        considerations:
+          - "Potential impact on ability to consistently meet customer and statutory/regulatory requirements"
+          - "Effectiveness of controls applied by external provider"
+          - "Verification or other activities necessary to ensure conformity"
+      - id: "8.4.3"
+        title: "Information for external providers"
+        requirements:
+          - "Ensure adequacy of requirements before communication to external provider"
+        communicate:
+          - "Processes, products, and services to be provided"
+          - "Approval of products/services, methods, processes, equipment, release"
+          - "Competence including qualification of persons"
+          - "Interactions with organization's QMS"
+          - "Control and monitoring of performance to be applied"
+          - "Verification or validation activities to be performed"
+          
+  section_8.5:
+    title: "Production and service provision"
+    subsections:
+      - id: "8.5.1"
+        title: "Control of production and service provision"
+        requirement: "Implement production and service provision under controlled conditions"
+        controlled_conditions_include:
+          - "Availability of documented information defining characteristics of products/services and activities/results"
+          - "Availability and use of suitable monitoring and measuring resources"
+          - "Implementation of monitoring and measurement activities at appropriate stages"
+          - "Use of suitable infrastructure and environment for operation of processes"
+          - "Appointment of competent persons, including any required qualification"
+          - "Validation and revalidation of ability to achieve planned results (when output cannot be verified)"
+          - "Implementation of actions to prevent human error"
+          - "Implementation of release, delivery, and post-delivery activities"
+      - id: "8.5.2"
+        title: "Identification and traceability"
+        requirements:
+          - "Use suitable means to identify outputs when necessary to ensure conformity"
+          - "Identify status of outputs with respect to monitoring and measurement requirements"
+          - "Control unique identification of outputs when traceability is a requirement"
+        documentation: "Retain documented information necessary to enable traceability"
+      - id: "8.5.3"
+        title: "Property belonging to customers or external providers"
+        requirements:
+          - "Exercise care with property while under organization's control or being used"
+          - "Identify, verify, protect, and safeguard"
+          - "Report to owner if lost, damaged, or found unsuitable"
+        note: "Property can include materials, components, tools, equipment, premises, intellectual property, personal data"
+      - id: "8.5.4"
+        title: "Preservation"
+        requirement: "Preserve outputs during production and service provision to extent necessary to ensure conformity"
+        note: "Preservation can include identification, handling, contamination control, packaging, storage, transmission or transportation, protection"
+      - id: "8.5.5"
+        title: "Post-delivery activities"
+        requirement: "Meet requirements for post-delivery activities associated with products and services"
+        considerations:
+          - "Statutory and regulatory requirements"
+          - "Potential undesired consequences associated with products and services"
+          - "Nature, use, and intended lifetime of products and services"
+          - "Customer requirements"
+          - "Customer feedback"
+        note: "Post-delivery can include warranty, maintenance, recycling, final disposal"
+      - id: "8.5.6"
+        title: "Control of changes"
+        requirements:
+          - "Review and control changes for production or service provision to ensure continuing conformity"
+        documentation: "Retain documented information describing results of review, persons authorizing change, necessary actions"
+        
+  section_8.6:
+    title: "Release of products and services"
+    requirement: "Implement planned arrangements at appropriate stages to verify product and service requirements have been met"
+    requirements:
+      - "Release to customer shall not proceed until planned arrangements satisfactorily completed (unless approved by relevant authority and, as applicable, by customer)"
+    documentation: "Retain documented information on release (evidence of conformity with acceptance criteria, traceability to person authorizing release)"
+    
+  section_8.7:
+    title: "Control of nonconforming outputs"
+    subsections:
+      - id: "8.7.1"
+        title: "General"
+        requirements:
+          - "Ensure outputs that do not conform are identified and controlled to prevent unintended use or delivery"
+          - "Take appropriate action based on nature of nonconformity and effect on conformity"
+          - "Applies also to nonconforming products and services detected after delivery"
+        actions:
+          - "Correction"
+          - "Segregation, containment, return or suspension of provision"
+          - "Informing the customer"
+          - "Obtaining authorization for acceptance under concession"
+        verification: "Verify conformity to requirements when nonconforming outputs are corrected"
+      - id: "8.7.2"
+        title: "Documentation"
+        documentation: "Retain documented information that describes nonconformity, actions taken, concessions obtained, authority deciding action"
+
+# ============================================================================
+# CLAUSE 9: PERFORMANCE EVALUATION
+# ============================================================================
+clause_9:
+  title: "Performance Evaluation"
+  pdca_phase: "Check"
+  
+  section_9.1:
+    title: "Monitoring, measurement, analysis and evaluation"
+    subsections:
+      - id: "9.1.1"
+        title: "General"
+        requirement: "Determine what needs to be monitored and measured, methods, when to perform, when to analyze and evaluate"
+        requirements:
+          - "Evaluate performance and effectiveness of QMS"
+        documentation: "Retain appropriate documented information as evidence of results"
+      - id: "9.1.2"
+        title: "Customer satisfaction"
+        requirements:
+          - "Monitor customers' perceptions of degree to which needs and expectations have been fulfilled"
+          - "Determine methods for obtaining, monitoring, and reviewing this information"
+        examples: "Customer surveys, feedback on delivered products/services, customer meetings, market-share analysis, compliments, warranty claims, dealer reports"
+      - id: "9.1.3"
+        title: "Analysis and evaluation"
+        requirements:
+          - "Analyze and evaluate appropriate data and information from monitoring and measurement"
+        use_for:
+          - "Conformity of products and services"
+          - "Degree of customer satisfaction"
+          - "Performance and effectiveness of QMS"
+          - "If planning has been implemented effectively"
+          - "Effectiveness of actions taken to address risks and opportunities"
+          - "Performance of external providers"
+          - "Need for improvements to QMS"
+          
+  section_9.2:
+    title: "Internal audit"
+    subsections:
+      - id: "9.2.1"
+        title: "General"
+        requirement: "Conduct internal audits at planned intervals"
+        purpose:
+          - "Conforms to organization's own requirements for QMS"
+          - "Conforms to requirements of this International Standard"
+          - "Is effectively implemented and maintained"
+      - id: "9.2.2"
+        title: "Audit program"
+        requirements:
+          - "Plan, establish, implement, and maintain audit programme including frequency, methods, responsibilities, planning requirements, and reporting"
+          - "Consider importance of processes, changes affecting organization, and results of previous audits"
+          - "Define audit criteria and scope for each audit"
+          - "Select auditors to ensure objectivity and impartiality"
+          - "Ensure results are reported to relevant management"
+          - "Take appropriate correction and corrective actions without undue delay"
+        documentation: "Retain documented information as evidence of implementation and audit results"
+        
+  section_9.3:
+    title: "Management review"
+    subsections:
+      - id: "9.3.1"
+        title: "General"
+        requirement: "Top management shall review QMS at planned intervals to ensure continuing suitability, adequacy, effectiveness, and alignment with strategic direction"
+      - id: "9.3.2"
+        title: "Management review inputs"
+        inputs:
+          - "Status of actions from previous management reviews"
+          - "Changes in external and internal issues relevant to QMS"
+          - "Information on QMS performance and effectiveness including trends in: customer satisfaction and feedback from interested parties, extent to which quality objectives have been met, process performance and conformity of products and services, nonconformities and corrective actions, monitoring and measurement results, audit results, performance of external providers"
+          - "Adequacy of resources"
+          - "Effectiveness of actions taken to address risks and opportunities"
+          - "Opportunities for improvement"
+      - id: "9.3.3"
+        title: "Management review outputs"
+        outputs:
+          - "Opportunities for improvement"
+          - "Any need for changes to QMS"
+          - "Resource needs"
+        documentation: "Retain documented information as evidence of results of management reviews"
+
+# ============================================================================
+# CLAUSE 10: IMPROVEMENT
+# ============================================================================
+clause_10:
+  title: "Improvement"
+  pdca_phase: "Act"
+  
+  section_10.1:
+    title: "General"
+    requirements:
+      - "Determine and select opportunities for improvement"
+      - "Implement any necessary actions to meet customer requirements and enhance satisfaction"
+    includes:
+      - "Improving products and services to meet requirements and address future needs and expectations"
+      - "Correcting, preventing, or reducing undesired effects"
+      - "Improving performance and effectiveness of QMS"
+      
+  section_10.2:
+    title: "Nonconformity and corrective action"
+    subsections:
+      - id: "10.2.1"
+        title: "React to nonconformity"
+        requirements:
+          - "React to nonconformity and as applicable take action to control and correct it, deal with consequences"
+          - "Evaluate need for action to eliminate causes so it does not recur or occur elsewhere"
+        evaluation:
+          - "Review and analyze the nonconformity"
+          - "Determine causes of nonconformity"
+          - "Determine if similar nonconformities exist or could potentially occur"
+        actions:
+          - "Implement any action needed"
+          - "Review effectiveness of corrective action taken"
+          - "Update risks and opportunities determined during planning if necessary"
+          - "Make changes to QMS if necessary"
+        note: "Corrective actions shall be appropriate to effects of nonconformities encountered"
+      - id: "10.2.2"
+        title: "Documentation"
+        documentation:
+          - "Nature of nonconformities and subsequent actions taken"
+          - "Results of any corrective action"
+          
+  section_10.3:
+    title: "Continual improvement"
+    requirement: "Continually improve the suitability, adequacy, and effectiveness of the QMS"
+    considerations:
+      - "Results of analysis and evaluation"
+      - "Outputs from management review"
+      - "Determine if there are needs or opportunities that shall be addressed as part of continual improvement"
+
+# ============================================================================
+# DOCUMENTED INFORMATION REQUIREMENTS
+# ============================================================================
+documented_information:
+  mandatory_maintain:
+    description: "Documented information that must be MAINTAINED (procedures, processes)"
+    items:
+      - clause: "4.3"
+        description: "Scope of the QMS"
+      - clause: "4.4.2"
+        description: "Support the operation of processes"
+      - clause: "5.2"
+        description: "Quality policy"
+      - clause: "6.2.1"
+        description: "Quality objectives"
+      - clause: "7.1.5.1"
+        description: "Monitoring and measuring resources"
+      - clause: "7.5.1"
+        description: "Documented information required by standard"
+      - clause: "8.1"
+        description: "Evidence that processes have been carried out as planned"
+        
+  mandatory_retain:
+    description: "Documented information that must be RETAINED (records)"
+    items:
+      - clause: "7.1.5.2"
+        description: "Calibration/verification of measurement equipment"
+      - clause: "7.2"
+        description: "Evidence of competence"
+      - clause: "8.2.3.2"
+        description: "Results of review of requirements; new requirements"
+      - clause: "8.3.3"
+        description: "Design and development inputs"
+      - clause: "8.3.4"
+        description: "Design and development controls"
+      - clause: "8.3.5"
+        description: "Design and development outputs"
+      - clause: "8.3.6"
+        description: "Design and development changes"
+      - clause: "8.4.1"
+        description: "Evaluation, selection, monitoring, re-evaluation of external providers"
+      - clause: "8.5.2"
+        description: "Traceability"
+      - clause: "8.5.3"
+        description: "Customer or external provider property (if lost, damaged, unsuitable)"
+      - clause: "8.5.6"
+        description: "Results of review of changes, persons authorizing changes"
+      - clause: "8.6"
+        description: "Conformity with acceptance criteria and traceability to authorizing person"
+      - clause: "8.7.2"
+        description: "Nonconformity, actions taken, concessions, authority"
+      - clause: "9.1.1"
+        description: "Results of monitoring and measurement"
+      - clause: "9.2.2"
+        description: "Evidence of audit programme implementation and results"
+      - clause: "9.3.3"
+        description: "Results of management reviews"
+      - clause: "10.2.2"
+        description: "Nature of nonconformities, actions, results of corrective actions"
+
+# ============================================================================
+# AGENT-TO-CONTROL MAPPINGS
+# ============================================================================
+agent_mappings:
+  GUARDIAN:
+    description: "Security-focused findings map to controls, external provider management, nonconformity control"
+    primary_controls:
+      - "8.4"         # Control of externally provided processes
+      - "8.5.3"       # Property belonging to customers
+      - "8.6"         # Release of products and services
+      - "8.7"         # Control of nonconforming outputs
+    secondary_controls:
+      - "7.5.3"       # Control of documented information
+      - "6.1"         # Risks and opportunities
+      
+  SENTINEL:
+    description: "Monitoring findings map to performance evaluation, audits, measurement"
+    primary_controls:
+      - "9.1"         # Monitoring, measurement, analysis, evaluation
+      - "9.2"         # Internal audit
+      - "7.1.5"       # Monitoring and measuring resources
+      - "8.5.1"       # Control of production (monitoring at appropriate stages)
+    secondary_controls:
+      - "9.1.2"       # Customer satisfaction
+      - "8.4.2"       # Type and extent of control (external providers)
+      
+  ARCHITECT:
+    description: "Design and structure findings map to planning, design, process establishment"
+    primary_controls:
+      - "4.4"         # QMS and its processes
+      - "6"           # Planning (all)
+      - "8.3"         # Design and development
+      - "8.1"         # Operational planning and control
+    secondary_controls:
+      - "4.3"         # Scope
+      - "8.5.6"       # Control of changes
+      
+  HERALD:
+    description: "Communication findings map to documented information, awareness, communication"
+    primary_controls:
+      - "7.4"         # Communication
+      - "7.5"         # Documented information
+      - "7.3"         # Awareness
+      - "8.2.1"       # Customer communication
+    secondary_controls:
+      - "5.2.2"       # Communicating quality policy
+      - "7.2"         # Competence
+      
+  OPERATOR:
+    description: "Production and process findings map to operations, provider control, resources"
+    primary_controls:
+      - "8.5"         # Production and service provision
+      - "8.4"         # External providers
+      - "7.1"         # Resources
+      - "8.2"         # Requirements for products and services
+    secondary_controls:
+      - "8.5.5"       # Post-delivery activities
+      - "8.5.4"       # Preservation
+      
+  NAVIGATOR:
+    description: "Strategic findings map to leadership, context, improvement"
+    primary_controls:
+      - "4.1"         # Understanding the organization and its context
+      - "4.2"         # Interested parties
+      - "5"           # Leadership (all)
+      - "9.3"         # Management review
+      - "10"          # Improvement (all)
+    secondary_controls:
+      - "6.1"         # Risks and opportunities
+      - "10.3"        # Continual improvement
+
+# ============================================================================
+# COMMON AUDIT FINDINGS
+# ============================================================================
+common_findings:
+  - finding_type: "Inadequate internal audits"
+    frequency: "Very common"
+    clauses: ["9.2"]
+    description: "Incomplete coverage, lack of objectivity, no follow-up on findings"
+    
+  - finding_type: "Poor corrective action process"
+    frequency: "Very common"
+    clauses: ["10.2"]
+    description: "Root cause not determined, actions not effective, no verification of effectiveness"
+    
+  - finding_type: "Incomplete management review"
+    frequency: "Common"
+    clauses: ["9.3"]
+    description: "Missing required inputs, outputs not actionable, not at planned intervals"
+    
+  - finding_type: "Inadequate documented information control"
+    frequency: "Common"
+    clauses: ["7.5"]
+    description: "Obsolete documents in use, missing approvals, version control issues"
+    
+  - finding_type: "External provider control gaps"
+    frequency: "Common"
+    clauses: ["8.4"]
+    description: "No evaluation criteria, monitoring not performed, requirements not communicated"
+    
+  - finding_type: "Quality objectives not measurable"
+    frequency: "Common"
+    clauses: ["6.2"]
+    description: "Vague objectives, no metrics defined, not monitored"
+    
+  - finding_type: "Competence records incomplete"
+    frequency: "Common"
+    clauses: ["7.2"]
+    description: "Training records missing, effectiveness not evaluated, competence not defined"
+    
+  - finding_type: "Customer requirements not fully determined"
+    frequency: "Common"
+    clauses: ["8.2"]
+    description: "Implied requirements not identified, statutory/regulatory requirements missed"
+
+# ============================================================================
+# RELATIONSHIP TO SECTOR STANDARDS
+# ============================================================================
+sector_standards:
+  iatf_16949:
+    relationship: "IATF 16949 is a supplement to ISO 9001:2015"
+    note: "Must be used IN CONJUNCTION with ISO 9001:2015"
+    key_additions:
+      - "Core tools (APQP, PPAP, FMEA, MSA, SPC)"
+      - "Customer-specific requirements"
+      - "Product safety requirements"
+      - "Supplier development"
+      - "Control plans"
+      
+  as9100_rev_d:
+    relationship: "AS9100 is a supplement to ISO 9001:2015"
+    note: "Includes all ISO 9001:2015 requirements plus aerospace additions"
+    key_additions:
+      - "Operational risk management"
+      - "Configuration management"
+      - "Product safety"
+      - "Counterfeit parts prevention"
+      - "First article inspection"
+      
+  iso_13485:
+    relationship: "ISO 13485:2016 is aligned with but separate from ISO 9001"
+    note: "Similar structure but regulatory focus; not identical requirements"
+    key_differences:
+      - "Continual improvement vs maintaining effectiveness"
+      - "Regulatory focus throughout"
+      - "Risk management (ISO 14971)"
+
+# ============================================================================
+# IMPLEMENTATION GUIDANCE
+# ============================================================================
+implementation_guidance:
+  phase_1_preparation:
+    duration: "Months 1-2"
+    activities:
+      - "Gain management commitment"
+      - "Conduct gap analysis against ISO 9001:2015"
+      - "Identify interested parties and their requirements"
+      - "Determine scope of QMS"
+      - "Establish implementation team"
+      
+  phase_2_documentation:
+    duration: "Months 2-4"
+    activities:
+      - "Establish quality policy"
+      - "Define quality objectives"
+      - "Document QMS scope"
+      - "Create/update process documentation"
+      - "Establish documented information controls"
+      
+  phase_3_implementation:
+    duration: "Months 3-6"
+    activities:
+      - "Implement processes"
+      - "Train personnel"
+      - "Conduct risk assessment (6.1)"
+      - "Establish measurement and monitoring"
+      - "Begin collecting evidence of implementation"
+      
+  phase_4_verification:
+    duration: "Months 5-8"
+    activities:
+      - "Conduct internal audits"
+      - "Perform management review"
+      - "Address nonconformities"
+      - "Verify effectiveness of corrective actions"
+      
+  phase_5_certification:
+    duration: "Months 8-12"
+    activities:
+      - "Select accredited certification body"
+      - "Complete Stage 1 audit (readiness review)"
+      - "Address Stage 1 findings"
+      - "Complete Stage 2 audit (certification audit)"
+      - "Close any nonconformities"
+      - "Receive ISO 9001:2015 certificate"
+
+# ============================================================================
+# CERTIFICATION INFORMATION
+# ============================================================================
+certification:
+  accreditation_bodies:
+    examples:
+      - "ANAB (ANSI National Accreditation Board) - USA"
+      - "UKAS (United Kingdom Accreditation Service) - UK"
+      - "DAkkS (Deutsche Akkreditierungsstelle) - Germany"
+      - "JAB (Japan Accreditation Board) - Japan"
+    iaf: "International Accreditation Forum provides mutual recognition"
+    
+  certification_bodies:
+    examples:
+      - "BSI"
+      - "DNV"
+      - "Bureau Veritas"
+      - "SGS"
+      - "TÜV"
+      - "Lloyd's Register"
+    note: "Must be accredited by a recognized accreditation body"
+    
+  audit_cycle:
+    stage_1: "Readiness review (documentation review, site visit)"
+    stage_2: "Certification audit (full assessment)"
+    surveillance: "Annual audits (typically)"
+    recertification: "Every 3 years"
+    
+  certification_stats:
+    certificates_worldwide: ">1,000,000"
+    countries: "189+"
+    most_certified_industries:
+      - "Manufacturing"
+      - "Construction"
+      - "Services"
+
+# ============================================================================
+# VERSION HISTORY
+# ============================================================================
+version_history:
+  iso_9001_timeline:
+    - version: "ISO 9001:1987"
+      description: "First edition"
+    - version: "ISO 9001:1994"
+      description: "Improved design and development controls"
+    - version: "ISO 9001:2000"
+      description: "Process-based approach; merged ISO 9001/9002/9003"
+    - version: "ISO 9001:2008"
+      description: "Clarifications, no new requirements"
+    - version: "ISO 9001:2015"
+      description: "High Level Structure, risk-based thinking, organizational knowledge"
+      current: true
+      
+  compliance_pack_version:
+    - version: "1.0"
+      date: "2026-02-03"
+      author: "Code Conclave AI Agent"
+      changes: "Initial ISO 9001:2015 compliance pack creation"
+      
+notes:
+  - "ISO 9001:2015 is the foundation for many sector-specific QMS standards"
+  - "Uses High Level Structure (Annex SL) for integration with other ISO management system standards"
+  - "Approximately 309 'shall' statements (requirements) in clauses 4-10"
+  - "Risk-based thinking replaces standalone preventive action requirement"
+  - "No mandatory 'quality manual' requirement (but scope must be documented)"
+  - "Term 'documented information' replaces 'documents' and 'records'"
+  - "Only clause 8 requirements may be excluded (if justified and does not affect conformity)"

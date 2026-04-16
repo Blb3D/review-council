@@ -1,0 +1,1074 @@
+# FDA 21 CFR Part 11 - Electronic Records; Electronic Signatures
+# Code Conclave Compliance Pack
+# Data Integrity and Computer System Validation Requirements
+#
+# Authority: Federal Food, Drug, and Cosmetic Act (21 U.S.C. 321-393)
+#            Public Health Service Act (42 U.S.C. 262)
+# Effective: August 20, 1997 (62 FR 13464)
+# Last Amended: March 2, 2023 (88 FR 13018)
+#
+# Scope: Electronic records and signatures used to meet FDA predicate rules
+# Critical pairing with: 21 CFR Part 820 (QSR/QMSR), Part 210/211 (cGMP)
+
+id: fda-21-cfr-11
+name: FDA 21 CFR Part 11 - Electronic Records; Electronic Signatures
+version: "1.0.0"
+type: regulatory
+authority: FDA
+jurisdiction: United States
+effective_date: "1997-08-20"
+last_updated: "2023-03-02"
+
+description: |
+  21 CFR Part 11 establishes the criteria under which FDA considers electronic 
+  records and electronic signatures to be trustworthy, reliable, and generally 
+  equivalent to paper records and handwritten signatures. This regulation is 
+  foundational for any computerized system used in FDA-regulated activities 
+  including quality management systems, laboratory information systems, 
+  manufacturing execution systems, and clinical trial data management.
+
+applicability:
+  industries:
+    - pharmaceuticals
+    - medical_devices
+    - biologics
+    - food_manufacturing
+    - cosmetics
+    - clinical_research
+    - contract_laboratories
+  systems_covered:
+    - quality_management_systems
+    - document_control_systems
+    - laboratory_information_management_systems
+    - manufacturing_execution_systems
+    - enterprise_resource_planning
+    - clinical_trial_data_systems
+    - electronic_batch_records
+    - calibration_management_systems
+    - training_management_systems
+    - complaint_handling_systems
+    - CAPA_systems
+  organizations:
+    - drug_manufacturers
+    - device_manufacturers
+    - biologics_manufacturers
+    - contract_research_organizations
+    - contract_manufacturing_organizations
+    - analytical_laboratories
+  excluded:
+    - food_traceability_records_part_1_subpart_J
+    - food_facility_registration_part_1_subpart_M
+    - preventive_controls_part_117
+    - animal_food_part_507
+    - produce_safety_part_112
+    - intentional_adulteration_part_121
+    - nutrition_labeling_electronic_signatures
+
+# =============================================================================
+# SUBPARTS AND REQUIREMENTS
+# =============================================================================
+
+subparts:
+  # ---------------------------------------------------------------------------
+  # SUBPART A - GENERAL PROVISIONS
+  # ---------------------------------------------------------------------------
+  - id: A
+    name: "General Provisions"
+    description: "Scope, implementation guidance, and key definitions"
+    sections:
+      - id: "11.1"
+        title: "Scope"
+        subsections:
+          - id: "11.1(a)"
+            title: "Criteria for trustworthiness"
+            requirement: |
+              The regulations in this part set forth the criteria under which the 
+              agency considers electronic records, electronic signatures, and 
+              handwritten signatures executed to electronic records to be trustworthy, 
+              reliable, and generally equivalent to paper records and handwritten 
+              signatures executed on paper.
+            agents: [guardian, architect]
+            finding_patterns: ["GUARDIAN-*", "ARCHITECT-001"]
+            critical: true
+            
+          - id: "11.1(b)"
+            title: "Records applicability"
+            requirement: |
+              This part applies to records in electronic form that are created, 
+              modified, maintained, archived, retrieved, or transmitted, under any 
+              records requirements set forth in agency regulations. This part also 
+              applies to electronic records submitted to the agency under requirements 
+              of the Federal Food, Drug, and Cosmetic Act and the Public Health 
+              Service Act, even if such records are not specifically identified in 
+              agency regulations. However, this part does not apply to paper records 
+              that are, or have been, transmitted by electronic means.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            
+          - id: "11.1(c)"
+            title: "Signature equivalence"
+            requirement: |
+              Where electronic signatures and their associated electronic records 
+              meet the requirements of this part, the agency will consider the 
+              electronic signatures to be equivalent to full handwritten signatures, 
+              initials, and other general signings as required by agency regulations, 
+              unless specifically excepted by regulation(s) effective on or after 
+              August 20, 1997.
+            agents: [guardian, architect]
+            finding_patterns: ["GUARDIAN-*", "ARCHITECT-001"]
+            critical: true
+            
+          - id: "11.1(d)"
+            title: "Electronic records in lieu of paper"
+            requirement: |
+              Electronic records that meet the requirements of this part may be 
+              used in lieu of paper records, in accordance with § 11.2, unless 
+              paper records are specifically required.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: false
+            
+          - id: "11.1(e)"
+            title: "FDA inspection availability"
+            requirement: |
+              Computer systems (including hardware and software), controls, and 
+              attendant documentation maintained under this part shall be readily 
+              available for, and subject to, FDA inspection.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-002", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - system_documentation
+              - validation_records
+              - audit_trails
+
+      - id: "11.2"
+        title: "Implementation"
+        subsections:
+          - id: "11.2(a)"
+            title: "Records maintained but not submitted"
+            requirement: |
+              For records required to be maintained but not submitted to the agency, 
+              persons may use electronic records in lieu of paper records or 
+              electronic signatures in lieu of traditional signatures, in whole or 
+              in part, provided that the requirements of this part are met.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: false
+            
+          - id: "11.2(b)"
+            title: "Records submitted to agency"
+            requirement: |
+              For records submitted to the agency, persons may use electronic records 
+              in lieu of paper records or electronic signatures in lieu of traditional 
+              signatures, in whole or in part, provided that: (1) The requirements of 
+              this part are met; and (2) The document or parts of a document to be 
+              submitted have been identified in public docket No. 92S-0251 as being 
+              the type of submission the agency accepts in electronic form.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: false
+
+      - id: "11.3"
+        title: "Definitions"
+        requirement: |
+          Establishes key definitions including:
+          - Act: Federal Food, Drug, and Cosmetic Act
+          - Agency: Food and Drug Administration
+          - Biometrics: Method of verifying identity based on physical features or 
+            repeatable actions unique to individual and measurable
+          - Closed system: Environment where system access is controlled by persons 
+            responsible for content of electronic records on the system
+          - Digital signature: Electronic signature based upon cryptographic methods 
+            of originator authentication
+          - Electronic record: Any combination of text, graphics, data, audio, 
+            pictorial, or other information representation in digital form
+          - Electronic signature: Computer data compilation of any symbol or series 
+            of symbols executed, adopted, or authorized by an individual to be the 
+            legally binding equivalent of the individual's handwritten signature
+          - Handwritten signature: Scripted name or legal mark handwritten by 
+            individual with present intention to authenticate a writing
+          - Open system: Environment where system access is not controlled by 
+            persons responsible for content of electronic records
+        agents: [architect, herald]
+        finding_patterns: ["ARCHITECT-001"]
+        critical: true
+        key_definitions:
+          biometrics:
+            definition: "Method of verifying identity based on physical features or repeatable actions"
+            examples: ["fingerprint", "retinal scan", "voice recognition"]
+          closed_system:
+            definition: "System access controlled by persons responsible for record content"
+            examples: ["internal QMS", "isolated lab systems", "air-gapped networks"]
+          open_system:
+            definition: "System access NOT controlled by persons responsible for record content"
+            examples: ["cloud systems", "internet-connected systems", "shared networks"]
+          digital_signature:
+            definition: "Electronic signature using cryptographic authentication"
+            note: "Subset of electronic signatures - not all e-signatures are digital"
+          electronic_signature:
+            definition: "Computer data compilation legally binding equivalent to handwritten signature"
+            components: ["identification code", "password", "biometric"]
+
+  # ---------------------------------------------------------------------------
+  # SUBPART B - ELECTRONIC RECORDS
+  # ---------------------------------------------------------------------------
+  - id: B
+    name: "Electronic Records"
+    description: "Controls for closed and open systems, signature manifestations, and linking"
+    sections:
+      - id: "11.10"
+        title: "Controls for closed systems"
+        requirement: |
+          Persons who use closed systems to create, modify, maintain, or transmit 
+          electronic records shall employ procedures and controls designed to ensure 
+          the authenticity, integrity, and, when appropriate, the confidentiality of 
+          electronic records, and to ensure that the signer cannot readily repudiate 
+          the signed record as not genuine.
+        agents: [guardian, sentinel, architect]
+        finding_patterns: ["GUARDIAN-*", "SENTINEL-*", "ARCHITECT-001"]
+        critical: true
+        subsections:
+          - id: "11.10(a)"
+            title: "System validation"
+            requirement: |
+              Validation of systems to ensure accuracy, reliability, consistent 
+              intended performance, and the ability to discern invalid or altered records.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-002", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - validation_master_plan
+              - IQ_OQ_PQ_protocols
+              - validation_summary_report
+              - traceability_matrix
+              - change_control_records
+              
+          - id: "11.10(b)"
+            title: "Record copy generation"
+            requirement: |
+              The ability to generate accurate and complete copies of records in 
+              both human readable and electronic form suitable for inspection, 
+              review, and copying by the agency. Persons should contact the agency 
+              if there are any questions regarding the ability of the agency to 
+              perform such review and copying of the electronic records.
+            agents: [herald, sentinel]
+            finding_patterns: ["HERALD-001", "SENTINEL-002"]
+            critical: true
+            evidence_types:
+              - export_functionality_validation
+              - report_generation_testing
+              - data_format_specifications
+              
+          - id: "11.10(c)"
+            title: "Record protection and retrieval"
+            requirement: |
+              Protection of records to enable their accurate and ready retrieval 
+              throughout the records retention period.
+            agents: [guardian, sentinel]
+            finding_patterns: ["GUARDIAN-*", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - backup_procedures
+              - disaster_recovery_plan
+              - retention_policy
+              - archive_validation
+              
+          - id: "11.10(d)"
+            title: "Access control"
+            requirement: |
+              Limiting system access to authorized individuals.
+            agents: [guardian]
+            finding_patterns: ["GUARDIAN-003", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - access_control_policy
+              - user_provisioning_procedures
+              - access_review_records
+              - role_definitions
+              
+          - id: "11.10(e)"
+            title: "Audit trails"
+            requirement: |
+              Use of secure, computer-generated, time-stamped audit trails to 
+              independently record the date and time of operator entries and 
+              actions that create, modify, or delete electronic records. Record 
+              changes shall not obscure previously recorded information. Such 
+              audit trail documentation shall be retained for a period at least 
+              as long as that required for the subject electronic records and 
+              shall be available for agency review and copying.
+            agents: [sentinel, guardian]
+            finding_patterns: ["SENTINEL-001", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - audit_trail_configuration
+              - audit_trail_review_procedures
+              - audit_trail_samples
+              - timestamp_synchronization
+              
+          - id: "11.10(f)"
+            title: "Operational system checks"
+            requirement: |
+              Use of operational system checks to enforce permitted sequencing 
+              of steps and events, as appropriate.
+            agents: [guardian, architect]
+            finding_patterns: ["GUARDIAN-*", "ARCHITECT-001"]
+            critical: false
+            evidence_types:
+              - workflow_validation
+              - sequencing_controls
+              - business_rule_testing
+              
+          - id: "11.10(g)"
+            title: "Authority checks"
+            requirement: |
+              Use of authority checks to ensure that only authorized individuals 
+              can use the system, electronically sign a record, access the operation 
+              or computer system input or output device, alter a record, or perform 
+              the operation at hand.
+            agents: [guardian]
+            finding_patterns: ["GUARDIAN-003", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - role_based_access_control
+              - permission_matrix
+              - authority_check_testing
+              
+          - id: "11.10(h)"
+            title: "Device checks"
+            requirement: |
+              Use of device (e.g., terminal) checks to determine, as appropriate, 
+              the validity of the source of data input or operational instruction.
+            agents: [guardian, sentinel]
+            finding_patterns: ["GUARDIAN-*", "SENTINEL-002"]
+            critical: false
+            evidence_types:
+              - device_authentication
+              - terminal_identification
+              - input_validation
+              
+          - id: "11.10(i)"
+            title: "Personnel qualification"
+            requirement: |
+              Determination that persons who develop, maintain, or use electronic 
+              record/electronic signature systems have the education, training, 
+              and experience to perform their assigned tasks.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-003", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - training_records
+              - job_descriptions
+              - competency_assessments
+              - qualification_records
+              
+          - id: "11.10(j)"
+            title: "Accountability policies"
+            requirement: |
+              The establishment of, and adherence to, written policies that hold 
+              individuals accountable and responsible for actions initiated under 
+              their electronic signatures, in order to deter record and signature 
+              falsification.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - accountability_policy
+              - user_agreements
+              - signature_acknowledgment
+              
+          - id: "11.10(k)"
+            title: "Systems documentation controls"
+            requirement: |
+              Use of appropriate controls over systems documentation including:
+              (1) Adequate controls over the distribution of, access to, and use of 
+              documentation for system operation and maintenance.
+              (2) Revision and change control procedures to maintain an audit trail 
+              that documents time-sequenced development and modification of systems 
+              documentation.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "HERALD-002", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - documentation_control_procedure
+              - change_control_records
+              - version_control_evidence
+
+      - id: "11.30"
+        title: "Controls for open systems"
+        requirement: |
+          Persons who use open systems to create, modify, maintain, or transmit 
+          electronic records shall employ procedures and controls designed to ensure 
+          the authenticity, integrity, and, as appropriate, the confidentiality of 
+          electronic records from the point of their creation to the point of their 
+          receipt. Such procedures and controls shall include those identified in 
+          § 11.10, as appropriate, and additional measures such as document encryption 
+          and use of appropriate digital signature standards to ensure, as necessary 
+          under the circumstances, record authenticity, integrity, and confidentiality.
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-*", "ARCHITECT-001"]
+        critical: true
+        additional_controls:
+          - encryption_at_rest
+          - encryption_in_transit
+          - digital_signatures
+          - certificate_management
+          - secure_transmission_protocols
+        evidence_types:
+          - encryption_configuration
+          - certificate_management_procedures
+          - network_security_assessment
+          - penetration_testing_results
+
+      - id: "11.50"
+        title: "Signature manifestations"
+        subsections:
+          - id: "11.50(a)"
+            title: "Required signature information"
+            requirement: |
+              Signed electronic records shall contain information associated with 
+              the signing that clearly indicates all of the following:
+              (1) The printed name of the signer;
+              (2) The date and time when the signature was executed; and
+              (3) The meaning (such as review, approval, responsibility, or 
+              authorship) associated with the signature.
+            agents: [guardian, herald]
+            finding_patterns: ["GUARDIAN-*", "HERALD-001"]
+            critical: true
+            signature_elements:
+              - printed_name: "Full name of signer"
+              - date_time: "Timestamp of signature execution"
+              - meaning: "Purpose of signature (review, approval, authorship, etc.)"
+            evidence_types:
+              - signature_block_design
+              - signature_meaning_definitions
+              - sample_signed_records
+              
+          - id: "11.50(b)"
+            title: "Signature display controls"
+            requirement: |
+              The items identified in paragraphs (a)(1), (a)(2), and (a)(3) of this 
+              section shall be subject to the same controls as for electronic records 
+              and shall be included as part of any human readable form of the 
+              electronic record (such as electronic display or printout).
+            agents: [herald, guardian]
+            finding_patterns: ["HERALD-001", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - display_verification
+              - printout_samples
+
+      - id: "11.70"
+        title: "Signature/record linking"
+        requirement: |
+          Electronic signatures and handwritten signatures executed to electronic 
+          records shall be linked to their respective electronic records to ensure 
+          that the signatures cannot be excised, copied, or otherwise transferred 
+          to falsify an electronic record by ordinary means.
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-*", "ARCHITECT-001"]
+        critical: true
+        evidence_types:
+          - signature_linking_mechanism
+          - integrity_verification
+          - tamper_detection_testing
+
+  # ---------------------------------------------------------------------------
+  # SUBPART C - ELECTRONIC SIGNATURES
+  # ---------------------------------------------------------------------------
+  - id: C
+    name: "Electronic Signatures"
+    description: "Requirements for electronic signature components, controls, and identification"
+    sections:
+      - id: "11.100"
+        title: "General requirements"
+        subsections:
+          - id: "11.100(a)"
+            title: "Signature uniqueness"
+            requirement: |
+              Each electronic signature shall be unique to one individual and shall 
+              not be reused by, or reassigned to, anyone else.
+            agents: [guardian]
+            finding_patterns: ["GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - user_management_procedures
+              - unique_id_policy
+              
+          - id: "11.100(b)"
+            title: "Identity verification"
+            requirement: |
+              Before an organization establishes, assigns, certifies, or otherwise 
+              sanctions an individual's electronic signature, or any element of such 
+              electronic signature, the organization shall verify the identity of 
+              the individual.
+            agents: [guardian, architect]
+            finding_patterns: ["GUARDIAN-*", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - identity_verification_procedure
+              - verification_records
+              
+          - id: "11.100(c)"
+            title: "FDA certification"
+            requirement: |
+              Persons using electronic signatures shall, prior to or at the time of 
+              such use, certify to the agency that the electronic signatures in their 
+              system, used on or after August 20, 1997, are intended to be the legally 
+              binding equivalent of traditional handwritten signatures.
+              (1) The certification shall be signed with a traditional handwritten 
+              signature and submitted in electronic or paper form. Information on 
+              where to submit the certification can be found on FDA's web page on 
+              Letters of Non-Repudiation Agreement.
+              (2) Persons using electronic signatures shall, upon agency request, 
+              provide additional certification or testimony that a specific electronic 
+              signature is the legally binding equivalent of the signer's handwritten 
+              signature.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - fda_certification_letter
+              - non_repudiation_agreement
+              - certification_records
+
+      - id: "11.200"
+        title: "Electronic signature components and controls"
+        subsections:
+          - id: "11.200(a)"
+            title: "Non-biometric signatures"
+            requirement: |
+              Electronic signatures that are not based upon biometrics shall:
+              (1) Employ at least two distinct identification components such as an 
+              identification code and password.
+                (i) When an individual executes a series of signings during a single, 
+                continuous period of controlled system access, the first signing shall 
+                be executed using all electronic signature components; subsequent 
+                signings shall be executed using at least one electronic signature 
+                component that is only executable by, and designed to be used only by, 
+                the individual.
+                (ii) When an individual executes one or more signings not performed 
+                during a single, continuous period of controlled system access, each 
+                signing shall be executed using all of the electronic signature components.
+              (2) Be used only by their genuine owners; and
+              (3) Be administered and executed to ensure that attempted use of an 
+              individual's electronic signature by anyone other than its genuine owner 
+              requires collaboration of two or more individuals.
+            agents: [guardian]
+            finding_patterns: ["GUARDIAN-*"]
+            critical: true
+            two_component_requirement:
+              component_1: "Identification code (user ID)"
+              component_2: "Password or other authenticator"
+              continuous_access: "First signing requires both; subsequent may use one"
+              non_continuous: "Each signing requires both components"
+            evidence_types:
+              - authentication_configuration
+              - session_management_design
+              - dual_control_procedures
+              
+          - id: "11.200(b)"
+            title: "Biometric signatures"
+            requirement: |
+              Electronic signatures based upon biometrics shall be designed to ensure 
+              that they cannot be used by anyone other than their genuine owners.
+            agents: [guardian]
+            finding_patterns: ["GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - biometric_system_validation
+              - false_acceptance_rate_testing
+              - false_rejection_rate_testing
+
+      - id: "11.300"
+        title: "Controls for identification codes/passwords"
+        requirement: |
+          Persons who use electronic signatures based upon use of identification 
+          codes in combination with passwords shall employ controls to ensure their 
+          security and integrity.
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-*"]
+        critical: true
+        subsections:
+          - id: "11.300(a)"
+            title: "Uniqueness"
+            requirement: |
+              Maintaining the uniqueness of each combined identification code and 
+              password, such that no two individuals have the same combination of 
+              identification code and password.
+            agents: [guardian]
+            finding_patterns: ["GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - user_id_uniqueness_verification
+              - password_policy
+              
+          - id: "11.300(b)"
+            title: "Periodic review and revision"
+            requirement: |
+              Ensuring that identification code and password issuances are periodically 
+              checked, recalled, or revised (e.g., to cover such events as password aging).
+            agents: [guardian, sentinel]
+            finding_patterns: ["GUARDIAN-*", "SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - password_aging_policy
+              - periodic_review_records
+              - password_change_logs
+              
+          - id: "11.300(c)"
+            title: "Loss management"
+            requirement: |
+              Following loss management procedures to electronically deauthorize lost, 
+              stolen, missing, or otherwise potentially compromised tokens, cards, and 
+              other devices that bear or generate identification code or password 
+              information, and to issue temporary or permanent replacements using 
+              suitable, rigorous controls.
+            agents: [guardian, operator]
+            finding_patterns: ["GUARDIAN-*", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - loss_management_procedure
+              - deauthorization_records
+              - replacement_controls
+              
+          - id: "11.300(d)"
+            title: "Transaction safeguards"
+            requirement: |
+              Use of transaction safeguards to prevent unauthorized use of passwords 
+              and/or identification codes, and to detect and report in an immediate 
+              and urgent manner any attempts at their unauthorized use to the system 
+              security unit, and, as appropriate, to organizational management.
+            agents: [guardian, sentinel]
+            finding_patterns: ["GUARDIAN-*", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - intrusion_detection_configuration
+              - security_monitoring_procedures
+              - incident_response_plan
+              - alert_notification_setup
+              
+          - id: "11.300(e)"
+            title: "Device testing"
+            requirement: |
+              Initial and periodic testing of devices, such as tokens or cards, that 
+              bear or generate identification code or password information to ensure 
+              that they function properly and have not been altered in an unauthorized 
+              manner.
+            agents: [sentinel, guardian]
+            finding_patterns: ["SENTINEL-002", "GUARDIAN-*"]
+            critical: false
+            evidence_types:
+              - device_testing_procedures
+              - periodic_testing_records
+
+# =============================================================================
+# AGENT TO REQUIREMENT MAPPINGS
+# =============================================================================
+
+mappings:
+  # Guardian findings - security and access control focus
+  GUARDIAN-001:
+    title: "Secrets in Source Control"
+    controls:
+      - "11.10(d)"       # Access control
+      - "11.300"         # ID code/password controls
+    severity: critical
+    
+  GUARDIAN-002:
+    title: "Insecure Dependencies"
+    controls:
+      - "11.10(a)"       # System validation
+      - "11.30"          # Open system controls
+    severity: high
+    
+  GUARDIAN-003:
+    title: "Missing Authentication"
+    controls:
+      - "11.10(d)"       # Access control
+      - "11.10(g)"       # Authority checks
+      - "11.200"         # Signature components
+      - "11.300"         # ID code/password controls
+    severity: critical
+    
+  GUARDIAN-004:
+    title: "SQL Injection Vulnerability"
+    controls:
+      - "11.10(a)"       # System validation
+      - "11.10(e)"       # Audit trails (integrity)
+    severity: critical
+    
+  GUARDIAN-005:
+    title: "Cross-Site Scripting (XSS)"
+    controls:
+      - "11.10(a)"       # System validation
+      - "11.30"          # Open system controls
+    severity: high
+    
+  GUARDIAN-006:
+    title: "Insufficient Encryption"
+    controls:
+      - "11.30"          # Open system controls (encryption required)
+      - "11.10(c)"       # Record protection
+    severity: critical
+    
+  GUARDIAN-007:
+    title: "Weak Password Policy"
+    controls:
+      - "11.300(a)"      # Uniqueness
+      - "11.300(b)"      # Password aging
+      - "11.300(d)"      # Transaction safeguards
+    severity: high
+    
+  GUARDIAN-008:
+    title: "Session Management Issues"
+    controls:
+      - "11.200(a)"      # Signature components - continuous access
+      - "11.10(d)"       # Access control
+    severity: high
+
+  # Sentinel findings - monitoring and validation focus
+  SENTINEL-001:
+    title: "Insufficient Logging"
+    controls:
+      - "11.10(e)"       # Audit trails
+      - "11.300(d)"      # Transaction safeguards - detection/reporting
+    severity: critical
+    
+  SENTINEL-002:
+    title: "Missing Validation Evidence"
+    controls:
+      - "11.10(a)"       # System validation
+      - "11.10(h)"       # Device checks
+    severity: critical
+    
+  SENTINEL-003:
+    title: "Audit Trail Gaps"
+    controls:
+      - "11.10(e)"       # Audit trails
+      - "11.300(b)"      # Periodic review
+    severity: critical
+
+  # Architect findings - design and documentation focus
+  ARCHITECT-001:
+    title: "Missing Documentation"
+    controls:
+      - "11.10(k)"       # Systems documentation controls
+      - "11.10(a)"       # System validation (documentation)
+      - "11.1(e)"        # FDA inspection availability
+    severity: high
+    
+  ARCHITECT-002:
+    title: "Design Control Gaps"
+    controls:
+      - "11.10(a)"       # System validation
+      - "11.10(f)"       # Operational system checks
+    severity: high
+    
+  ARCHITECT-003:
+    title: "System Architecture Issues"
+    controls:
+      - "11.30"          # Open system controls
+      - "11.70"          # Signature/record linking
+    severity: medium
+
+  # Herald findings - documentation and training focus
+  HERALD-001:
+    title: "Documentation Deficiency"
+    controls:
+      - "11.10(k)"       # Systems documentation controls
+      - "11.10(j)"       # Accountability policies
+      - "11.50"          # Signature manifestations
+    severity: medium
+    
+  HERALD-002:
+    title: "Change Control Issues"
+    controls:
+      - "11.10(k)(2)"    # Revision and change control
+    severity: medium
+    
+  HERALD-003:
+    title: "Training Documentation Gaps"
+    controls:
+      - "11.10(i)"       # Personnel qualification
+    severity: medium
+
+  # Operator findings - operational controls focus
+  OPERATOR-001:
+    title: "Process Control Deficiency"
+    controls:
+      - "11.10(f)"       # Operational system checks
+      - "11.300(c)"      # Loss management
+    severity: medium
+
+  # Navigator findings (limited Part 11 relevance)
+  NAVIGATOR-001:
+    title: "API Documentation Issues"
+    controls:
+      - "11.10(k)"       # Systems documentation
+    severity: low
+
+# =============================================================================
+# COMPUTER SYSTEM VALIDATION FRAMEWORK
+# =============================================================================
+
+csv_framework:
+  description: |
+    Computer System Validation (CSV) is required by 11.10(a) to demonstrate 
+    system accuracy, reliability, and consistent intended performance. This 
+    framework aligns with GAMP 5 methodology.
+    
+  validation_phases:
+    planning:
+      deliverables:
+        - validation_master_plan
+        - system_risk_assessment
+        - validation_strategy
+      requirements:
+        - "11.10(a)"
+        
+    specification:
+      deliverables:
+        - user_requirements_specification
+        - functional_specification
+        - design_specification
+      requirements:
+        - "11.10(a)"
+        - "11.10(k)"
+        
+    verification:
+      deliverables:
+        - installation_qualification
+        - operational_qualification
+        - performance_qualification
+      requirements:
+        - "11.10(a)"
+        - "11.10(b)"
+        
+    reporting:
+      deliverables:
+        - validation_summary_report
+        - traceability_matrix
+        - deviation_reports
+      requirements:
+        - "11.10(a)"
+        - "11.1(e)"
+        
+    maintenance:
+      deliverables:
+        - periodic_review_records
+        - change_control_records
+        - revalidation_records
+      requirements:
+        - "11.10(a)"
+        - "11.10(k)(2)"
+
+  gamp_categories:
+    category_1:
+      name: "Infrastructure Software"
+      examples: ["operating systems", "databases", "network components"]
+      validation_approach: "Configuration verification"
+      
+    category_3:
+      name: "Non-configured Products"
+      examples: ["off-the-shelf firmware", "standard instruments"]
+      validation_approach: "Functional verification"
+      
+    category_4:
+      name: "Configured Products"
+      examples: ["LIMS", "ERP", "QMS", "eQMS"]
+      validation_approach: "Configuration and functional verification"
+      
+    category_5:
+      name: "Custom Applications"
+      examples: ["bespoke software", "custom integrations"]
+      validation_approach: "Full lifecycle validation"
+
+# =============================================================================
+# DATA INTEGRITY PRINCIPLES (ALCOA+)
+# =============================================================================
+
+data_integrity:
+  description: |
+    Part 11 requirements align with FDA's data integrity expectations. 
+    ALCOA+ principles provide a framework for compliance.
+    
+  alcoa_plus:
+    attributable:
+      definition: "Data must be traceable to the person who created it"
+      part_11_alignment:
+        - "11.10(e)"     # Audit trails
+        - "11.50"        # Signature manifestations
+        - "11.100(a)"    # Signature uniqueness
+        
+    legible:
+      definition: "Data must be readable and permanent"
+      part_11_alignment:
+        - "11.10(b)"     # Human readable copies
+        - "11.10(c)"     # Record protection
+        
+    contemporaneous:
+      definition: "Data must be recorded at the time of activity"
+      part_11_alignment:
+        - "11.10(e)"     # Time-stamped audit trails
+        - "11.50(a)(2)"  # Date and time of signature
+        
+    original:
+      definition: "Source data or certified copy"
+      part_11_alignment:
+        - "11.10(b)"     # Accurate and complete copies
+        - "11.10(c)"     # Record protection
+        
+    accurate:
+      definition: "Data must be error-free and truthful"
+      part_11_alignment:
+        - "11.10(a)"     # System validation
+        - "11.10(f)"     # Operational system checks
+        
+    complete:
+      definition: "All data including repeat tests, OOS results"
+      part_11_alignment:
+        - "11.10(e)"     # Audit trails - no obscuring
+        - "11.10(b)"     # Complete copies
+        
+    consistent:
+      definition: "Data follows expected patterns and timestamps"
+      part_11_alignment:
+        - "11.10(e)"     # Time-stamped audit trails
+        - "11.10(a)"     # System validation
+        
+    enduring:
+      definition: "Data preserved for required retention period"
+      part_11_alignment:
+        - "11.10(c)"     # Record protection and retrieval
+        - "11.10(e)"     # Audit trail retention
+        
+    available:
+      definition: "Data accessible when needed"
+      part_11_alignment:
+        - "11.10(c)"     # Ready retrieval
+        - "11.1(e)"      # FDA inspection availability
+
+# =============================================================================
+# SCORING AND ASSESSMENT
+# =============================================================================
+
+scoring:
+  methodology: "FDA Part 11 Compliance Assessment"
+  
+  total_subparts: 3
+  total_sections: 10
+  total_subsections: 28
+  
+  critical_requirements:
+    - "11.10(a)"         # System validation
+    - "11.10(d)"         # Access control
+    - "11.10(e)"         # Audit trails
+    - "11.10(g)"         # Authority checks
+    - "11.10(i)"         # Personnel qualification
+    - "11.10(j)"         # Accountability policies
+    - "11.10(k)"         # Systems documentation
+    - "11.30"            # Open system controls
+    - "11.50(a)"         # Signature manifestations
+    - "11.70"            # Signature/record linking
+    - "11.100"           # Electronic signature general requirements
+    - "11.200(a)"        # Non-biometric signature components
+    - "11.300"           # ID code/password controls
+    
+  common_findings:
+    - category: "Audit Trail Deficiencies"
+      frequency: "Most common"
+      sections: ["11.10(e)"]
+      
+    - category: "System Validation Gaps"
+      frequency: "Very common"
+      sections: ["11.10(a)"]
+      
+    - category: "Access Control Issues"
+      frequency: "Common"
+      sections: ["11.10(d)", "11.10(g)"]
+      
+    - category: "Documentation Control"
+      frequency: "Common"
+      sections: ["11.10(k)"]
+      
+    - category: "Password Controls"
+      frequency: "Common"
+      sections: ["11.300"]
+
+assessment:
+  type: "FDA Inspection / Data Integrity Assessment"
+  guidance_documents:
+    - title: "Part 11 Scope and Application"
+      year: 2003
+      status: "Current FDA guidance"
+    - title: "Data Integrity and Compliance with cGMP"
+      year: 2018
+      status: "Current FDA guidance"
+    - title: "Computerized Systems Used in Clinical Investigations"
+      year: 2007
+      status: "Current FDA guidance"
+
+# =============================================================================
+# RELATED REGULATIONS
+# =============================================================================
+
+related_regulations:
+  - id: "21_cfr_820"
+    name: "Quality System Regulation (QSR/QMSR)"
+    relationship: "Part 11 applies to electronic records required by Part 820"
+    cross_references:
+      - "820.30 Design controls - DHF records"
+      - "820.40 Document controls"
+      - "820.70(i) Automated processes"
+      - "820.180 Records requirements"
+    
+  - id: "21_cfr_210_211"
+    name: "Current Good Manufacturing Practice (cGMP) for Drugs"
+    relationship: "Part 11 applies to batch records, lab records, etc."
+    
+  - id: "21_cfr_58"
+    name: "Good Laboratory Practice (GLP)"
+    relationship: "Part 11 applies to nonclinical laboratory study data"
+    
+  - id: "21_cfr_312"
+    name: "Investigational New Drug Application"
+    relationship: "Part 11 applies to clinical trial data and submissions"
+    
+  - id: "21_cfr_803"
+    name: "Medical Device Reporting"
+    relationship: "Part 11 applies to electronic MDR submissions"
+    
+  - id: "eu_annex_11"
+    name: "EU GMP Annex 11 - Computerized Systems"
+    relationship: "International equivalent; harmonization considerations"
+    
+  - id: "ich_e6_r2"
+    name: "ICH E6(R2) Good Clinical Practice"
+    relationship: "Clinical trial computerized systems requirements"
+
+# =============================================================================
+# METADATA
+# =============================================================================
+
+metadata:
+  pack_version: "1.0.0"
+  created_date: "2026-02-02"
+  created_by: "Code Conclave"
+  last_modified: "2026-02-02"
+  
+  sources:
+    - "21 CFR Part 11 (eCFR)"
+    - "FDA Guidance: Part 11 Scope and Application (2003)"
+    - "FDA Guidance: Data Integrity and Compliance with cGMP (2018)"
+    - "FDA Guidance: Computerized Systems Used in Clinical Investigations (2007)"
+    - "GAMP 5: A Risk-Based Approach to Compliant GxP Computerized Systems"
+    - "PIC/S PI 011-3: Good Practices for Computerised Systems"
+    
+  notes:
+    - "Part 11 is foundational - applies to ALL electronic records under FDA predicate rules"
+    - "2003 guidance narrowed enforcement scope to risk-based approach"
+    - "Data integrity expectations have increased since 2015"
+    - "QMSR (effective Feb 2, 2026) maintains Part 11 applicability for 820 records"
+    - "Cloud/SaaS systems typically require open system controls (11.30)"

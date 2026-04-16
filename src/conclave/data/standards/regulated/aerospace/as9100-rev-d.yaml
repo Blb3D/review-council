@@ -1,0 +1,1295 @@
+# AS9100 Rev D (AS9100D:2016) - Quality Management Systems
+# Requirements for Aviation, Space and Defense Organizations
+# Comprehensive Compliance Pack for Code Conclave
+# 
+# Standard: SAE AS9100D:2016 / EN 9100:2018 / JISQ 9100:2016
+# Published: September 20, 2016
+# Publisher: SAE International / IAQG (International Aerospace Quality Group)
+# Base Standard: ISO 9001:2015 (incorporated in full)
+# 
+# CRITICAL: AS9100D = ISO 9001:2015 + Aerospace-Specific Requirements
+# Aerospace additions appear in bold/italics in the original standard
+
+metadata:
+  standard_id: "AS9100D"
+  standard_name: "Quality Management Systems - Requirements for Aviation, Space and Defense Organizations"
+  version: "Revision D"
+  publication_date: "2016-09-20"
+  publisher: "SAE International"
+  governing_body: "IAQG (International Aerospace Quality Group)"
+  base_standard: "ISO 9001:2015"
+  regional_equivalents:
+    americas: "AS9100D (SAE)"
+    europe: "EN 9100:2018"
+    asia_pacific: "JISQ 9100:2016"
+  document_url: "https://www.sae.org/standards/content/as9100d/"
+
+applicability:
+  industries:
+    - "Aviation (commercial, military, general)"
+    - "Space systems and launch vehicles"
+    - "Defense products and services"
+    - "Unmanned aerial systems (UAS/drones)"
+  organizations:
+    - "Aircraft/spacecraft OEMs"
+    - "Tier 1/2/3 suppliers"
+    - "Parts manufacturers"
+    - "Assembly operations"
+    - "Design and engineering services"
+    - "Testing and calibration laboratories"
+    - "Special process providers (heat treat, plating, NDT)"
+  prime_contractors_requiring:
+    - "Boeing"
+    - "Airbus"
+    - "Lockheed Martin"
+    - "Northrop Grumman"
+    - "Raytheon Technologies"
+    - "General Dynamics"
+    - "BAE Systems"
+    - "Safran"
+    - "Rolls-Royce"
+    - "GE Aerospace"
+    - "SpaceX"
+  regulatory_acceptance:
+    - "FAA (Federal Aviation Administration)"
+    - "EASA (European Union Aviation Safety Agency)"
+    - "DoD (U.S. Department of Defense)"
+    - "NASA"
+
+# ============================================================================
+# KEY DEFINITIONS (Clause 3)
+# ============================================================================
+definitions:
+  counterfeit_part:
+    id: "3.1"
+    definition: "An unauthorized copy, imitation, substitute, or modified part which is knowingly misrepresented as a specified genuine part of an original or authorized manufacturer"
+    note: "Examples include false identification of marking/labeling, grade, serial number, date code, documentation, or performance characteristics"
+    
+  critical_items:
+    id: "3.2"
+    definition: "Items having significant effect on product realization and use including safety, performance, form, fit, function, producibility, service life that require specific actions to ensure adequate management"
+    examples: "Safety critical items, fracture critical items, mission critical items, key characteristics"
+    
+  key_characteristic:
+    id: "3.3"
+    definition: "An attribute or feature whose variation has significant effect on product fit, form, function, performance, service life, or producibility requiring specific actions for controlling variation"
+    
+  product_safety:
+    id: "3.4"
+    definition: "The state in which a product is able to perform to its designed or intended purpose without causing unacceptable risk of harm to persons or damage to property"
+    
+  special_requirements:
+    id: "3.5"
+    definition: "Requirements identified by customer or organization with high risks of not being met, requiring inclusion in operational risk management process"
+    factors: "Product/process complexity, past experience, product/process maturity"
+
+# ============================================================================
+# CLAUSE 4: CONTEXT OF THE ORGANIZATION
+# ============================================================================
+clause_4:
+  title: "Context of the Organization"
+  sections:
+    "4.1":
+      title: "Understanding the organization and its context"
+      requirements:
+        - "Determine external and internal issues relevant to purpose and strategic direction"
+      aerospace_addition: false
+      
+    "4.2":
+      title: "Understanding the needs and expectations of interested parties"
+      requirements:
+        - "Determine interested parties relevant to QMS"
+        - "Determine requirements of these interested parties"
+        - "Monitor and review information about interested parties"
+      aerospace_addition: false
+      
+    "4.3":
+      title: "Determining the scope of the QMS"
+      requirements:
+        - "Determine boundaries and applicability to establish scope"
+        - "Consider external/internal issues and interested party requirements"
+        - "Scope shall be available and maintained as documented information"
+      aerospace_addition:
+        note: "If a requirement is determined not applicable, this shall not affect organization's ability or responsibility to ensure conformity"
+        
+    "4.4":
+      title: "Quality management system and its processes"
+      iso_requirements:
+        - "Establish, implement, maintain and continually improve QMS"
+        - "Determine inputs required and outputs expected"
+        - "Determine sequence and interaction of processes"
+        - "Determine and apply criteria and methods for monitoring/measurement"
+        - "Determine resources needed and ensure availability"
+        - "Assign responsibilities and authorities"
+        - "Address risks and opportunities per 6.1"
+        - "Evaluate processes and implement changes needed"
+        - "Improve processes and QMS"
+      aerospace_additions:
+        - req: "4.4.2.b"
+          description: "Establish and maintain documented information including: general description of interested parties, QMS scope with boundaries and applicability, description of processes and their application, sequence and interaction of processes"
+          note: "This may be compiled into a quality manual"
+          critical: true
+
+# ============================================================================
+# CLAUSE 5: LEADERSHIP
+# ============================================================================
+clause_5:
+  title: "Leadership"
+  sections:
+    "5.1.1":
+      title: "Leadership and commitment - General"
+      iso_requirements:
+        - "Taking accountability for effectiveness of QMS"
+        - "Ensuring quality policy and objectives are established"
+        - "Ensuring integration of QMS into business processes"
+        - "Promoting process approach and risk-based thinking"
+        - "Ensuring resources needed are available"
+        - "Communicating importance of effective QMS"
+        - "Ensuring QMS achieves intended results"
+        - "Engaging and supporting persons"
+        - "Promoting improvement"
+        - "Supporting other management roles"
+      aerospace_additions:
+        - req: "5.1.1.k"
+          description: "Ensure integrity of QMS is maintained when changes are planned and implemented"
+          critical: true
+          
+    "5.1.2":
+      title: "Customer focus"
+      iso_requirements:
+        - "Customer and regulatory requirements are determined, understood and consistently met"
+        - "Risks and opportunities affecting conformity are determined and addressed"
+        - "Focus on enhancing customer satisfaction is maintained"
+      aerospace_additions:
+        - req: "5.1.2.d"
+          description: "Top management ensures conformity of products and services and on-time delivery performance is measured, and appropriate action taken if planned results not achieved"
+          critical: true
+          
+    "5.2":
+      title: "Quality Policy"
+      requirements:
+        - "Policy appropriate to purpose and context"
+        - "Provides framework for setting quality objectives"
+        - "Includes commitment to satisfy requirements"
+        - "Includes commitment to continual improvement"
+        - "Available as documented information"
+        - "Communicated, understood and applied"
+        - "Available to interested parties as appropriate"
+        
+    "5.3":
+      title: "Organizational roles, responsibilities and authorities"
+      iso_requirements:
+        - "Responsibilities and authorities assigned, communicated, understood"
+        - "Ensuring QMS conforms to requirements"
+        - "Ensuring processes deliver intended outputs"
+        - "Reporting on QMS performance and improvement opportunities"
+        - "Ensuring promotion of customer focus"
+      aerospace_additions:
+        - req: "5.3.f"
+          description: "Top management shall appoint management representative(s) with responsibility and authority for ensuring QMS conforms to requirements, reporting to top management, and ensuring promotion of customer focus"
+          critical: true
+        - req: "5.3.g"
+          description: "Persons assigned responsibility shall have organizational freedom and unrestricted access to top management to resolve quality issues"
+          critical: true
+
+# ============================================================================
+# CLAUSE 6: PLANNING
+# ============================================================================
+clause_6:
+  title: "Planning"
+  sections:
+    "6.1":
+      title: "Actions to address risks and opportunities"
+      iso_requirements:
+        - "Consider issues (4.1) and requirements (4.2)"
+        - "Determine risks and opportunities to assure QMS achieves intended results"
+        - "Plan actions to address risks and opportunities"
+        - "Integrate actions into QMS processes"
+        - "Evaluate effectiveness of actions"
+      aerospace_additions:
+        - req: "6.1.2 note"
+          description: "Actions taken shall be proportionate to potential impact on conformity of products and services"
+          critical: true
+          
+    "6.2":
+      title: "Quality objectives and planning to achieve them"
+      requirements:
+        - "Establish quality objectives at relevant functions, levels, processes"
+        - "Objectives consistent with quality policy"
+        - "Objectives measurable"
+        - "Objectives take into account applicable requirements"
+        - "Objectives relevant to conformity and customer satisfaction"
+        - "Objectives monitored, communicated, updated"
+        - "Maintain documented information on objectives"
+        - "Determine what, resources, who, when, how evaluated"
+        
+    "6.3":
+      title: "Planning of changes"
+      requirements:
+        - "Changes carried out in planned manner"
+        - "Consider purpose and potential consequences"
+        - "Consider integrity of QMS"
+        - "Consider availability of resources"
+        - "Consider allocation of responsibilities and authorities"
+
+# ============================================================================
+# CLAUSE 7: SUPPORT
+# ============================================================================
+clause_7:
+  title: "Support"
+  sections:
+    "7.1.1":
+      title: "Resources - General"
+      requirements:
+        - "Determine and provide resources for QMS"
+        - "Consider capabilities of existing internal resources"
+        - "Consider what to obtain from external providers"
+        
+    "7.1.2":
+      title: "People"
+      requirements:
+        - "Determine and provide persons necessary for effective QMS"
+        
+    "7.1.3":
+      title: "Infrastructure"
+      requirements:
+        - "Determine, provide and maintain infrastructure for processes"
+        - "Includes buildings, equipment, transportation, IT"
+        
+    "7.1.4":
+      title: "Environment for operation of processes"
+      iso_requirements:
+        - "Determine, provide and maintain environment for processes"
+        - "Consider social, psychological, physical factors"
+      aerospace_additions:
+        - description: "Human factors should be considered"
+          critical: true
+          
+    "7.1.5":
+      title: "Monitoring and measuring resources"
+      iso_requirements:
+        - "Determine and provide resources for valid/reliable monitoring and measurement"
+        - "Ensure resources suitable and maintained"
+        - "Retain documented information of fitness for purpose"
+        - "Calibrate or verify against traceable standards"
+        - "Identify to determine calibration status"
+        - "Safeguard from adjustments, damage, deterioration"
+        - "Determine validity of previous results if equipment nonconforming"
+      aerospace_additions:
+        - req: "7.1.5.2.e"
+          description: "Records of calibration and verification activities shall be retained"
+          critical: true
+          
+    "7.1.6":
+      title: "Organizational knowledge"
+      requirements:
+        - "Determine knowledge necessary for processes"
+        - "Knowledge maintained and available"
+        - "Address changing needs and trends"
+        
+    "7.2":
+      title: "Competence"
+      requirements:
+        - "Determine necessary competence"
+        - "Ensure persons competent based on education, training, experience"
+        - "Take actions to acquire competence and evaluate effectiveness"
+        - "Retain documented information as evidence of competence"
+        
+    "7.3":
+      title: "Awareness"
+      iso_requirements:
+        - "Aware of quality policy"
+        - "Aware of relevant quality objectives"
+        - "Aware of contribution to QMS effectiveness"
+        - "Aware of implications of not conforming"
+      aerospace_additions:
+        - req: "7.3.e"
+          description: "Aware of their contribution to product or service conformity"
+          critical: true
+        - req: "7.3.f"
+          description: "Aware of their contribution to product safety"
+          critical: true
+        - req: "7.3.g"
+          description: "Aware of the importance of ethical behavior"
+          critical: true
+          
+    "7.4":
+      title: "Communication"
+      requirements:
+        - "Determine internal and external communications"
+        - "What, when, with whom, how, who communicates"
+        
+    "7.5":
+      title: "Documented information"
+      iso_requirements:
+        - "QMS includes documented information required by standard"
+        - "Documented information determined necessary by organization"
+        - "Appropriate identification and description"
+        - "Appropriate format and media"
+        - "Review and approval for suitability and adequacy"
+        - "Available and suitable for use"
+        - "Adequately protected"
+        - "Distribution, access, retrieval, use"
+        - "Storage and preservation"
+        - "Control of changes"
+        - "Retention and disposition"
+      aerospace_additions:
+        - req: "7.5.3.2.e"
+          description: "Prevention of unintended use of obsolete documented information"
+        - req: "7.5.3.5"
+          description: "Ensure documented information of external origin is identified and distribution controlled"
+        - req: "7.5.3.6"
+          description: "Access to documented information can imply view only or view and change authority"
+# AS9100 Rev D - Part 2: Clause 8 Operation
+# This clause contains the majority of aerospace-specific additions
+
+# ============================================================================
+# CLAUSE 8: OPERATION
+# ============================================================================
+clause_8:
+  title: "Operation"
+  
+  section_8.1:
+    title: "Operational planning and control"
+    iso_requirements:
+      - "Plan, implement and control processes for products and services"
+      - "Determine requirements for products and services"
+      - "Establish criteria for processes and acceptance"
+      - "Determine resources needed"
+      - "Implement control of processes"
+      - "Maintain and retain documented information"
+    aerospace_additions:
+      - "Consider organizational knowledge when determining requirements"
+      - "Use statistical techniques for acceptance sampling as appropriate"
+      
+    # =========== MAJOR AEROSPACE-SPECIFIC SECTIONS ===========
+    
+    subsection_8.1.1:
+      title: "Operational Risk Management"
+      aerospace_specific: true
+      critical: true
+      requirements:
+        - req: "8.1.1.1"
+          description: "Plan, implement, and control a process for managing operational risks to achievement of applicable requirements"
+        - req: "8.1.1.a"
+          description: "Assignment of responsibilities for operational risk management"
+        - req: "8.1.1.b"
+          description: "Definition of risk assessment criteria (likelihood, consequences, risk acceptance)"
+        - req: "8.1.1.c"
+          description: "Identification, assessment, and communication of risks throughout product realization"
+        - req: "8.1.1.d"
+          description: "Identification, implementation, and management of actions to mitigate risks exceeding acceptance criteria"
+        - req: "8.1.1.e"
+          description: "Acceptance of risks remaining after implementation of mitigating actions"
+      note: "Operational risk is limited to risks associated with operational processes needed for provision of products and services"
+      
+    subsection_8.1.2:
+      title: "Configuration Management"
+      aerospace_specific: true
+      critical: true
+      requirements:
+        - req: "8.1.2.1"
+          description: "Plan, implement, and control a process for configuration management to ensure identification and control of physical and functional attributes throughout product lifecycle"
+        - req: "8.1.2.a"
+          description: "Control product identity and traceability to requirements, including implementation of identified changes"
+        - req: "8.1.2.b"
+          description: "Ensure documented information is consistent with actual attributes of products and services"
+      reference: "See ISO 10007 for guidance"
+      
+    subsection_8.1.3:
+      title: "Product Safety"
+      aerospace_specific: true
+      critical: true
+      requirements:
+        - req: "8.1.3.1"
+          description: "Plan, implement, and control processes needed to assure product safety during product lifecycle"
+      examples:
+        - "Identifying safety requirements in design input"
+        - "Identification of product safety critical items"
+        - "Hazard analysis and risk mitigation"
+        - "Safe life determination"
+        - "Product safety reporting including recall/alerts"
+        - "Escalation to design authority"
+        
+    subsection_8.1.4:
+      title: "Prevention of Counterfeit Parts"
+      aerospace_specific: true
+      critical: true
+      requirements:
+        - req: "8.1.4.1"
+          description: "Plan, implement, and control processes for prevention of use of counterfeit or suspect counterfeit parts"
+      controls_to_consider:
+        - "Training of appropriate persons in awareness and prevention"
+        - "Application of parts obsolescence monitoring program"
+        - "Controls for acquiring from original/authorized manufacturers, authorized distributors, or approved sources"
+        - "Requirements for assuring traceability to original/authorized manufacturers"
+        - "Verification and test methodologies to detect counterfeit parts"
+        - "Monitoring of counterfeit parts reporting from external sources"
+        - "Quarantine and reporting of suspect or detected counterfeit parts"
+
+  section_8.2:
+    title: "Requirements for products and services"
+    
+    subsection_8.2.1:
+      title: "Customer communication"
+      requirements:
+        - "Provide information relating to products and services"
+        - "Handle enquiries, contracts or orders including changes"
+        - "Obtain customer feedback including complaints"
+        - "Handle or control customer property"
+        - "Establish contingency actions when relevant"
+        
+    subsection_8.2.2:
+      title: "Determining requirements for products and services"
+      iso_requirements:
+        - "Requirements defined including statutory and regulatory"
+        - "Organization can meet claims for products and services"
+      aerospace_additions:
+        - req: "8.2.2.c"
+          description: "Determine any special requirements for products and services"
+          
+    subsection_8.2.3:
+      title: "Review of requirements"
+      iso_requirements:
+        - "Ensure ability to meet requirements"
+        - "Requirements specified by customer"
+        - "Requirements not stated but necessary"
+        - "Requirements specified by organization"
+        - "Statutory and regulatory requirements"
+        - "Contract or order requirements differing from previously expressed"
+        - "Confirm customer requirements when no documented statement"
+        - "Retain documented information on results of review"
+      aerospace_additions:
+        - req: "8.2.3.1.f"
+          description: "Review special requirements for products and services"
+        - req: "8.2.3.1.g"
+          description: "Identify and document organizational and customer risks associated with new technology, short delivery timeframe, organizational capability/capacity"
+          critical: true
+
+  section_8.3:
+    title: "Design and development"
+    
+    subsection_8.3.1:
+      title: "General"
+      requirements:
+        - "Establish, implement and maintain a design and development process"
+        
+    subsection_8.3.2:
+      title: "Design and development planning"
+      iso_requirements:
+        - "Determine nature, duration, complexity"
+        - "Required process stages including reviews"
+        - "Required verification and validation activities"
+        - "Responsibilities and authorities"
+        - "Internal and external resource needs"
+        - "Control interfaces between persons involved"
+        - "Need for customer/user involvement"
+        - "Requirements for subsequent provision"
+        - "Level of control expected by customers and interested parties"
+        - "Documented information to demonstrate requirements met"
+      aerospace_additions:
+        - req: "8.3.2.k"
+          description: "Identification of design and development constraints including timing, capacity, cost targets, capability targets, material limitations, installation requirements"
+        - req: "8.3.2.l"
+          description: "Inputs shall include critical items including key characteristics"
+          critical: true
+          
+    subsection_8.3.3:
+      title: "Design and development inputs"
+      iso_requirements:
+        - "Functional and performance requirements"
+        - "Information from previous similar activities"
+        - "Statutory and regulatory requirements"
+        - "Standards or codes of practice"
+        - "Potential consequences of failure"
+        - "Inputs adequate, complete, unambiguous, not conflicting"
+        - "Retain documented information on inputs"
+      aerospace_additions:
+        - req: "8.3.3.f"
+          description: "Organizational and customer requirements including suitability, durability, reliability, maintainability, human factors, serviceability, logistics, obsolescence, product safety requirements"
+          critical: true
+          
+    subsection_8.3.4:
+      title: "Design and development controls"
+      iso_requirements:
+        - "Results to be achieved are defined"
+        - "Reviews conducted to evaluate ability to meet requirements"
+        - "Verification ensures outputs meet input requirements"
+        - "Validation ensures products meet requirements for intended use"
+        - "Necessary actions taken on problems"
+        - "Documented information retained"
+      aerospace_additions:
+        - req: "8.3.4.g"
+          description: "Validation shall be completed prior to product delivery or service implementation, if reasonably practicable"
+        - req: "8.3.4.h"
+          description: "Test plans that identify test articles, test resources, test conditions, test parameters, tests to be performed, acceptance/rejection criteria shall be documented"
+          critical: true
+          
+    subsection_8.3.5:
+      title: "Design and development outputs"
+      iso_requirements:
+        - "Meet input requirements"
+        - "Adequate for subsequent processes"
+        - "Include or reference monitoring/measuring requirements and acceptance criteria"
+        - "Specify essential characteristics for intended purpose and safe provision"
+        - "Retain documented information on outputs"
+      aerospace_additions:
+        - req: "8.3.5.f"
+          description: "Outputs shall define and specify critical items including key characteristics and specific actions to be taken"
+          critical: true
+        - req: "8.3.5.g"
+          description: "Outputs shall identify data essential for product to be identified, manufactured, inspected, used and maintained"
+          
+    subsection_8.3.6:
+      title: "Design and development changes"
+      iso_requirements:
+        - "Identify, review and control changes"
+        - "Ensure no adverse impact on conformity"
+        - "Retain documented information on changes"
+        - "Results of reviews"
+        - "Authorization of changes"
+        - "Actions to prevent adverse impacts"
+      aerospace_additions:
+        - req: "8.3.6.e"
+          description: "Changes controlled consistent with configuration management process"
+        - req: "8.3.6.f"
+          description: "Analyze design changes for effects on constituent parts, products, or services already delivered"
+          critical: true
+
+  section_8.4:
+    title: "Control of externally provided processes, products and services"
+    
+    subsection_8.4.1:
+      title: "General"
+      iso_requirements:
+        - "Ensure externally provided items conform to requirements"
+        - "Apply criteria for evaluation, selection, monitoring, re-evaluation"
+        - "Retain documented information of activities and actions"
+      aerospace_additions:
+        - req: "8.4.1.f"
+          description: "Ensure only approved external providers provide externally provided items"
+          critical: true
+        - req: "8.4.1.g"
+          description: "Define process, responsibilities, authority for approval status decision, changes, and controlled use conditions"
+        - req: "8.4.1.h"
+          description: "Determine and manage risk when selecting and using external providers"
+        - req: "8.4.1.i"
+          description: "Define and implement actions when external provider performance does not meet requirements"
+        - req: "8.4.1.j"
+          description: "Establish process for receiving, processing, retaining, disposing of nonconforming externally provided product"
+          
+    subsection_8.4.2:
+      title: "Type and extent of control"
+      iso_requirements:
+        - "Ensure externally provided processes remain within QMS control"
+        - "Define controls for external provider and resulting output"
+        - "Consider potential impact on conformity"
+        - "Consider effectiveness of controls by external provider"
+        - "Determine verification activities"
+      aerospace_additions:
+        - req: "8.4.2.f"
+          description: "Monitor external provider's processes and products to confirm they meet requirements"
+        - req: "8.4.2.g"
+          description: "Periodically monitor delegated verification activities including surveillance, audit, review of process effectiveness"
+          critical: true
+        - req: "8.4.2.h"
+          description: "Implement process for evaluating test report data to confirm products meet requirements"
+        - req: "8.4.2.i"
+          description: "Validate accuracy of test reports for raw material identified as significant operational risk"
+          critical: true
+          
+    subsection_8.4.3:
+      title: "Information for external providers"
+      iso_requirements:
+        - "Ensure adequacy of requirements before communication"
+        - "Communicate requirements for processes, products, services"
+        - "Approval of products, methods, processes, equipment, release"
+        - "Competence including qualification of persons"
+        - "External provider interactions with organization"
+        - "Control and monitoring to be applied"
+        - "Verification activities at external provider premises"
+      aerospace_additions:
+        - req: "8.4.3.h"
+          description: "Notify organization of nonconforming items from their providers and obtain approval for disposition"
+        - req: "8.4.3.i"
+          description: "Control and retention of documented information"
+        - req: "8.4.3.j"
+          description: "Prevention of counterfeit or suspect counterfeit parts"
+          critical: true
+        - req: "8.4.3.k"
+          description: "Flow down applicable requirements including customer requirements"
+          critical: true
+          note: "Flowdown is a key aerospace concept"
+        - req: "8.4.3.l"
+          description: "Ensure external provider personnel aware of contribution to product conformity, product safety, and ethical behavior"
+          critical: true
+        - req: "8.4.3.m"
+          description: "Notify and obtain approval prior to changing process, product, service or production site"
+          critical: true
+
+  section_8.5:
+    title: "Production and service provision"
+    
+    subsection_8.5.1:
+      title: "Control of production and service provision"
+      iso_requirements:
+        - "Implement under controlled conditions"
+        - "Availability of documented information defining characteristics and results"
+        - "Availability and use of monitoring and measuring resources"
+        - "Implementation of monitoring and measurement at appropriate stages"
+        - "Use of suitable infrastructure and environment"
+        - "Appointment of competent persons"
+        - "Validation and revalidation of processes where output cannot be verified"
+        - "Implementation of release, delivery, post-delivery activities"
+      aerospace_additions:
+        - req: "8.5.1.a.7"
+          description: "Implementation of actions to prevent human error"
+          critical: true
+        - req: "8.5.1.b"
+          description: "Establish and maintain documented information defining production and service provision controls"
+        - req: "8.5.1.c"
+          description: "Plan post-delivery activities considering potential consequences of failure, expected lifetime, customer requirements, customer feedback"
+        - req: "8.5.1.d"
+          description: "Production process changes shall be documented and authorized prior to implementation"
+        - req: "8.5.1.e"
+          description: "When production equipment, tools, and software used for inspection, they shall be validated prior to production use and maintained"
+          critical: true
+        - req: "8.5.1.f"
+          description: "Documented information retained as evidence that all production and inspection/verification steps completed as planned or documented and authorized"
+          critical: true
+          
+    subsection_8.5.1.1:
+      title: "Control of Equipment, Tools, and Software Programs"
+      aerospace_specific: true
+      requirements:
+        - "When production equipment, tools, and software programs used as form of product inspection, they shall be validated prior to release for production use and shall be maintained"
+        
+    subsection_8.5.1.2:
+      title: "Validation and Control of Special Processes"
+      aerospace_specific: true
+      critical: true
+      requirements:
+        - "For processes where resulting output cannot be verified by subsequent monitoring or measurement, establish arrangements including:"
+        - "Defined criteria for review and approval of processes"
+        - "Determination of conditions for process approval"
+        - "Approval of facilities and equipment"
+        - "Qualification of personnel"
+        - "Use of specific methods and procedures for implementation and monitoring"
+        - "Requirements for documented information to be retained"
+        - "Revalidation"
+      examples: "Heat treatment, welding, plating, NDT, painting/coating, passivation, chemical processing"
+      
+    subsection_8.5.1.3:
+      title: "Production Process Verification (First Article Inspection)"
+      aerospace_specific: true
+      critical: true
+      requirements:
+        - req: "8.5.1.3.1"
+          description: "Implement production process verification activities to ensure production process is able to produce products that meet requirements"
+          activities: "Risk assessments, capability studies, capacity studies, control plans"
+        - req: "8.5.1.3.2"
+          description: "Representative item from first production run shall be used to verify production processes, production documentation, and tooling are able to produce parts and assemblies that meet requirements. Activity repeated when changes invalidate original results"
+          note: "This is First Article Inspection (FAI) - see AS9102"
+          
+    subsection_8.5.2:
+      title: "Identification and traceability"
+      iso_requirements:
+        - "Use suitable means to identify outputs"
+        - "Identify status of outputs with respect to monitoring and measurement"
+        - "Control unique identification when traceability is required"
+        - "Retain documented information for traceability"
+      aerospace_additions:
+        - req: "8.5.2.d"
+          description: "Identify all products produced using a configuration that deviates from configuration in effect"
+        - req: "8.5.2.e"
+          description: "When required by customer, provide for traceability throughout production and service provision, provide delivery documentation identifying scope and extent"
+        - req: "8.5.2.f"
+          description: "Identity and traceability maintained throughout product lifecycle"
+          critical: true
+          
+    subsection_8.5.3:
+      title: "Property belonging to customers or external providers"
+      requirements:
+        - "Exercise care with property while under organization's control"
+        - "Identify, verify, protect and safeguard property"
+        - "Report lost, damaged, or unsuitable property and retain documented information"
+        
+    subsection_8.5.4:
+      title: "Preservation"
+      iso_requirements:
+        - "Preserve outputs to ensure conformity"
+      aerospace_additions:
+        - req: "8.5.4.2"
+          description: "Preservation shall include handling, storage, transmission, packaging, protection, and limited life or shelf-life management"
+        - req: "8.5.4.3"
+          description: "Prevent damage, deterioration, or contamination of product during all stages"
+          
+    subsection_8.5.5:
+      title: "Post-delivery activities"
+      requirements:
+        - "Meet requirements for post-delivery activities"
+        - "Consider statutory and regulatory requirements"
+        - "Consider potential undesired consequences"
+        - "Consider nature, use and intended lifetime"
+        - "Consider customer requirements and feedback"
+        
+    subsection_8.5.6:
+      title: "Control of changes"
+      iso_requirements:
+        - "Review and control changes for continuing conformity"
+        - "Retain documented information on results of review, persons authorizing, necessary actions"
+      aerospace_additions:
+        - req: "8.5.6.3"
+          description: "Changes to production processes shall be assessed for effect on configuration management and product safety"
+          critical: true
+
+  section_8.6:
+    title: "Release of products and services"
+    iso_requirements:
+      - "Implement planned arrangements at appropriate stages"
+      - "Release shall not proceed until planned arrangements completed unless approved by relevant authority and customer"
+      - "Retain documented information on release including evidence of conformity and traceability to persons authorizing"
+    aerospace_additions:
+      - req: "8.6.4"
+        description: "Product release and service delivery documentation shall provide clear evidence of conformance, confirmation of verification activities, and identification of person authorizing release"
+        critical: true
+
+  section_8.7:
+    title: "Control of nonconforming outputs"
+    iso_requirements:
+      - "Ensure nonconforming outputs identified and controlled"
+      - "Take appropriate action based on nature and effect"
+      - "Deal by correction, segregation, containment, return, suspension"
+      - "Inform customer"
+      - "Obtain authorization for acceptance under concession"
+      - "Verify conformity when corrected"
+      - "Retain documented information describing nonconformity, actions, concessions, authority"
+    aerospace_additions:
+      - req: "8.7.1.g"
+        description: "Control disposition through use-as-is, rework, repair, scrap, or other dispositions"
+      - req: "8.7.1.h"
+        description: "Ensure scrap is conspicuously and permanently marked or controlled until physically rendered unusable"
+        critical: true
+      - req: "8.7.1.i"
+        description: "Persons responsible for authority to disposition nonconforming product shall be identified"
+      - req: "8.7.1.j"
+        description: "Concessions shall be recorded for number of devices, quantity, time period, and reported to customer when required"
+      - req: "8.7.1.k"
+        description: "Product dispositioned for scrap, rework, or repair shall be re-inspected per original acceptance criteria or other documented acceptance activity"
+# AS9100 Rev D - Part 3: Clauses 9-10, Agent Mappings, Implementation Guidance
+
+# ============================================================================
+# CLAUSE 9: PERFORMANCE EVALUATION
+# ============================================================================
+clause_9:
+  title: "Performance Evaluation"
+  
+  section_9.1:
+    title: "Monitoring, measurement, analysis and evaluation"
+    
+    subsection_9.1.1:
+      title: "General"
+      requirements:
+        - "Determine what needs to be monitored and measured"
+        - "Determine methods for monitoring, measurement, analysis, evaluation"
+        - "Determine when monitoring and measuring shall be performed"
+        - "Determine when results shall be analyzed and evaluated"
+        - "Evaluate performance and effectiveness of QMS"
+        - "Retain documented information as evidence"
+        
+    subsection_9.1.2:
+      title: "Customer satisfaction"
+      iso_requirements:
+        - "Monitor customer perceptions of degree to which needs and expectations fulfilled"
+        - "Determine methods for obtaining, monitoring and reviewing information"
+      aerospace_additions:
+        - req: "9.1.2.3"
+          description: "Customer satisfaction monitoring shall include product conformity, on-time delivery performance, customer complaints, and corrective action requests"
+          critical: true
+        - req: "9.1.2.4"
+          description: "Develop and implement plans for customer satisfaction improvement that address identified deficiencies and evaluate effectiveness"
+          
+    subsection_9.1.3:
+      title: "Analysis and evaluation"
+      requirements:
+        - "Analyze and evaluate data and information from monitoring and measurement"
+        - "Evaluate conformity of products and services"
+        - "Evaluate degree of customer satisfaction"
+        - "Evaluate performance and effectiveness of QMS"
+        - "Evaluate if planning implemented effectively"
+        - "Evaluate effectiveness of actions for risks and opportunities"
+        - "Evaluate performance of external providers"
+        - "Evaluate need for improvements"
+
+  section_9.2:
+    title: "Internal audit"
+    iso_requirements:
+      - "Conduct at planned intervals"
+      - "Provide information on QMS conformity to organization requirements and this standard"
+      - "Determine if QMS effectively implemented and maintained"
+      - "Plan, establish, implement, maintain audit programme"
+      - "Define audit criteria and scope for each audit"
+      - "Select auditors for objectivity and impartiality"
+      - "Report results to relevant management"
+      - "Take correction and corrective actions without undue delay"
+      - "Retain documented information on audit programme and results"
+    aerospace_additions:
+      - req: "9.2.2.g"
+        description: "Internal audit programme shall address importance and performance of processes, changes affecting organization, results of previous audits"
+
+  section_9.3:
+    title: "Management review"
+    
+    subsection_9.3.1:
+      title: "General"
+      requirements:
+        - "Top management shall review QMS at planned intervals"
+        - "Ensure continuing suitability, adequacy, effectiveness"
+        - "Ensure alignment with strategic direction"
+        
+    subsection_9.3.2:
+      title: "Management review inputs"
+      iso_requirements:
+        - "Status of actions from previous reviews"
+        - "Changes in external and internal issues"
+        - "Information on QMS performance and effectiveness including customer satisfaction, extent objectives met, process performance, nonconformities and corrective actions, monitoring results, audit results, external provider performance"
+        - "Adequacy of resources"
+        - "Effectiveness of actions for risks and opportunities"
+        - "Opportunities for improvement"
+      aerospace_additions:
+        - req: "9.3.2.g"
+          description: "On-time delivery performance"
+          critical: true
+          
+    subsection_9.3.3:
+      title: "Management review outputs"
+      requirements:
+        - "Decisions and actions related to opportunities for improvement"
+        - "Any need for changes to QMS"
+        - "Resource needs"
+        - "Retain documented information as evidence"
+
+# ============================================================================
+# CLAUSE 10: IMPROVEMENT
+# ============================================================================
+clause_10:
+  title: "Improvement"
+  
+  section_10.1:
+    title: "General"
+    requirements:
+      - "Determine and select opportunities for improvement"
+      - "Implement necessary actions to meet customer requirements and enhance satisfaction"
+      - "Improve products and services to meet requirements and address future needs"
+      - "Correct, prevent, or reduce undesired effects"
+      - "Improve performance and effectiveness of QMS"
+
+  section_10.2:
+    title: "Nonconformity and corrective action"
+    iso_requirements:
+      - "React to nonconformity - control and correct, deal with consequences"
+      - "Evaluate need for action to eliminate cause(s)"
+      - "Review and analyze nonconformity"
+      - "Determine causes of nonconformity"
+      - "Determine if similar nonconformities exist or could occur"
+      - "Implement any action needed"
+      - "Review effectiveness of corrective action"
+      - "Update risks and opportunities if necessary"
+      - "Make changes to QMS if necessary"
+      - "Corrective actions proportionate to effects of nonconformities"
+      - "Retain documented information on nature, actions, results"
+    aerospace_additions:
+      - req: "10.2.1.b.2"
+        description: "Determining causes of nonconformity, including as applicable those related to human factors"
+        critical: true
+      - req: "10.2.1.g"
+        description: "Flow down corrective action requirements to external provider when it is determined that external provider is responsible for nonconformity"
+        critical: true
+      - req: "10.2.1.h"
+        description: "Take specific action when timely and/or effective corrective actions are not achieved"
+      - req: "10.2.4"
+        description: "Organization shall establish and maintain documented information that defines the nonconformity and corrective action management processes"
+        critical: true
+
+  section_10.3:
+    title: "Continual improvement"
+    requirements:
+      - "Continually improve suitability, adequacy and effectiveness of QMS"
+      - "Consider results of analysis and evaluation, and outputs from management review"
+      - "Determine if there are needs or opportunities as part of continual improvement"
+
+# ============================================================================
+# AGENT-TO-CONTROL MAPPINGS
+# ============================================================================
+agent_mappings:
+  GUARDIAN:
+    description: "Security-focused findings map to access control, counterfeit prevention, and externally provided product controls"
+    primary_controls:
+      - "8.1.4"     # Prevention of counterfeit parts
+      - "8.4.1"     # External provider controls
+      - "8.4.3.j"   # Communicate counterfeit prevention requirements
+      - "7.5.3"     # Control of documented information
+      - "8.5.2"     # Identification and traceability
+    secondary_controls:
+      - "8.4.2"     # Type and extent of control
+      - "7.1.5"     # Monitoring and measuring resources
+      - "8.7.1.h"   # Scrap control
+      
+  SENTINEL:
+    description: "Monitoring and audit findings map to performance evaluation, measurement, and records"
+    primary_controls:
+      - "9.1"       # Monitoring, measurement, analysis
+      - "9.2"       # Internal audit
+      - "9.3"       # Management review
+      - "7.1.5.2"   # Measurement traceability
+      - "8.5.1.3"   # Production process verification (FAI)
+    secondary_controls:
+      - "9.1.2"     # Customer satisfaction
+      - "10.2"      # Corrective action
+      - "8.5.1.f"   # Evidence of operations completed
+      
+  ARCHITECT:
+    description: "Design and structure findings map to design controls, configuration management, and documentation"
+    primary_controls:
+      - "8.3"       # Design and development
+      - "8.1.2"     # Configuration management
+      - "4.4"       # QMS and its processes
+      - "7.5"       # Documented information
+    secondary_controls:
+      - "8.3.4"     # Design controls
+      - "8.3.5"     # Design outputs
+      - "8.3.6"     # Design changes
+      
+  HERALD:
+    description: "Communication and documentation findings map to documented information controls, customer communication, and training"
+    primary_controls:
+      - "7.5"       # Documented information
+      - "8.2.1"     # Customer communication
+      - "7.4"       # Communication
+      - "7.2"       # Competence
+      - "7.3"       # Awareness
+    secondary_controls:
+      - "8.4.3"     # Information for external providers
+      - "5.2.2"     # Communicating quality policy
+      
+  OPERATOR:
+    description: "Production and process findings map to operational controls, production, and external provider management"
+    primary_controls:
+      - "8.5.1"     # Control of production
+      - "8.5.1.2"   # Special processes
+      - "8.1.1"     # Operational risk management
+      - "8.4"       # External providers
+      - "8.5.4"     # Preservation
+    secondary_controls:
+      - "8.5.6"     # Control of changes
+      - "8.6"       # Release of products
+      - "8.7"       # Nonconforming outputs
+      
+  NAVIGATOR:
+    description: "Strategic and planning findings map to leadership, planning, and risk/opportunity management"
+    primary_controls:
+      - "5.1"       # Leadership
+      - "6.1"       # Risks and opportunities
+      - "6.2"       # Quality objectives
+      - "4.1"       # Context of organization
+      - "4.2"       # Interested parties
+    secondary_controls:
+      - "5.3"       # Roles, responsibilities
+      - "6.3"       # Planning of changes
+      - "9.3"       # Management review
+
+# ============================================================================
+# RELATED STANDARDS
+# ============================================================================
+related_standards:
+  base_standard:
+    - id: "ISO 9001:2015"
+      relationship: "AS9100D includes ISO 9001:2015 in full and adds aerospace requirements"
+      
+  aerospace_family:
+    - id: "AS9110"
+      title: "Requirements for Aviation Maintenance Organizations (MRO)"
+    - id: "AS9120"
+      title: "Requirements for Aviation, Space and Defense Distributors"
+    - id: "AS9102"
+      title: "Aerospace First Article Inspection Requirement"
+      relationship: "Guidance for 8.5.1.3 production process verification"
+    - id: "AS9101"
+      title: "Quality Management Systems Audit Requirements"
+    - id: "AS9103"
+      title: "Variation Management of Key Characteristics"
+    - id: "AS9145"
+      title: "APQP and PPAP Requirements"
+      
+  supporting_standards:
+    - id: "ISO 10007"
+      title: "Guidelines for Configuration Management"
+    - id: "SAE AS6081"
+      title: "Counterfeit Electronic Parts - Avoidance, Detection, Mitigation"
+    - id: "SAE AS6174"
+      title: "Counterfeit Materiel; Assuring Acquisition of Authentic Materiel"
+      
+  industry_programs:
+    - id: "NADCAP"
+      description: "Special process accreditation (heat treat, NDT, chemical processing, etc.)"
+    - id: "OASIS"
+      description: "Online Aerospace Supplier Information System - mandatory database listing for all AS9100 certified organizations"
+
+# ============================================================================
+# COMMON AUDIT FINDINGS
+# ============================================================================
+common_findings:
+  - finding_type: "Corrective action effectiveness"
+    frequency: "Most common"
+    clauses: ["10.2"]
+    description: "Poor root cause analysis, lack of effectiveness verification, untimely closure"
+    
+  - finding_type: "External provider control"
+    frequency: "Very common"
+    clauses: ["8.4"]
+    description: "Inadequate monitoring, missing flowdown requirements, incomplete approval process"
+    
+  - finding_type: "Risk management"
+    frequency: "Common"
+    clauses: ["6.1", "8.1.1"]
+    description: "Incomplete risk assessment, lack of operational risk process, risks not linked to actions"
+    
+  - finding_type: "Measurement equipment"
+    frequency: "Common"
+    clauses: ["7.1.5"]
+    description: "Missing calibration records, inadequate traceability, equipment used out of calibration"
+    
+  - finding_type: "Design controls"
+    frequency: "Common"
+    clauses: ["8.3"]
+    description: "Incomplete design validation, missing test plans, inadequate design review records"
+    
+  - finding_type: "Configuration management"
+    frequency: "Common"
+    clauses: ["8.1.2"]
+    description: "Product not traceable to configuration, changes not controlled, as-built vs as-designed discrepancies"
+    
+  - finding_type: "Production process verification"
+    frequency: "Common"
+    clauses: ["8.5.1.3"]
+    description: "Incomplete FAI, missing re-FAI after changes, FAI not per AS9102 when required"
+    
+  - finding_type: "Human factors"
+    frequency: "Emerging"
+    clauses: ["7.1.4", "8.5.1.a.7", "10.2.1.b.2"]
+    description: "Human error not considered in nonconformity analysis, work environment factors not addressed"
+
+# ============================================================================
+# AEROSPACE-SPECIFIC ADDITIONS SUMMARY
+# ============================================================================
+aerospace_additions_summary:
+  clause_4:
+    - "4.4.2.b: Quality manual type documentation required"
+    
+  clause_5:
+    - "5.1.1.k: QMS integrity during changes"
+    - "5.1.2.d: Product conformity and OTD measurement"
+    - "5.3.f: Management representative required"
+    - "5.3.g: Organizational freedom for quality personnel"
+    
+  clause_6:
+    - "6.1.2: Actions proportionate to impact"
+    
+  clause_7:
+    - "7.1.4: Human factors consideration"
+    - "7.1.5.2.e: Calibration records retained"
+    - "7.3.e-g: Awareness of conformity, product safety, ethical behavior"
+    - "7.5.3: Prevention of obsolete document use, external document control"
+    
+  clause_8_new_sections:
+    - "8.1.1: Operational risk management (NEW)"
+    - "8.1.2: Configuration management (NEW)"
+    - "8.1.3: Product safety (NEW)"
+    - "8.1.4: Counterfeit parts prevention (NEW)"
+    - "8.5.1.1: Equipment/tools/software validation"
+    - "8.5.1.2: Special process validation"
+    - "8.5.1.3: Production process verification (FAI)"
+    
+  clause_8_enhancements:
+    - "8.2.2.c, 8.2.3.1.f-g: Special requirements identification and review"
+    - "8.3.2.k-l, 8.3.3.f, 8.3.4.g-h, 8.3.5.f-g, 8.3.6.e-f: Design enhancements"
+    - "8.4.1.f-j, 8.4.2.f-i, 8.4.3.h-m: External provider control enhancements"
+    - "8.5.1.a.7, 8.5.1.b-f: Production control enhancements"
+    - "8.5.2.d-f: Identification and traceability enhancements"
+    - "8.5.4.2-3, 8.5.6.3, 8.6.4, 8.7.1.g-k: Other Clause 8 enhancements"
+    
+  clause_9:
+    - "9.1.2.3-4: Customer satisfaction monitoring including OTD, complaints, CARs"
+    - "9.2.2.g: Audit programme considerations"
+    - "9.3.2.g: On-time delivery in management review"
+    
+  clause_10:
+    - "10.2.1.b.2: Human factors in root cause analysis"
+    - "10.2.1.g-h: Flowdown corrective action, action for ineffective CA"
+    - "10.2.4: Documented nonconformity/corrective action process"
+
+# ============================================================================
+# IMPLEMENTATION GUIDANCE
+# ============================================================================
+implementation_guidance:
+  phase_1_foundation:
+    duration: "Months 1-3"
+    activities:
+      - "Gap analysis against AS9100D requirements"
+      - "Define QMS scope and boundaries"
+      - "Document context of organization (4.1, 4.2)"
+      - "Establish quality policy and objectives"
+      - "Appoint management representative"
+      - "Map existing processes to AS9100D structure"
+      
+  phase_2_core_processes:
+    duration: "Months 3-6"
+    activities:
+      - "Document operational risk management process (8.1.1)"
+      - "Document configuration management process (8.1.2)"
+      - "Document product safety process (8.1.3)"
+      - "Document counterfeit parts prevention process (8.1.4)"
+      - "Develop/update design and development procedures (8.3)"
+      - "Establish external provider control system (8.4)"
+      - "Document production controls including special processes (8.5)"
+      - "Implement nonconforming product control (8.7)"
+      - "Establish corrective action process with human factors (10.2)"
+      
+  phase_3_support_systems:
+    duration: "Months 4-6"
+    activities:
+      - "Implement document control system meeting 7.5 requirements"
+      - "Establish calibration system with traceability (7.1.5)"
+      - "Develop competence and training records (7.2)"
+      - "Conduct awareness training on conformity, safety, ethics (7.3)"
+      - "Establish First Article Inspection process (8.5.1.3)"
+      - "Implement customer satisfaction monitoring (9.1.2)"
+      
+  phase_4_implementation:
+    duration: "Months 6-9"
+    activities:
+      - "Implement all documented processes"
+      - "Conduct internal audits (9.2)"
+      - "Hold management reviews (9.3)"
+      - "Generate records to demonstrate conformity"
+      - "Address nonconformities through corrective action"
+      
+  phase_5_certification:
+    duration: "Months 9-12"
+    activities:
+      - "Select accredited certification body"
+      - "Complete Stage 1 audit (documentation review)"
+      - "Close Stage 1 findings"
+      - "Complete Stage 2 audit (implementation audit)"
+      - "Close any nonconformities"
+      - "Receive AS9100D certificate"
+      - "Register in OASIS database"
+
+# ============================================================================
+# FLOWDOWN REQUIREMENTS CHECKLIST
+# ============================================================================
+flowdown_checklist:
+  description: "Requirements that must be communicated to external providers per 8.4.3"
+  items:
+    - "Product/service requirements including acceptance criteria"
+    - "Special requirements identified"
+    - "Methods, processes, equipment approval requirements"
+    - "Competence requirements including personnel qualification"
+    - "QMS requirements"
+    - "Interaction requirements with organization"
+    - "Control and monitoring to be applied"
+    - "Verification activities at provider premises"
+    - "Nonconformity notification and disposition approval requirements"
+    - "Control and retention of documented information"
+    - "Counterfeit parts prevention requirements"
+    - "Customer requirements flowdown"
+    - "Awareness requirements (conformity, safety, ethical behavior)"
+    - "Change notification and approval requirements"
+    - "Right of access for organization, customer, regulatory authorities"
+
+# ============================================================================
+# KEY PERFORMANCE INDICATORS
+# ============================================================================
+suggested_kpis:
+  customer_focused:
+    - name: "Product Conformity Rate"
+      target: ">99%"
+    - name: "On-Time Delivery (OTD)"
+      target: ">95%"
+      note: "Required per 5.1.2.d and 9.3.2.g"
+    - name: "Customer Complaints"
+      target: "Trending down"
+    - name: "Corrective Action Requests from Customers"
+      target: "Trending down"
+      
+  internal_quality:
+    - name: "First Pass Yield"
+      target: ">95%"
+    - name: "Internal Nonconformance Rate"
+      target: "Trending down"
+    - name: "Corrective Action Effectiveness"
+      target: ">90%"
+    - name: "Corrective Action Timeliness"
+      target: ">85%"
+      
+  external_provider:
+    - name: "Supplier Quality Rate"
+      target: ">98%"
+    - name: "Supplier OTD"
+      target: ">95%"
+    - name: "Supplier Corrective Actions"
+      target: "Trending down"
+      
+  process_effectiveness:
+    - name: "FAI Pass Rate"
+      target: ">90%"
+    - name: "Calibration Compliance"
+      target: "100%"
+    - name: "Audit Finding Closure Rate"
+      target: ">95%"
+
+# ============================================================================
+# ISO 9001 TO AS9100 TRANSITION
+# ============================================================================
+iso9001_to_as9100_transition:
+  new_processes_required:
+    - "8.1.1: Operational Risk Management"
+    - "8.1.2: Configuration Management"
+    - "8.1.3: Product Safety"
+    - "8.1.4: Counterfeit Parts Prevention"
+    - "8.5.1.3: Production Process Verification (FAI)"
+    - "8.5.1.2: Special Process Validation"
+    
+  enhanced_requirements:
+    - "5.3.f-g: Management Representative with organizational freedom"
+    - "7.3.e-g: Awareness of safety and ethical behavior"
+    - "8.4: Significantly expanded external provider control"
+    - "8.3: Critical items, key characteristics, test plans"
+    - "10.2: Human factors consideration, flowdown to suppliers"
+    - "9.1.2: Customer satisfaction must include OTD, complaints, CARs"
+    
+  documentation_additions:
+    - "Quality manual-type documentation (4.4.2)"
+    - "Documented operational risk management process (8.1.1)"
+    - "Documented configuration management process (8.1.2)"
+    - "Documented nonconformity/corrective action process (10.2.4)"
+    - "FAI records per AS9102 format if customer requires"
+    - "Test plans for design verification/validation (8.3.4.h)"
+
+# ============================================================================
+# VERSION HISTORY
+# ============================================================================
+version_history:
+  - version: "1.0"
+    date: "2026-02-03"
+    author: "Code Conclave AI Agent"
+    changes: "Initial AS9100 Rev D compliance pack creation"
+    
+notes:
+  - "This compliance pack covers AS9100D:2016 / EN 9100:2018 / JISQ 9100:2016"
+  - "All ISO 9001:2015 requirements are included plus aerospace additions"
+  - "Aerospace-specific requirements marked with 'aerospace_specific: true' or 'aerospace_additions'"
+  - "Requirements marked 'critical: true' are commonly audited focal points"
+  - "Organizations should verify current IAQG interpretations and clarifications"
+  - "A new revision (IA9100) is expected ~2026 with ISO 9001 updates"
+  - "OASIS database registration is mandatory for certified organizations"

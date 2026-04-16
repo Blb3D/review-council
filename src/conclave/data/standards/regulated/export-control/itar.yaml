@@ -1,0 +1,760 @@
+# ============================================================================
+# Code Conclave Compliance Pack: ITAR (International Traffic in Arms Regulations)
+# ============================================================================
+# Standard: 22 CFR Parts 120-130 (ITAR)
+# Administered by: U.S. Department of State, Directorate of Defense Trade Controls
+# Version: 1.0.0
+# Last Updated: 2026-02-04
+# Author: BLB3D / Code Conclave
+# License: Proprietary - Requires Code Conclave Compliance Pack License
+# ============================================================================
+#
+# IMPORTANT: ITAR compliance is a LEGAL requirement. This pack helps identify
+# software-related compliance gaps but does NOT constitute legal advice.
+# Consult with export control counsel for authoritative guidance.
+#
+# ============================================================================
+
+id: itar
+name: "ITAR Export Control Compliance"
+version: "1.0.0"
+domain: export-control
+description: |
+  The International Traffic in Arms Regulations (ITAR) controls the export and 
+  import of defense-related articles, services, and technical data on the 
+  United States Munitions List (USML). 
+  
+  This compliance pack focuses on SOFTWARE-SPECIFIC ITAR requirements:
+  - Access control (US Persons only for technical data)
+  - Technical data protection and classification
+  - Audit trails and accountability
+  - Encryption and data-at-rest/in-transit protection
+  - Cloud/hosting location requirements
+  - Third-party and subcontractor controls
+
+applicability:
+  industries:
+    - defense
+    - aerospace
+    - firearms_manufacturers
+    - satellite_communications
+    - military_electronics
+    - government_contractors
+  data_types:
+    - technical_data      # Defense articles technical data
+    - usml_software       # Software on USML
+    - manufacturing_data  # Production know-how
+    - source_code         # For defense articles
+  triggers:
+    - "Defense contract"
+    - "USML item development"
+    - "Foreign national access"
+    - "Cloud hosting decision"
+    - "Subcontractor onboarding"
+
+references:
+  - name: "22 CFR 120-130 (ITAR)"
+    url: "https://www.ecfr.gov/current/title-22/chapter-I/subchapter-M"
+  - name: "DDTC Guidelines"
+    url: "https://www.pmddtc.state.gov/ddtc_public"
+  - name: "USML Categories"
+    url: "https://www.ecfr.gov/current/title-22/chapter-I/subchapter-M/part-121"
+  - name: "EAR vs ITAR Comparison"
+    url: "https://www.bis.doc.gov/index.php/policy-guidance/ear-vs-itar"
+
+penalties:
+  civil: "Up to $1,000,000 per violation"
+  criminal: "Up to $1,000,000 and 20 years imprisonment"
+  debarment: "Prohibited from future export privileges"
+
+# ============================================================================
+# CONTROL DOMAINS (7 Domains, 45 Controls)
+# ============================================================================
+
+domains:
+  # --------------------------------------------------------------------------
+  # ACCESS CONTROL (AC) - 12 Controls
+  # --------------------------------------------------------------------------
+  - id: AC
+    name: "Access Control & US Person Verification"
+    description: |
+      ITAR requires that access to technical data be limited to US Persons 
+      (citizens, permanent residents, protected individuals) unless a license
+      or exemption applies.
+    control_count: 12
+    critical: true
+    
+    controls:
+      - id: "AC-1"
+        title: "US Person Verification Before Access"
+        description: |
+          Systems must verify US Person status before granting access to 
+          ITAR-controlled technical data. This includes citizenship verification,
+          I-9 documentation, or equivalent HR verification.
+        agents: [guardian, architect]
+        finding_patterns:
+          - "GUARDIAN-001"  # Authentication issues
+          - "GUARDIAN-002"  # Authorization gaps
+          - "ARCHITECT-001" # Access control design
+        evidence_required:
+          - "US Person verification workflow"
+          - "Access request/approval records"
+          - "Citizenship attestation forms"
+        remediation: |
+          Implement pre-access verification workflow:
+          1. Integrate with HR system for citizenship status
+          2. Require attestation before ITAR data access
+          3. Log all verification checks
+          4. Implement periodic re-verification
+        
+      - id: "AC-2"
+        title: "Foreign National Access Prevention"
+        description: |
+          Prevent foreign nationals from accessing ITAR technical data unless
+          authorized by license (TAA, MLA) or exemption.
+        agents: [guardian, sentinel]
+        finding_patterns:
+          - "GUARDIAN-003"  # Unauthorized access paths
+          - "SENTINEL-001"  # Missing access tests
+        critical: true
+        evidence_required:
+          - "Foreign national identification process"
+          - "Access denial logs"
+          - "License/exemption documentation"
+        
+      - id: "AC-3"
+        title: "Role-Based Access Control (RBAC)"
+        description: |
+          Implement RBAC with ITAR-specific roles. Technical data access
+          should be need-to-know, not role-based alone.
+        agents: [guardian, architect]
+        finding_patterns:
+          - "GUARDIAN-004"  # RBAC gaps
+          - "ARCHITECT-002" # Role design issues
+        evidence_required:
+          - "Role definitions with ITAR markings"
+          - "Access matrix documentation"
+          - "Role assignment audit trail"
+          
+      - id: "AC-4"
+        title: "Multi-Factor Authentication for ITAR Data"
+        description: |
+          MFA required for all access to ITAR-controlled systems and data.
+        agents: [guardian]
+        finding_patterns:
+          - "GUARDIAN-005"  # MFA not enforced
+          - "GUARDIAN-006"  # Weak authentication
+        critical: true
+        
+      - id: "AC-5"
+        title: "Session Management and Timeout"
+        description: |
+          Automatic session termination after inactivity. ITAR data should
+          not remain accessible on unattended workstations.
+        agents: [guardian]
+        finding_patterns:
+          - "GUARDIAN-007"  # Session timeout issues
+          
+      - id: "AC-6"
+        title: "Access Revocation on Termination"
+        description: |
+          Immediate access revocation when employee terminates, changes role,
+          or loses US Person status.
+        agents: [guardian, operator]
+        finding_patterns:
+          - "GUARDIAN-008"  # Delayed revocation
+          - "OPERATOR-001"  # Offboarding gaps
+          
+      - id: "AC-7"
+        title: "Visitor and Contractor Access"
+        description: |
+          Temporary access for visitors/contractors must include US Person
+          verification and be time-limited.
+        agents: [guardian, architect]
+        finding_patterns:
+          - "GUARDIAN-009"  # Visitor access gaps
+          - "ARCHITECT-003" # Temporary access design
+          
+      - id: "AC-8"
+        title: "Remote Access Controls"
+        description: |
+          Remote access to ITAR data must use encrypted connections and
+          verify access is from authorized locations (US soil or approved).
+        agents: [guardian, operator]
+        finding_patterns:
+          - "GUARDIAN-010"  # VPN/remote access issues
+          - "OPERATOR-002"  # Location verification
+        critical: true
+        
+      - id: "AC-9"
+        title: "API Access Controls"
+        description: |
+          APIs exposing ITAR data must implement authentication, authorization,
+          and US Person verification for consuming applications.
+        agents: [guardian, architect]
+        finding_patterns:
+          - "GUARDIAN-011"  # API security gaps
+          - "ARCHITECT-004" # API design issues
+          
+      - id: "AC-10"
+        title: "Database Access Controls"
+        description: |
+          Direct database access to ITAR data must be restricted and audited.
+          No shared credentials for database access.
+        agents: [guardian]
+        finding_patterns:
+          - "GUARDIAN-012"  # Database access issues
+          - "GUARDIAN-013"  # Shared credentials
+          
+      - id: "AC-11"
+        title: "Privileged Access Management"
+        description: |
+          System administrators with ITAR data access must be US Persons.
+          Privileged access must be logged and reviewed.
+        agents: [guardian, operator]
+        finding_patterns:
+          - "GUARDIAN-014"  # Admin access gaps
+          - "OPERATOR-003"  # PAM issues
+          
+      - id: "AC-12"
+        title: "Access Reviews and Recertification"
+        description: |
+          Periodic review (at least annual) of all ITAR data access rights.
+          Remove unnecessary access promptly.
+        agents: [sentinel, operator]
+        finding_patterns:
+          - "SENTINEL-002"  # Missing access reviews
+          - "OPERATOR-004"  # Recertification gaps
+
+  # --------------------------------------------------------------------------
+  # DATA CLASSIFICATION (DC) - 8 Controls
+  # --------------------------------------------------------------------------
+  - id: DC
+    name: "Data Classification & Marking"
+    description: |
+      ITAR technical data must be properly classified, marked, and handled
+      according to its sensitivity level.
+    control_count: 8
+    
+    controls:
+      - id: "DC-1"
+        title: "Technical Data Identification"
+        description: |
+          Process to identify what constitutes ITAR technical data within
+          the system. Include drawings, specs, source code, manuals.
+        agents: [herald, architect]
+        finding_patterns:
+          - "HERALD-001"  # Documentation gaps
+          - "ARCHITECT-005" # Data classification design
+        evidence_required:
+          - "Technical data inventory"
+          - "Classification criteria"
+          - "Data flow diagrams"
+          
+      - id: "DC-2"
+        title: "ITAR Markings and Legends"
+        description: |
+          All ITAR technical data must bear appropriate export control markings.
+          Include USML category, distribution statement, handling caveats.
+        agents: [herald]
+        finding_patterns:
+          - "HERALD-002"  # Missing markings
+          - "HERALD-003"  # Incorrect markings
+        critical: true
+        marking_example: |
+          WARNING: This document contains technical data whose export is 
+          restricted by the Arms Export Control Act (Title 22, U.S.C., 
+          Sec 2751, et seq.) or the Export Administration Act of 1979 
+          (Title 50, U.S.C., App. 2401 et seq.). Violations may result 
+          in criminal penalties.
+          
+      - id: "DC-3"
+        title: "Source Code Classification"
+        description: |
+          Source code for defense articles must be classified and marked.
+          Consider whether source code itself is technical data.
+        agents: [herald, architect]
+        finding_patterns:
+          - "HERALD-004"  # Source code marking gaps
+          - "ARCHITECT-006" # Code organization issues
+          
+      - id: "DC-4"
+        title: "Derived Data Classification"
+        description: |
+          Data derived from ITAR technical data inherits ITAR controls.
+          Reports, analyses, and transformations must be marked.
+        agents: [herald, architect]
+        finding_patterns:
+          - "HERALD-005"  # Derived data gaps
+          
+      - id: "DC-5"
+        title: "Public Domain Determination"
+        description: |
+          Process to determine if technical data qualifies for public domain
+          exclusion under 22 CFR 120.11. Document the determination.
+        agents: [herald]
+        finding_patterns:
+          - "HERALD-006"  # Public domain documentation
+          
+      - id: "DC-6"
+        title: "Fundamental Research Exclusion"
+        description: |
+          If applicable, document fundamental research exclusion per
+          22 CFR 120.11(a)(8). Research must meet publication criteria.
+        agents: [herald]
+        finding_patterns:
+          - "HERALD-007"  # Research exclusion docs
+          
+      - id: "DC-7"
+        title: "Data Inventory and Mapping"
+        description: |
+          Maintain inventory of all ITAR technical data locations, including
+          databases, file shares, cloud storage, and backups.
+        agents: [architect, operator]
+        finding_patterns:
+          - "ARCHITECT-007" # Data mapping gaps
+          - "OPERATOR-005"  # Inventory issues
+          
+      - id: "DC-8"
+        title: "Classification Review Process"
+        description: |
+          Periodic review of data classifications. Update as USML changes
+          or project scope evolves.
+        agents: [sentinel]
+        finding_patterns:
+          - "SENTINEL-003"  # Review process gaps
+
+  # --------------------------------------------------------------------------
+  # ENCRYPTION & DATA PROTECTION (EN) - 7 Controls
+  # --------------------------------------------------------------------------
+  - id: EN
+    name: "Encryption & Data Protection"
+    description: |
+      ITAR technical data must be protected at rest and in transit using
+      FIPS 140-2/3 validated encryption.
+    control_count: 7
+    critical: true
+    
+    controls:
+      - id: "EN-1"
+        title: "Encryption at Rest"
+        description: |
+          All ITAR technical data must be encrypted at rest using
+          FIPS 140-2/3 validated cryptographic modules.
+        agents: [guardian, architect]
+        finding_patterns:
+          - "GUARDIAN-015"  # Encryption gaps
+          - "ARCHITECT-008" # Storage design issues
+        critical: true
+        
+      - id: "EN-2"
+        title: "Encryption in Transit"
+        description: |
+          TLS 1.2+ required for all ITAR data transmission. Certificate
+          validation must be enforced.
+        agents: [guardian]
+        finding_patterns:
+          - "GUARDIAN-016"  # TLS issues
+          - "GUARDIAN-017"  # Certificate problems
+        critical: true
+        
+      - id: "EN-3"
+        title: "Key Management"
+        description: |
+          Encryption keys for ITAR data must be managed by US Persons.
+          Keys must not be accessible to foreign nationals.
+        agents: [guardian, operator]
+        finding_patterns:
+          - "GUARDIAN-018"  # Key management gaps
+          - "OPERATOR-006"  # Key access issues
+          
+      - id: "EN-4"
+        title: "Backup Encryption"
+        description: |
+          Backups containing ITAR data must be encrypted and stored
+          in US-controlled facilities.
+        agents: [operator]
+        finding_patterns:
+          - "OPERATOR-007"  # Backup encryption
+          - "OPERATOR-008"  # Backup location
+          
+      - id: "EN-5"
+        title: "End-to-End Encryption"
+        description: |
+          Consider E2E encryption for highly sensitive technical data
+          where intermediate systems should not have access.
+        agents: [guardian, architect]
+        finding_patterns:
+          - "GUARDIAN-019"  # E2E gaps
+          
+      - id: "EN-6"
+        title: "Cryptographic Algorithm Compliance"
+        description: |
+          Use only approved algorithms (AES-256, RSA-2048+, SHA-256+).
+          Deprecated algorithms must be replaced.
+        agents: [guardian]
+        finding_patterns:
+          - "GUARDIAN-020"  # Weak crypto
+          
+      - id: "EN-7"
+        title: "Secure Deletion"
+        description: |
+          ITAR data deletion must use secure wiping methods. Encryption
+          key destruction is acceptable for encrypted data.
+        agents: [operator]
+        finding_patterns:
+          - "OPERATOR-009"  # Secure deletion gaps
+
+  # --------------------------------------------------------------------------
+  # AUDIT & ACCOUNTABILITY (AU) - 8 Controls
+  # --------------------------------------------------------------------------
+  - id: AU
+    name: "Audit & Accountability"
+    description: |
+      Comprehensive audit logging is required to demonstrate ITAR compliance
+      and support investigations of potential violations.
+    control_count: 8
+    
+    controls:
+      - id: "AU-1"
+        title: "Access Logging"
+        description: |
+          Log all access to ITAR technical data. Include user identity,
+          timestamp, data accessed, and action performed.
+        agents: [guardian, sentinel]
+        finding_patterns:
+          - "GUARDIAN-021"  # Logging gaps
+          - "SENTINEL-004"  # Audit test gaps
+        critical: true
+        
+      - id: "AU-2"
+        title: "Authentication Logging"
+        description: |
+          Log all authentication attempts (success and failure) to
+          ITAR-controlled systems.
+        agents: [guardian]
+        finding_patterns:
+          - "GUARDIAN-022"  # Auth logging gaps
+          
+      - id: "AU-3"
+        title: "Administrative Action Logging"
+        description: |
+          Log all administrative actions including user provisioning,
+          role changes, and configuration changes.
+        agents: [guardian, operator]
+        finding_patterns:
+          - "GUARDIAN-023"  # Admin logging gaps
+          - "OPERATOR-010"  # Config change logging
+          
+      - id: "AU-4"
+        title: "Export/Download Logging"
+        description: |
+          Log all exports, downloads, and extractions of ITAR data.
+          This is critical for demonstrating no unauthorized exports.
+        agents: [guardian, sentinel]
+        finding_patterns:
+          - "GUARDIAN-024"  # Export logging gaps
+        critical: true
+        
+      - id: "AU-5"
+        title: "Log Protection"
+        description: |
+          Audit logs must be protected from tampering. Use write-once
+          storage or cryptographic integrity verification.
+        agents: [guardian, operator]
+        finding_patterns:
+          - "GUARDIAN-025"  # Log protection gaps
+          - "OPERATOR-011"  # Log storage issues
+          
+      - id: "AU-6"
+        title: "Log Retention"
+        description: |
+          Retain ITAR-related audit logs for minimum 5 years or as
+          required by contract/regulation.
+        agents: [operator]
+        finding_patterns:
+          - "OPERATOR-012"  # Retention policy gaps
+          
+      - id: "AU-7"
+        title: "Log Review Process"
+        description: |
+          Regular review of audit logs for anomalies, unauthorized access
+          attempts, and potential violations.
+        agents: [sentinel, operator]
+        finding_patterns:
+          - "SENTINEL-005"  # Review process gaps
+          - "OPERATOR-013"  # Monitoring gaps
+          
+      - id: "AU-8"
+        title: "Violation Reporting"
+        description: |
+          Process for detecting and reporting potential ITAR violations
+          to DDTC (mandatory disclosure within 60 days).
+        agents: [herald, operator]
+        finding_patterns:
+          - "HERALD-008"  # Reporting procedure docs
+          - "OPERATOR-014"  # Incident response gaps
+
+  # --------------------------------------------------------------------------
+  # HOSTING & INFRASTRUCTURE (HI) - 5 Controls
+  # --------------------------------------------------------------------------
+  - id: HI
+    name: "Hosting & Infrastructure"
+    description: |
+      ITAR technical data must be stored on US-controlled infrastructure.
+      Cloud services must meet specific requirements.
+    control_count: 5
+    critical: true
+    
+    controls:
+      - id: "HI-1"
+        title: "US-Based Hosting"
+        description: |
+          ITAR technical data must be hosted in the continental United States.
+          Servers must be physically located in US facilities.
+        agents: [operator, architect]
+        finding_patterns:
+          - "OPERATOR-015"  # Hosting location issues
+          - "ARCHITECT-009" # Infrastructure design
+        critical: true
+        
+      - id: "HI-2"
+        title: "Cloud Provider Requirements"
+        description: |
+          Cloud providers must offer ITAR-compliant regions (AWS GovCloud,
+          Azure Government, etc.) with US Person-only operations.
+        agents: [operator, architect]
+        finding_patterns:
+          - "OPERATOR-016"  # Cloud compliance gaps
+        critical: true
+        evidence_required:
+          - "Cloud provider ITAR attestation"
+          - "Service configuration documentation"
+          - "Data residency confirmation"
+          
+      - id: "HI-3"
+        title: "Network Segmentation"
+        description: |
+          ITAR systems should be segmented from non-ITAR systems.
+          Defense-in-depth approach required.
+        agents: [guardian, architect]
+        finding_patterns:
+          - "GUARDIAN-026"  # Network segmentation gaps
+          - "ARCHITECT-010" # Segmentation design
+          
+      - id: "HI-4"
+        title: "Physical Security"
+        description: |
+          Physical access to ITAR data centers/servers must be restricted
+          to US Persons with need-to-know.
+        agents: [operator]
+        finding_patterns:
+          - "OPERATOR-017"  # Physical security gaps
+          
+      - id: "HI-5"
+        title: "Disaster Recovery Location"
+        description: |
+          DR sites must also be in the US with same ITAR controls.
+          Failover must not route data through foreign infrastructure.
+        agents: [operator]
+        finding_patterns:
+          - "OPERATOR-018"  # DR location issues
+
+  # --------------------------------------------------------------------------
+  # THIRD PARTY & SUPPLY CHAIN (TP) - 3 Controls
+  # --------------------------------------------------------------------------
+  - id: TP
+    name: "Third Party & Supply Chain"
+    description: |
+      Subcontractors and third parties with ITAR data access must meet
+      the same compliance requirements.
+    control_count: 3
+    
+    controls:
+      - id: "TP-1"
+        title: "Subcontractor Flow-Down"
+        description: |
+          ITAR requirements must flow down to all subcontractors with
+          access to technical data. Include in contracts.
+        agents: [herald, architect]
+        finding_patterns:
+          - "HERALD-009"  # Contract documentation
+          - "ARCHITECT-011" # Integration design
+          
+      - id: "TP-2"
+        title: "Third-Party Access Verification"
+        description: |
+          Verify US Person status of third-party personnel before
+          granting access to ITAR data.
+        agents: [guardian]
+        finding_patterns:
+          - "GUARDIAN-027"  # Third-party access gaps
+          
+      - id: "TP-3"
+        title: "Supply Chain Security"
+        description: |
+          Verify that software dependencies and tools do not compromise
+          ITAR data (no foreign-controlled components with data access).
+        agents: [guardian, architect]
+        finding_patterns:
+          - "GUARDIAN-028"  # Dependency risks
+          - "ARCHITECT-012" # Supply chain design
+
+  # --------------------------------------------------------------------------
+  # TRAINING & AWARENESS (TA) - 2 Controls
+  # --------------------------------------------------------------------------
+  - id: TA
+    name: "Training & Awareness"
+    description: |
+      Personnel with ITAR data access must receive appropriate training
+      on export control requirements.
+    control_count: 2
+    
+    controls:
+      - id: "TA-1"
+        title: "ITAR Awareness Training"
+        description: |
+          All personnel with ITAR data access must complete export control
+          training. Document completion and refresh annually.
+        agents: [herald]
+        finding_patterns:
+          - "HERALD-010"  # Training documentation
+        evidence_required:
+          - "Training completion records"
+          - "Training content/curriculum"
+          - "Acknowledgment forms"
+          
+      - id: "TA-2"
+        title: "Developer Security Training"
+        description: |
+          Developers working on ITAR software must understand secure coding
+          practices specific to export-controlled projects.
+        agents: [sentinel, herald]
+        finding_patterns:
+          - "SENTINEL-006"  # Developer training gaps
+          - "HERALD-011"    # Training materials
+
+# ============================================================================
+# SEVERITY MAPPING
+# ============================================================================
+
+severity_mapping:
+  blocker:
+    description: "Potential ITAR violation that could result in enforcement action"
+    examples:
+      - "Foreign national access to technical data"
+      - "ITAR data stored in foreign data center"
+      - "Missing export control markings on technical data"
+      - "Unencrypted ITAR data transmission"
+    action: "Immediate remediation required. Consider voluntary disclosure."
+    
+  high:
+    description: "Significant compliance gap requiring urgent attention"
+    examples:
+      - "Missing access logging"
+      - "Inadequate US Person verification"
+      - "Weak encryption algorithms"
+    action: "Remediate within 30 days"
+    
+  medium:
+    description: "Compliance weakness that should be addressed"
+    examples:
+      - "Incomplete audit trails"
+      - "Missing training documentation"
+      - "Access review delays"
+    action: "Remediate within 90 days"
+    
+  low:
+    description: "Minor finding or improvement opportunity"
+    examples:
+      - "Documentation formatting"
+      - "Process efficiency improvements"
+    action: "Address in normal development cycle"
+
+# ============================================================================
+# AGENT RESPONSIBILITIES
+# ============================================================================
+
+agent_responsibilities:
+  guardian:
+    primary_domains: [AC, EN, AU]
+    description: "Access control, encryption, and security audit"
+    control_count: 28
+    
+  architect:
+    primary_domains: [AC, DC, HI, TP]
+    description: "System design, data classification, infrastructure"
+    control_count: 15
+    
+  sentinel:
+    primary_domains: [AU, TA]
+    description: "Testing, validation, and training verification"
+    control_count: 8
+    
+  operator:
+    primary_domains: [EN, AU, HI]
+    description: "Operations, hosting, and continuity"
+    control_count: 18
+    
+  herald:
+    primary_domains: [DC, TP, TA]
+    description: "Documentation, markings, and training records"
+    control_count: 12
+    
+  navigator:
+    primary_domains: []
+    description: "Limited ITAR applicability (UX rarely involves technical data)"
+    control_count: 0
+
+# ============================================================================
+# EXEMPTIONS & LICENSES
+# ============================================================================
+
+exemptions:
+  - id: "public_domain"
+    name: "Public Domain Exclusion"
+    reference: "22 CFR 120.11"
+    description: "Information in the public domain is not subject to ITAR"
+    
+  - id: "fundamental_research"
+    name: "Fundamental Research Exclusion"
+    reference: "22 CFR 120.11(a)(8)"
+    description: "Basic research at accredited institutions"
+    
+  - id: "canadian_exemption"
+    name: "Canadian Exemption"
+    reference: "22 CFR 126.5"
+    description: "Limited exemptions for Canadian persons/facilities"
+
+licenses:
+  - id: "dsp_5"
+    name: "DSP-5 Export License"
+    description: "Permanent export of defense articles"
+    
+  - id: "taa"
+    name: "Technical Assistance Agreement"
+    description: "Defense services or technical data to foreign persons"
+    
+  - id: "mla"
+    name: "Manufacturing License Agreement"
+    description: "Foreign manufacture of defense articles"
+
+# ============================================================================
+# COMPLIANCE CHECKLIST (Quick Reference)
+# ============================================================================
+
+quick_checklist:
+  - "☐ All ITAR data identified and inventoried"
+  - "☐ Export control markings applied to all technical data"
+  - "☐ US Person verification process implemented"
+  - "☐ Access controls restrict to authorized US Persons"
+  - "☐ MFA enabled for ITAR system access"
+  - "☐ Data encrypted at rest (FIPS 140-2/3)"
+  - "☐ Data encrypted in transit (TLS 1.2+)"
+  - "☐ Hosting in US-based, ITAR-compliant infrastructure"
+  - "☐ Audit logging enabled for all access"
+  - "☐ Log retention meets 5-year minimum"
+  - "☐ Subcontractor flow-down clauses in contracts"
+  - "☐ Personnel trained on export control requirements"
+  - "☐ Violation reporting procedure documented"
+  - "☐ Periodic access reviews scheduled"

@@ -1,0 +1,154 @@
+"""Compliance report generation.
+
+Port of Export-ComplianceReport from mapping-engine.ps1.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from ..models.compliance import ComplianceMapping
+
+
+def _md_safe(text: str) -> str:
+    """Escape pipe characters for markdown tables."""
+    if not text:
+        return ""
+    return text.replace("|", r"\|")
+
+
+def export_compliance_report(
+    mapping: ComplianceMapping,
+    output_path: Path,
+    project_name: str = "Project",
+) -> str:
+    """Generate a markdown compliance mapping report.
+
+    Returns the output path as string.
+    """
+    lines: list[str] = []
+
+    # Header
+    lines.append("# Compliance Mapping Report")
+    lines.append("")
+    lines.append(f"**Standard:** {mapping.standard_name}")
+    lines.append(f"**Project:** {project_name}")
+    lines.append(f"**Generated:** {mapping.timestamp}")
+
+    # Verdict
+    if mapping.critical_gaps:
+        verdict = "CRITICAL GAPS"
+    elif mapping.coverage_percent < 50:
+        verdict = "LOW COVERAGE"
+    elif mapping.coverage_percent < 80:
+        verdict = "PARTIAL COVERAGE"
+    else:
+        verdict = "GOOD COVERAGE"
+
+    lines.append(f"**Verdict:** {verdict}")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # Executive Summary
+    lines.append("## Executive Summary")
+    lines.append("")
+    lines.append("| Metric | Value |")
+    lines.append("|--------|-------|")
+    lines.append(f"| Total Controls | {mapping.total_controls} |")
+    lines.append(f"| Controls Addressed | {mapping.addressed_controls} |")
+    lines.append(f"| Gaps Identified | {mapping.gapped_controls} |")
+    lines.append(f"| Critical Gaps | {len(mapping.critical_gaps)} |")
+    lines.append(f"| Coverage | {mapping.coverage_percent}% |")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # Coverage by Domain
+    lines.append("## Coverage by Domain")
+    lines.append("")
+    lines.append("| Domain | Controls | Addressed | Gaps | Coverage |")
+    lines.append("|--------|----------|-----------|------|----------|")
+
+    for domain_id in sorted(mapping.by_domain):
+        d = mapping.by_domain[domain_id]
+        name = _md_safe(d.name)
+        lines.append(
+            f"| {name} ({domain_id}) | {d.total} | {d.addressed} | {d.gaps} | {d.coverage}% |"
+        )
+
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # Mapped Findings
+    lines.append("## Mapped Findings")
+    lines.append("")
+
+    if not mapping.mapped_findings:
+        lines.append("*No findings were mapped to controls.*")
+    else:
+        lines.append("| Finding | Severity | Controls Addressed |")
+        lines.append("|---------|----------|-------------------|")
+        for mf in mapping.mapped_findings:
+            title = _md_safe(mf.finding_title)
+            ctrl_ids = ", ".join(mf.control_ids)
+            lines.append(f"| {mf.finding_id}: {title} | {mf.finding_severity} | {ctrl_ids} |")
+
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # Gap Analysis
+    lines.append("## Gap Analysis")
+    lines.append("")
+
+    if mapping.critical_gaps:
+        lines.append("### Critical Gaps (Must Address)")
+        lines.append("")
+        for gap in mapping.critical_gaps:
+            agents = ", ".join(a.upper() for a in gap.agents) if gap.agents else "N/A"
+            lines.append(f"- **{gap.id}** - {gap.title}")
+            lines.append(f"  - Domain: {gap.domain_name}")
+            lines.append(f"  - Recommended agents: {agents}")
+            lines.append("")
+
+    if mapping.gaps:
+        lines.append(f"### All Gaps ({len(mapping.gaps)} total)")
+        lines.append("")
+        lines.append("<details>")
+        lines.append("<summary>View all gaps...</summary>")
+        lines.append("")
+        lines.append("| Control | Title | Domain | Agents |")
+        lines.append("|---------|-------|--------|--------|")
+        for gap in mapping.gaps:
+            agents = ", ".join(a.upper() for a in gap.agents) if gap.agents else "-"
+            critical_mark = " **" if gap.critical else ""
+            title = _md_safe(gap.title)
+            domain = _md_safe(gap.domain_name)
+            lines.append(f"| {gap.id}{critical_mark} | {title} | {domain} | {agents} |")
+        lines.append("")
+        lines.append("</details>")
+    else:
+        lines.append("*No gaps identified - all controls are addressed!*")
+
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # Next Steps
+    lines.append("## Next Steps")
+    lines.append("")
+    lines.append("1. Address critical gaps first (if any)")
+    lines.append(f"2. Run targeted agent reviews with `-Standard {mapping.standard_id}` flag")
+    lines.append("3. Document gap remediation in your compliance documentation")
+    lines.append("4. Re-run mapping to verify improved coverage")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+    lines.append("*Generated by Code Conclave Compliance Engine*")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text("\n".join(lines), encoding="utf-8")
+
+    return str(output_path)

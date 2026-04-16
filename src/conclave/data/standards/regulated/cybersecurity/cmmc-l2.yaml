@@ -1,0 +1,753 @@
+# ============================================================================
+# Code Conclave Compliance Pack: CMMC Level 2
+# ============================================================================
+# Standard: Cybersecurity Maturity Model Certification (CMMC) 2.0 Level 2
+# Based on: NIST SP 800-171 Revision 2 (110 controls, 320 assessment objectives)
+# Version: 1.0.0
+# Last Updated: 2026-02-02
+# Author: BLB3D / Code Conclave
+# License: Proprietary - Requires Code Conclave Compliance Pack License
+# ============================================================================
+
+id: cmmc-l2
+name: "CMMC 2.0 Level 2 (Advanced)"
+version: "1.0.0"
+domain: cybersecurity
+description: |
+  CMMC Level 2 aligns with NIST SP 800-171 Rev 2 and is required for contractors 
+  handling Controlled Unclassified Information (CUI) for the Department of Defense.
+  This pack maps Code Conclave findings to the 110 security controls across 14 domains.
+
+applicability:
+  industries:
+    - defense
+    - aerospace
+    - government_contractors
+  data_types:
+    - cui  # Controlled Unclassified Information
+    - cdi  # Covered Defense Information
+    - cti  # Controlled Technical Information
+    - itar # International Traffic in Arms Regulations
+  
+references:
+  - name: "NIST SP 800-171 Rev 2"
+    url: "https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final"
+  - name: "CMMC Assessment Guide Level 2"
+    url: "https://dodcio.defense.gov/CMMC/Documentation/"
+  - name: "32 CFR Part 170"
+    url: "https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-M/part-170"
+
+# ============================================================================
+# CONTROL FAMILIES (14 Domains, 110 Controls)
+# ============================================================================
+
+domains:
+  # --------------------------------------------------------------------------
+  # ACCESS CONTROL (AC) - 22 Controls
+  # --------------------------------------------------------------------------
+  - id: AC
+    name: "Access Control"
+    control_count: 22
+    controls:
+      - id: "3.1.1"
+        title: "Limit system access to authorized users"
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-*", "ARCHITECT-005"]
+        
+      - id: "3.1.2"
+        title: "Limit system access to authorized transactions"
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-003", "ARCHITECT-006"]
+        
+      - id: "3.1.3"
+        title: "Control CUI flow"
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-004", "ARCHITECT-007"]
+        
+      - id: "3.1.4"
+        title: "Separation of duties"
+        agents: [architect]
+        finding_patterns: ["ARCHITECT-008"]
+        
+      - id: "3.1.5"
+        title: "Least privilege"
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-005", "ARCHITECT-009"]
+        
+      - id: "3.1.6"
+        title: "Non-privileged access for non-security functions"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-006"]
+        
+      - id: "3.1.7"
+        title: "Prevent non-privileged execution of privileged functions"
+        agents: [guardian, sentinel]
+        finding_patterns: ["GUARDIAN-007", "SENTINEL-005"]
+        
+      - id: "3.1.8"
+        title: "Limit unsuccessful logon attempts"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-008"]
+        
+      - id: "3.1.9"
+        title: "Privacy and security notices"
+        agents: [herald]
+        finding_patterns: ["HERALD-001"]
+        
+      - id: "3.1.10"
+        title: "Session lock"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-009"]
+        
+      - id: "3.1.11"
+        title: "Session termination"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-010"]
+        
+      - id: "3.1.12"
+        title: "Monitor remote access"
+        agents: [guardian, sentinel]
+        finding_patterns: ["GUARDIAN-011", "SENTINEL-006"]
+        
+      - id: "3.1.13"
+        title: "Encrypt remote access"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-012"]
+        
+      - id: "3.1.14"
+        title: "Route remote access via managed access points"
+        agents: [architect]
+        finding_patterns: ["ARCHITECT-010"]
+        
+      - id: "3.1.15"
+        title: "Authorize privileged remote commands"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-013"]
+        
+      - id: "3.1.16"
+        title: "Authorize wireless access"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-014"]
+        
+      - id: "3.1.17"
+        title: "Protect wireless access"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-015"]
+        
+      - id: "3.1.18"
+        title: "Control mobile devices"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-016"]
+        
+      - id: "3.1.19"
+        title: "Encrypt CUI on mobile devices"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-017"]
+        
+      - id: "3.1.20"
+        title: "Verify external systems"
+        agents: [architect, guardian]
+        finding_patterns: ["ARCHITECT-011", "GUARDIAN-018"]
+        
+      - id: "3.1.21"
+        title: "Limit portable storage"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-019"]
+        
+      - id: "3.1.22"
+        title: "Control publicly accessible content"
+        agents: [guardian, herald]
+        finding_patterns: ["GUARDIAN-020", "HERALD-002"]
+
+  # --------------------------------------------------------------------------
+  # AWARENESS AND TRAINING (AT) - 3 Controls
+  # --------------------------------------------------------------------------
+  - id: AT
+    name: "Awareness and Training"
+    control_count: 3
+    controls:
+      - id: "3.2.1"
+        title: "Security awareness"
+        agents: [herald]
+        finding_patterns: ["HERALD-003"]
+        
+      - id: "3.2.2"
+        title: "Role-based training"
+        agents: [herald]
+        finding_patterns: ["HERALD-004"]
+        
+      - id: "3.2.3"
+        title: "Insider threat awareness"
+        agents: [herald]
+        finding_patterns: ["HERALD-005"]
+
+  # --------------------------------------------------------------------------
+  # AUDIT AND ACCOUNTABILITY (AU) - 9 Controls
+  # --------------------------------------------------------------------------
+  - id: AU
+    name: "Audit and Accountability"
+    control_count: 9
+    controls:
+      - id: "3.3.1"
+        title: "Create audit logs"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-001", "SENTINEL-002"]
+        critical: true
+        
+      - id: "3.3.2"
+        title: "User accountability"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-003"]
+        
+      - id: "3.3.3"
+        title: "Review logged events"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-004"]
+        
+      - id: "3.3.4"
+        title: "Audit process failure alerts"
+        agents: [sentinel, operator]
+        finding_patterns: ["SENTINEL-007", "OPERATOR-001"]
+        
+      - id: "3.3.5"
+        title: "Correlate audit records"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-008"]
+        
+      - id: "3.3.6"
+        title: "Audit reduction and reporting"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-009"]
+        
+      - id: "3.3.7"
+        title: "Authoritative time source"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-002"]
+        
+      - id: "3.3.8"
+        title: "Protect audit information"
+        agents: [guardian, sentinel]
+        finding_patterns: ["GUARDIAN-021", "SENTINEL-010"]
+        
+      - id: "3.3.9"
+        title: "Limit audit management"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-022"]
+
+  # --------------------------------------------------------------------------
+  # CONFIGURATION MANAGEMENT (CM) - 9 Controls
+  # --------------------------------------------------------------------------
+  - id: CM
+    name: "Configuration Management"
+    control_count: 9
+    controls:
+      - id: "3.4.1"
+        title: "Baseline configurations"
+        agents: [architect, operator]
+        finding_patterns: ["ARCHITECT-001", "OPERATOR-003"]
+        
+      - id: "3.4.2"
+        title: "Security configuration settings"
+        agents: [architect, guardian]
+        finding_patterns: ["ARCHITECT-002", "GUARDIAN-023"]
+        
+      - id: "3.4.3"
+        title: "Configuration change control"
+        agents: [architect]
+        finding_patterns: ["ARCHITECT-003"]
+        
+      - id: "3.4.4"
+        title: "Security impact analysis"
+        agents: [architect]
+        finding_patterns: ["ARCHITECT-004"]
+        
+      - id: "3.4.5"
+        title: "Access restrictions for change"
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-024", "ARCHITECT-012"]
+        
+      - id: "3.4.6"
+        title: "Least functionality"
+        agents: [architect, operator]
+        finding_patterns: ["ARCHITECT-013", "OPERATOR-004"]
+        
+      - id: "3.4.7"
+        title: "Restrict nonessential programs"
+        agents: [architect, guardian]
+        finding_patterns: ["ARCHITECT-014", "GUARDIAN-025"]
+        
+      - id: "3.4.8"
+        title: "Application whitelisting/blacklisting"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-026"]
+        
+      - id: "3.4.9"
+        title: "User-installed software"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-027"]
+
+  # --------------------------------------------------------------------------
+  # IDENTIFICATION AND AUTHENTICATION (IA) - 11 Controls
+  # --------------------------------------------------------------------------
+  - id: IA
+    name: "Identification and Authentication"
+    control_count: 11
+    controls:
+      - id: "3.5.1"
+        title: "Identify users and devices"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-028"]
+        
+      - id: "3.5.2"
+        title: "Authenticate users and devices"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-029"]
+        
+      - id: "3.5.3"
+        title: "Multifactor authentication"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-030"]
+        critical: true
+        
+      - id: "3.5.4"
+        title: "Replay-resistant authentication"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-031"]
+        
+      - id: "3.5.5"
+        title: "Identifier reuse"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-032"]
+        
+      - id: "3.5.6"
+        title: "Identifier inactivity"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-033"]
+        
+      - id: "3.5.7"
+        title: "Password complexity"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-034"]
+        
+      - id: "3.5.8"
+        title: "Password reuse"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-035"]
+        
+      - id: "3.5.9"
+        title: "Temporary passwords"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-036"]
+        
+      - id: "3.5.10"
+        title: "Cryptographically-protected passwords"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-001", "GUARDIAN-037"]
+        critical: true
+        
+      - id: "3.5.11"
+        title: "Obscure authentication feedback"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-038"]
+
+  # --------------------------------------------------------------------------
+  # INCIDENT RESPONSE (IR) - 3 Controls
+  # --------------------------------------------------------------------------
+  - id: IR
+    name: "Incident Response"
+    control_count: 3
+    controls:
+      - id: "3.6.1"
+        title: "Incident handling capability"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-005"]
+        
+      - id: "3.6.2"
+        title: "Track and report incidents"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-006"]
+        
+      - id: "3.6.3"
+        title: "Test incident response"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-007"]
+
+  # --------------------------------------------------------------------------
+  # MAINTENANCE (MA) - 6 Controls
+  # --------------------------------------------------------------------------
+  - id: MA
+    name: "Maintenance"
+    control_count: 6
+    controls:
+      - id: "3.7.1"
+        title: "Perform system maintenance"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-008"]
+        
+      - id: "3.7.2"
+        title: "Control maintenance tools"
+        agents: [guardian, operator]
+        finding_patterns: ["GUARDIAN-039", "OPERATOR-009"]
+        
+      - id: "3.7.3"
+        title: "Sanitize equipment for off-site maintenance"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-040"]
+        
+      - id: "3.7.4"
+        title: "Check maintenance media"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-041"]
+        
+      - id: "3.7.5"
+        title: "Nonlocal maintenance"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-042"]
+        
+      - id: "3.7.6"
+        title: "Supervise maintenance personnel"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-043"]
+
+  # --------------------------------------------------------------------------
+  # MEDIA PROTECTION (MP) - 9 Controls
+  # --------------------------------------------------------------------------
+  - id: MP
+    name: "Media Protection"
+    control_count: 9
+    controls:
+      - id: "3.8.1"
+        title: "Protect system media"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-044"]
+        
+      - id: "3.8.2"
+        title: "Limit media access"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-045"]
+        
+      - id: "3.8.3"
+        title: "Sanitize media"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-046"]
+        
+      - id: "3.8.4"
+        title: "Mark media"
+        agents: [herald]
+        finding_patterns: ["HERALD-006"]
+        
+      - id: "3.8.5"
+        title: "Control media transport"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-047"]
+        
+      - id: "3.8.6"
+        title: "Encrypt portable media"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-048"]
+        
+      - id: "3.8.7"
+        title: "Control removable media"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-049"]
+        
+      - id: "3.8.8"
+        title: "Prohibit unidentified portable storage"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-050"]
+        
+      - id: "3.8.9"
+        title: "Protect backup CUI"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-051"]
+
+  # --------------------------------------------------------------------------
+  # PERSONNEL SECURITY (PS) - 2 Controls
+  # --------------------------------------------------------------------------
+  - id: PS
+    name: "Personnel Security"
+    control_count: 2
+    controls:
+      - id: "3.9.1"
+        title: "Screen individuals"
+        agents: [herald]
+        finding_patterns: ["HERALD-007"]
+        
+      - id: "3.9.2"
+        title: "Protect CUI during personnel actions"
+        agents: [guardian, operator]
+        finding_patterns: ["GUARDIAN-052", "OPERATOR-010"]
+
+  # --------------------------------------------------------------------------
+  # PHYSICAL PROTECTION (PE) - 6 Controls
+  # --------------------------------------------------------------------------
+  - id: PE
+    name: "Physical Protection"
+    control_count: 6
+    controls:
+      - id: "3.10.1"
+        title: "Limit physical access"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-053"]
+        
+      - id: "3.10.2"
+        title: "Protect physical facility"
+        agents: [guardian, operator]
+        finding_patterns: ["GUARDIAN-054", "OPERATOR-011"]
+        
+      - id: "3.10.3"
+        title: "Escort visitors"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-055"]
+        
+      - id: "3.10.4"
+        title: "Maintain physical access logs"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-011"]
+        
+      - id: "3.10.5"
+        title: "Control physical access devices"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-056"]
+        
+      - id: "3.10.6"
+        title: "Alternate work sites"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-057"]
+
+  # --------------------------------------------------------------------------
+  # RISK ASSESSMENT (RA) - 3 Controls
+  # --------------------------------------------------------------------------
+  - id: RA
+    name: "Risk Assessment"
+    control_count: 3
+    controls:
+      - id: "3.11.1"
+        title: "Risk assessments"
+        agents: [architect]
+        finding_patterns: ["ARCHITECT-015"]
+        
+      - id: "3.11.2"
+        title: "Vulnerability scanning"
+        agents: [sentinel, operator]
+        finding_patterns: ["SENTINEL-012", "OPERATOR-012"]
+        
+      - id: "3.11.3"
+        title: "Vulnerability remediation"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-013"]
+
+  # --------------------------------------------------------------------------
+  # SECURITY ASSESSMENT (CA) - 4 Controls
+  # --------------------------------------------------------------------------
+  - id: CA
+    name: "Security Assessment"
+    control_count: 4
+    controls:
+      - id: "3.12.1"
+        title: "Security controls assessment"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-013"]
+        
+      - id: "3.12.2"
+        title: "Plan of action"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-014"]
+        
+      - id: "3.12.3"
+        title: "Monitor security controls"
+        agents: [sentinel, operator]
+        finding_patterns: ["SENTINEL-014", "OPERATOR-015"]
+        
+      - id: "3.12.4"
+        title: "System security plan"
+        agents: [architect, herald]
+        finding_patterns: ["ARCHITECT-016", "HERALD-008"]
+
+  # --------------------------------------------------------------------------
+  # SYSTEM AND COMMUNICATIONS PROTECTION (SC) - 16 Controls
+  # --------------------------------------------------------------------------
+  - id: SC
+    name: "System and Communications Protection"
+    control_count: 16
+    controls:
+      - id: "3.13.1"
+        title: "Boundary protection"
+        agents: [architect, guardian]
+        finding_patterns: ["ARCHITECT-017", "GUARDIAN-058"]
+        
+      - id: "3.13.2"
+        title: "Security architecture"
+        agents: [architect]
+        finding_patterns: ["ARCHITECT-018"]
+        
+      - id: "3.13.3"
+        title: "Role separation"
+        agents: [architect]
+        finding_patterns: ["ARCHITECT-019"]
+        
+      - id: "3.13.4"
+        title: "Prevent unauthorized transfer"
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-059", "ARCHITECT-020"]
+        
+      - id: "3.13.5"
+        title: "Publicly accessible system separation"
+        agents: [architect]
+        finding_patterns: ["ARCHITECT-021"]
+        
+      - id: "3.13.6"
+        title: "Deny by default"
+        agents: [guardian, architect]
+        finding_patterns: ["GUARDIAN-060", "ARCHITECT-022"]
+        
+      - id: "3.13.7"
+        title: "Prevent split tunneling"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-061"]
+        
+      - id: "3.13.8"
+        title: "Encrypt CUI in transit"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-062"]
+        
+      - id: "3.13.9"
+        title: "Terminate network connections"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-063"]
+        
+      - id: "3.13.10"
+        title: "Cryptographic key management"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-064"]
+        
+      - id: "3.13.11"
+        title: "FIPS-validated cryptography"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-065"]
+        critical: true
+        
+      - id: "3.13.12"
+        title: "Prohibit remote activation"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-066"]
+        
+      - id: "3.13.13"
+        title: "Control mobile code"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-067"]
+        
+      - id: "3.13.14"
+        title: "Control VoIP"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-068"]
+        
+      - id: "3.13.15"
+        title: "Protect communications authenticity"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-069"]
+        
+      - id: "3.13.16"
+        title: "Protect CUI at rest"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-070"]
+
+  # --------------------------------------------------------------------------
+  # SYSTEM AND INFORMATION INTEGRITY (SI) - 7 Controls
+  # --------------------------------------------------------------------------
+  - id: SI
+    name: "System and Information Integrity"
+    control_count: 7
+    controls:
+      - id: "3.14.1"
+        title: "Flaw remediation"
+        agents: [operator, sentinel]
+        finding_patterns: ["OPERATOR-016", "SENTINEL-015"]
+        
+      - id: "3.14.2"
+        title: "Malicious code protection"
+        agents: [guardian]
+        finding_patterns: ["GUARDIAN-071"]
+        
+      - id: "3.14.3"
+        title: "Monitor security alerts"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-017"]
+        
+      - id: "3.14.4"
+        title: "Update malicious code protection"
+        agents: [operator]
+        finding_patterns: ["OPERATOR-018"]
+        
+      - id: "3.14.5"
+        title: "System and file scanning"
+        agents: [guardian, operator]
+        finding_patterns: ["GUARDIAN-072", "OPERATOR-019"]
+        
+      - id: "3.14.6"
+        title: "Monitor inbound/outbound communications"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-016"]
+        
+      - id: "3.14.7"
+        title: "Identify unauthorized use"
+        agents: [sentinel]
+        finding_patterns: ["SENTINEL-017"]
+
+# ============================================================================
+# FINDING-TO-CONTROL MAPPINGS
+# ============================================================================
+
+mappings:
+  # Critical findings
+  GUARDIAN-001:
+    title: "Secrets in Source Control"
+    controls: ["3.5.10", "3.13.8"]
+    severity: critical
+    
+  GUARDIAN-002:
+    title: "Hardcoded Credentials"
+    controls: ["3.5.10", "3.4.2"]
+    severity: critical
+    
+  GUARDIAN-003:
+    title: "Missing Authentication"
+    controls: ["3.1.1", "3.1.2", "3.5.2"]
+    severity: high
+    
+  # Architecture findings
+  ARCHITECT-001:
+    title: "Missing Documentation"
+    controls: ["3.12.4", "3.4.1"]
+    severity: medium
+    
+  ARCHITECT-002:
+    title: "Technical Debt"
+    controls: ["3.4.1", "3.14.1"]
+    severity: low
+    
+  # Audit findings
+  SENTINEL-001:
+    title: "Insufficient Logging"
+    controls: ["3.3.1", "3.3.2"]
+    severity: high
+    
+  SENTINEL-002:
+    title: "Missing Test Coverage"
+    controls: ["3.12.1", "3.14.1"]
+    severity: medium
+
+# ============================================================================
+# SCORING
+# ============================================================================
+
+scoring:
+  total_controls: 110
+  minimum_score: 88  # 80% for conditional compliance
+  perfect_score: 110
+  
+  critical_controls:
+    - "3.5.3"   # MFA
+    - "3.5.10"  # Password protection
+    - "3.13.11" # FIPS crypto
+    - "3.3.1"   # Audit logging

@@ -1,0 +1,1833 @@
+# FDA 21 CFR Part 820 - Quality System Regulation (QSR)
+# Code Conclave Compliance Pack
+# Medical Device Current Good Manufacturing Practice (cGMP)
+#
+# Authority: Federal Food, Drug, and Cosmetic Act Section 520(f)
+# Effective: October 7, 1996 (61 FR 52654)
+# Note: Transitioning to QMSR (ISO 13485 harmonization) effective Feb 2, 2026
+#
+# Scope: All finished medical devices intended for human use
+# - Class I (limited design controls per 820.30(a)(2))
+# - Class II (full requirements)
+# - Class III (full requirements)
+
+id: fda-820-qsr
+name: FDA 21 CFR Part 820 - Quality System Regulation
+version: "1.0.0"
+type: regulatory
+authority: FDA
+jurisdiction: United States
+effective_date: "1996-10-07"
+last_updated: "2024-02-02"
+transition_note: "QMSR incorporating ISO 13485:2016 effective Feb 2, 2026"
+
+description: |
+  FDA's Quality System Regulation establishes current good manufacturing 
+  practice (cGMP) requirements for medical device manufacturers. Part 820 
+  governs the methods, facilities, and controls used for the design, 
+  manufacture, packaging, labeling, storage, installation, and servicing 
+  of all finished devices intended for human use.
+
+applicability:
+  industries:
+    - medical_devices
+    - in_vitro_diagnostics
+    - combination_products
+  organizations:
+    - device_manufacturers
+    - contract_manufacturers
+    - specification_developers
+    - reprocessors
+    - relabelers
+    - initial_distributors
+  device_classes:
+    - class_i_limited    # Design controls for specific devices only
+    - class_ii           # Full QSR requirements
+    - class_iii          # Full QSR requirements
+  excluded:
+    - blood_components   # Subject to 21 CFR Part 606
+    - human_cells_tissues # Subject to 21 CFR Part 1271
+
+# =============================================================================
+# SUBPARTS AND REQUIREMENTS
+# =============================================================================
+
+subparts:
+  # ---------------------------------------------------------------------------
+  # SUBPART A - GENERAL PROVISIONS
+  # ---------------------------------------------------------------------------
+  - id: A
+    name: "General Provisions"
+    description: "Scope, definitions, and quality system requirements"
+    sections:
+      - id: "820.1"
+        title: "Scope"
+        subsections:
+          - id: "820.1(a)"
+            title: "Applicability"
+            requirement: |
+              cGMP requirements govern methods, facilities, and controls used for 
+              design, manufacture, packaging, labeling, storage, installation, and 
+              servicing of all finished devices intended for human use.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-*"]
+            critical: false
+            
+          - id: "820.1(b)"
+            title: "Limitations"
+            requirement: |
+              Manufacturers engaging in only some operations need only comply with 
+              requirements applicable to their operations.
+            agents: [architect]
+            finding_patterns: []
+            critical: false
+            
+          - id: "820.1(c)"
+            title: "Authority"
+            requirement: |
+              Failure to comply renders device adulterated under section 501(h) of 
+              the FD&C Act, subjecting device and responsible persons to regulatory action.
+            agents: [architect]
+            finding_patterns: []
+            critical: true
+            
+          - id: "820.1(d)"
+            title: "Foreign manufacturers"
+            requirement: |
+              Foreign manufacturers refusing FDA inspection appear non-compliant 
+              for purposes of section 801(a) of the act.
+            agents: [architect]
+            finding_patterns: []
+            critical: false
+
+      - id: "820.3"
+        title: "Definitions"
+        requirement: |
+          Establishes definitions for key terms including: complaint, component, 
+          design history file (DHF), design input, design output, design review, 
+          device history record (DHR), device master record (DMR), finished device, 
+          management representative, manufacturer, nonconformity, product, 
+          quality audit, quality policy, quality system, remanufacturer, 
+          specification, validation, verification.
+        agents: [herald, architect]
+        finding_patterns: ["HERALD-002"]
+        critical: false
+
+      - id: "820.5"
+        title: "Quality system"
+        requirement: |
+          Each manufacturer shall establish and maintain a quality system appropriate 
+          for the specific medical device(s) designed or manufactured, meeting the 
+          requirements of this part.
+        agents: [architect, sentinel]
+        finding_patterns: ["ARCHITECT-001", "ARCHITECT-002"]
+        critical: true
+
+  # ---------------------------------------------------------------------------
+  # SUBPART B - QUALITY SYSTEM REQUIREMENTS
+  # ---------------------------------------------------------------------------
+  - id: B
+    name: "Quality System Requirements"
+    description: "Management responsibility, quality audits, and personnel"
+    sections:
+      - id: "820.20"
+        title: "Management responsibility"
+        subsections:
+          - id: "820.20(a)"
+            title: "Quality policy"
+            requirement: |
+              Management with executive responsibility shall establish quality policy 
+              and objectives and ensure quality policy is understood, implemented, 
+              and maintained at all levels of the organization.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            evidence_types:
+              - quality_policy_document
+              - management_commitment_records
+              
+          - id: "820.20(b)"
+            title: "Organization"
+            requirement: |
+              Each manufacturer shall establish and maintain an adequate organizational 
+              structure to ensure devices are designed and produced in accordance with 
+              this part. Management shall appoint a management representative with 
+              authority and responsibility to ensure quality system requirements are 
+              effectively established and maintained.
+            agents: [architect]
+            finding_patterns: ["ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - organizational_chart
+              - management_representative_appointment
+              - responsibility_matrix
+              
+          - id: "820.20(c)"
+            title: "Management review"
+            requirement: |
+              Management with executive responsibility shall review the suitability 
+              and effectiveness of the quality system at defined intervals and with 
+              sufficient frequency to ensure the quality system satisfies requirements 
+              of this part and manufacturer's established quality policy and objectives.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - management_review_records
+              - review_schedule
+              - action_items
+              
+          - id: "820.20(d)"
+            title: "Quality planning"
+            requirement: |
+              Each manufacturer shall establish a quality plan defining quality 
+              practices, resources, and activities relevant to devices designed and 
+              manufactured.
+            agents: [architect]
+            finding_patterns: ["ARCHITECT-001", "ARCHITECT-002"]
+            critical: false
+            evidence_types:
+              - quality_plan
+              - resource_allocation_records
+              
+          - id: "820.20(e)"
+            title: "Quality system procedures"
+            requirement: |
+              Each manufacturer shall establish quality system procedures and 
+              instructions. An outline of the structure of documentation used 
+              in the quality system shall be established.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001", "HERALD-002"]
+            critical: true
+            evidence_types:
+              - quality_manual
+              - procedure_index
+              - document_hierarchy
+
+      - id: "820.22"
+        title: "Quality audits"
+        requirement: |
+          Each manufacturer shall establish procedures for quality audits and conduct 
+          such audits to assure the quality system is in compliance with established 
+          quality system requirements and to determine effectiveness of the quality 
+          system. Quality audits shall be conducted by individuals who do not have 
+          direct responsibility for the matters being audited. Corrective action(s) 
+          including re-audit of deficient matters shall be taken when necessary.
+        agents: [sentinel, architect]
+        finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+        critical: true
+        evidence_types:
+          - audit_schedule
+          - audit_reports
+          - auditor_qualifications
+          - corrective_action_records
+
+      - id: "820.25"
+        title: "Personnel"
+        subsections:
+          - id: "820.25(a)"
+            title: "General"
+            requirement: |
+              Each manufacturer shall have sufficient personnel with the necessary 
+              education, background, training, and experience to assure that all 
+              activities required by this part are correctly performed.
+            agents: [architect]
+            finding_patterns: ["ARCHITECT-001"]
+            critical: false
+            evidence_types:
+              - staffing_records
+              - job_descriptions
+              - qualification_records
+              
+          - id: "820.25(b)"
+            title: "Training"
+            requirement: |
+              Each manufacturer shall establish procedures for identifying training 
+              needs and ensure that all personnel are trained to adequately perform 
+              their assigned responsibilities. Training shall be documented.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-003", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - training_procedures
+              - training_records
+              - competency_assessments
+
+  # ---------------------------------------------------------------------------
+  # SUBPART C - DESIGN CONTROLS
+  # ---------------------------------------------------------------------------
+  - id: C
+    name: "Design Controls"
+    description: "Procedures to control device design and ensure design requirements are met"
+    applicability_note: |
+      Applies to all Class II and III devices. Class I devices subject to design 
+      controls only if: (1) automated with computer software, or (2) specifically 
+      listed in 820.30(a)(2)(ii).
+    sections:
+      - id: "820.30"
+        title: "Design controls"
+        subsections:
+          - id: "820.30(a)"
+            title: "General"
+            requirement: |
+              Each manufacturer of Class III or Class II device, and Class I devices 
+              listed in paragraph (a)(2), shall establish and maintain procedures to 
+              control the design of the device to ensure specified design requirements 
+              are met.
+            agents: [architect, guardian]
+            finding_patterns: ["ARCHITECT-001", "ARCHITECT-002"]
+            critical: true
+            class_i_devices_subject:
+              - "Devices automated with computer software"
+              - "Catheter, Tracheobronchial Suction (868.6810)"
+              - "Glove, Surgeon's (878.4460)"
+              - "Restraint, Protective (880.6760)"
+              - "System, Applicator, Radionuclide, Manual (892.5650)"
+              - "Source, Radionuclide Teletherapy (892.5740)"
+              
+          - id: "820.30(b)"
+            title: "Design and development planning"
+            requirement: |
+              Each manufacturer shall establish and maintain plans that describe or 
+              reference design and development activities and define responsibility 
+              for implementation. Plans shall identify and describe interfaces with 
+              different groups or activities that provide or result in input to design 
+              and development process. Plans shall be reviewed, updated, and approved 
+              as design and development evolves.
+            agents: [architect]
+            finding_patterns: ["ARCHITECT-001", "ARCHITECT-002"]
+            critical: true
+            evidence_types:
+              - design_development_plan
+              - interface_definitions
+              - responsibility_matrix
+              
+          - id: "820.30(c)"
+            title: "Design input"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures to ensure 
+              design requirements relating to a device are appropriate and address 
+              intended use of the device, including needs of user and patient. 
+              Procedures shall include mechanism for addressing incomplete, ambiguous, 
+              or conflicting requirements. Design input requirements shall be 
+              documented, reviewed, and approved by designated individual(s).
+            agents: [architect, navigator]
+            finding_patterns: ["ARCHITECT-001", "NAVIGATOR-001"]
+            critical: true
+            evidence_types:
+              - design_input_requirements
+              - user_needs_documentation
+              - approval_signatures
+              
+          - id: "820.30(d)"
+            title: "Design output"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for defining 
+              and documenting design output in terms that allow adequate evaluation 
+              of conformance to design input requirements. Design output procedures 
+              shall contain or reference acceptance criteria and ensure design outputs 
+              essential for proper functioning of device are identified. Design output 
+              shall be documented, reviewed, and approved before release.
+            agents: [architect, guardian]
+            finding_patterns: ["ARCHITECT-001", "ARCHITECT-002", "GUARDIAN-*"]
+            critical: true
+            evidence_types:
+              - design_output_documents
+              - acceptance_criteria
+              - approval_records
+              
+          - id: "820.30(e)"
+            title: "Design review"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures to ensure 
+              formal documented reviews of design results are planned and conducted 
+              at appropriate stages of device's design development. Procedures shall 
+              ensure participants include representatives of all functions concerned 
+              with design stage being reviewed and individual(s) who does not have 
+              direct responsibility for design stage being reviewed, as well as any 
+              specialists needed. Results of design review shall be documented in DHF.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - design_review_procedures
+              - review_meeting_minutes
+              - attendee_records
+              - action_items
+              
+          - id: "820.30(f)"
+            title: "Design verification"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for verifying 
+              device design. Design verification shall confirm that design output meets 
+              design input requirements. Results of design verification, including 
+              identification of design, method(s), date, and individual(s) performing 
+              verification, shall be documented in DHF.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-002"]
+            critical: true
+            evidence_types:
+              - verification_procedures
+              - verification_test_records
+              - traceability_matrix
+              
+          - id: "820.30(g)"
+            title: "Design validation"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for validating 
+              device design. Design validation shall be performed under defined 
+              operating conditions on initial production units, lots, or batches, or 
+              their equivalents. Design validation shall ensure devices conform to 
+              defined user needs and intended uses and shall include testing of 
+              production units under actual or simulated use conditions. Design 
+              validation shall include software validation and risk analysis, where 
+              appropriate. Results shall be documented in DHF.
+            agents: [architect, guardian, sentinel]
+            finding_patterns: ["ARCHITECT-001", "GUARDIAN-*", "SENTINEL-002"]
+            critical: true
+            evidence_types:
+              - validation_protocol
+              - validation_report
+              - software_validation_records
+              - risk_analysis
+              
+          - id: "820.30(h)"
+            title: "Design transfer"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures to ensure 
+              device design is correctly translated into production specifications.
+            agents: [architect, operator]
+            finding_patterns: ["ARCHITECT-001", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - transfer_procedures
+              - production_specifications
+              - manufacturing_instructions
+              
+          - id: "820.30(i)"
+            title: "Design changes"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for 
+              identification, documentation, validation or where appropriate 
+              verification, review, and approval of design changes before implementation.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - change_control_procedures
+              - change_orders
+              - impact_assessments
+              
+          - id: "820.30(j)"
+            title: "Design history file"
+            requirement: |
+              Each manufacturer shall establish and maintain a DHF for each type 
+              of device. The DHF shall contain or reference records necessary to 
+              demonstrate design was developed in accordance with approved design 
+              plan and requirements of this part.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: true
+            evidence_types:
+              - design_history_file
+              - design_plan
+              - verification_validation_records
+
+  # ---------------------------------------------------------------------------
+  # SUBPART D - DOCUMENT CONTROLS
+  # ---------------------------------------------------------------------------
+  - id: D
+    name: "Document Controls"
+    description: "Requirements for document approval and distribution"
+    sections:
+      - id: "820.40"
+        title: "Document controls"
+        subsections:
+          - id: "820.40(a)"
+            title: "Document approval and distribution"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures to control 
+              all documents required by this part. Procedures shall provide for: 
+              (1) review and approval of documents for adequacy prior to issuance, 
+              (2) document distribution to ensure current revision available at all 
+              locations where operations essential to device's effective functioning 
+              are performed.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "HERALD-002", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - document_control_procedure
+              - distribution_lists
+              - approval_records
+              
+          - id: "820.40(b)"
+            title: "Document changes"
+            requirement: |
+              Changes to documents shall be reviewed and approved by an individual(s) 
+              in same function or organization that performed original review and 
+              approval, unless specifically designated otherwise. Approved changes 
+              shall be communicated in a timely manner. Each manufacturer shall 
+              maintain records of changes to documents.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "HERALD-002"]
+            critical: true
+            evidence_types:
+              - change_records
+              - revision_history
+              - communication_records
+
+  # ---------------------------------------------------------------------------
+  # SUBPART E - PURCHASING CONTROLS
+  # ---------------------------------------------------------------------------
+  - id: E
+    name: "Purchasing Controls"
+    description: "Requirements for suppliers, contractors, and consultants"
+    sections:
+      - id: "820.50"
+        title: "Purchasing controls"
+        subsections:
+          - id: "820.50(a)"
+            title: "Evaluation of suppliers, contractors, and consultants"
+            requirement: |
+              Each manufacturer shall establish and maintain requirements, including 
+              quality requirements, that must be met by suppliers, contractors, and 
+              consultants. Each manufacturer shall: (1) evaluate and select potential 
+              suppliers, contractors, and consultants on basis of their ability to 
+              meet specified requirements, (2) define type and extent of control to 
+              be exercised over product, services, suppliers, contractors, and 
+              consultants based on evaluation results and risk.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-003", "SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - supplier_qualification_procedure
+              - approved_supplier_list
+              - supplier_audits
+              
+          - id: "820.50(b)"
+            title: "Purchasing data"
+            requirement: |
+              Each manufacturer shall establish and maintain data that clearly describe 
+              or reference specified requirements, including quality requirements, for 
+              purchased or otherwise received product and services.
+            agents: [architect, herald]
+            finding_patterns: ["ARCHITECT-001", "HERALD-001"]
+            critical: false
+            evidence_types:
+              - purchase_orders
+              - specifications
+              - quality_agreements
+
+  # ---------------------------------------------------------------------------
+  # SUBPART F - IDENTIFICATION AND TRACEABILITY
+  # ---------------------------------------------------------------------------
+  - id: F
+    name: "Identification and Traceability"
+    description: "Product identification and traceability requirements"
+    sections:
+      - id: "820.60"
+        title: "Identification"
+        requirement: |
+          Each manufacturer shall establish and maintain procedures for identifying 
+          product during all stages of receipt, production, distribution, and 
+          installation to prevent mixups.
+        agents: [operator, sentinel]
+        finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+        critical: true
+        evidence_types:
+          - identification_procedures
+          - labeling_records
+          - lot_batch_records
+
+      - id: "820.65"
+        title: "Traceability"
+        requirement: |
+          Each manufacturer of a device that is intended for surgical implant into 
+          the body or to support or sustain life and whose failure to perform when 
+          properly used in accordance with instructions for use provided in labeling 
+          can be reasonably expected to result in significant injury to user shall 
+          establish and maintain procedures for identifying with a control number 
+          each unit, lot, or batch of finished devices and where appropriate 
+          components. Procedures shall facilitate corrective action. Such 
+          identification shall be documented in DHR.
+        agents: [operator, sentinel, architect]
+        finding_patterns: ["OPERATOR-001", "SENTINEL-001", "ARCHITECT-001"]
+        critical: true
+        applicability: "Life-sustaining/life-supporting and implantable devices"
+        evidence_types:
+          - traceability_procedures
+          - control_number_records
+          - component_traceability
+
+  # ---------------------------------------------------------------------------
+  # SUBPART G - PRODUCTION AND PROCESS CONTROLS
+  # ---------------------------------------------------------------------------
+  - id: G
+    name: "Production and Process Controls"
+    description: "Requirements for manufacturing processes and equipment"
+    sections:
+      - id: "820.70"
+        title: "Production and process controls"
+        subsections:
+          - id: "820.70(a)"
+            title: "General"
+            requirement: |
+              Each manufacturer shall develop, conduct, control, and monitor 
+              production processes to ensure device conforms to its specifications. 
+              Where deviations from device specifications could occur as result of 
+              manufacturing process, manufacturer shall establish and maintain 
+              process control procedures describing any process controls necessary 
+              to ensure conformance to specifications.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "OPERATOR-002", "SENTINEL-002"]
+            critical: true
+            evidence_types:
+              - process_control_procedures
+              - work_instructions
+              - process_monitoring_records
+              
+          - id: "820.70(b)"
+            title: "Production and process changes"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for changes 
+              to a specification, method, process, or procedure. Such changes shall 
+              be verified or where appropriate validated according to 820.75, before 
+              implementation and these activities shall be documented.
+            agents: [operator, architect]
+            finding_patterns: ["OPERATOR-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - change_control_records
+              - validation_records
+              
+          - id: "820.70(c)"
+            title: "Environmental control"
+            requirement: |
+              Where environmental conditions could reasonably be expected to have an 
+              adverse effect on product quality, each manufacturer shall establish 
+              and maintain procedures to adequately control these environmental 
+              conditions. Environmental control system(s) shall be periodically 
+              inspected to verify equipment is adequate and functioning properly.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-002", "SENTINEL-002"]
+            critical: false
+            evidence_types:
+              - environmental_control_procedures
+              - monitoring_records
+              - inspection_records
+              
+          - id: "820.70(d)"
+            title: "Personnel"
+            requirement: |
+              Each manufacturer shall establish and maintain requirements for the 
+              health, cleanliness, personal practices, and clothing of personnel if 
+              contact between such personnel and product or environment could 
+              reasonably be expected to have an adverse effect on product quality.
+            agents: [operator]
+            finding_patterns: ["OPERATOR-002"]
+            critical: false
+            evidence_types:
+              - personnel_hygiene_procedures
+              - gowning_procedures
+              
+          - id: "820.70(e)"
+            title: "Contamination control"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures to prevent 
+              contamination of equipment or product by substances that could 
+              reasonably be expected to have an adverse effect on product quality.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-002", "SENTINEL-002"]
+            critical: false
+            evidence_types:
+              - contamination_control_procedures
+              - cleaning_validation
+              
+          - id: "820.70(f)"
+            title: "Buildings"
+            requirement: |
+              Buildings shall be of suitable design and contain sufficient space to 
+              perform necessary operations, prevent mixups, and assure orderly handling.
+            agents: [operator]
+            finding_patterns: ["OPERATOR-002"]
+            critical: false
+            evidence_types:
+              - facility_layout
+              - space_assessments
+              
+          - id: "820.70(g)"
+            title: "Equipment"
+            requirement: |
+              Each manufacturer shall ensure that all equipment used in the 
+              manufacturing process meets specified requirements and is appropriately 
+              designed, constructed, placed, and installed to facilitate maintenance, 
+              adjustment, cleaning, and use.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "OPERATOR-002"]
+            critical: true
+            evidence_types:
+              - equipment_qualification
+              - installation_qualification
+              
+          - id: "820.70(h)"
+            title: "Manufacturing material"
+            requirement: |
+              Where manufacturing material could reasonably be expected to have an 
+              adverse effect on product quality, the manufacturer shall establish 
+              and maintain procedures for use and removal of such manufacturing 
+              material to ensure it is removed or limited to an amount that does 
+              not adversely affect device quality.
+            agents: [operator]
+            finding_patterns: ["OPERATOR-001"]
+            critical: false
+            evidence_types:
+              - material_control_procedures
+              - residue_testing
+              
+          - id: "820.70(i)"
+            title: "Automated processes"
+            requirement: |
+              When computers or automated data processing systems are used as part 
+              of production or quality system, the manufacturer shall validate 
+              computer software for its intended use according to an established 
+              protocol. All software changes shall be validated before approval and 
+              issuance. Validation and revalidation activities shall be documented.
+            agents: [guardian, architect, sentinel]
+            finding_patterns: ["GUARDIAN-*", "ARCHITECT-001", "SENTINEL-002"]
+            critical: true
+            evidence_types:
+              - software_validation_protocol
+              - validation_report
+              - change_validation_records
+
+      - id: "820.72"
+        title: "Inspection, measuring, and test equipment"
+        subsections:
+          - id: "820.72(a)"
+            title: "Control of inspection, measuring, and test equipment"
+            requirement: |
+              Each manufacturer shall ensure that all inspection, measuring, and 
+              test equipment, including mechanical, automated, or electronic 
+              inspection and test equipment, is suitable for its intended purposes 
+              and is capable of producing valid results. Each manufacturer shall 
+              establish and maintain procedures to ensure that equipment is 
+              routinely calibrated, inspected, checked, and maintained.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - calibration_procedures
+              - equipment_list
+              - calibration_records
+              
+          - id: "820.72(b)"
+            title: "Calibration"
+            requirement: |
+              Calibration procedures shall include specific directions and limits 
+              for accuracy and precision. When accuracy and precision limits are 
+              not met, there shall be provisions for remedial action to reestablish 
+              limits and to evaluate whether there was any adverse effect on device 
+              quality. These activities shall be documented.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - calibration_standards
+              - out_of_tolerance_procedures
+              - impact_assessments
+
+      - id: "820.75"
+        title: "Process validation"
+        subsections:
+          - id: "820.75(a)"
+            title: "General"
+            requirement: |
+              Where results of a process cannot be fully verified by subsequent 
+              inspection and test, the process shall be validated with a high 
+              degree of assurance and approved according to established procedures. 
+              Validation activities and results, including date and signature of 
+              individual(s) approving validation and where appropriate the major 
+              equipment validated, shall be documented.
+            agents: [architect, sentinel, operator]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - validation_master_plan
+              - IQ_OQ_PQ_protocols
+              - validation_reports
+              
+          - id: "820.75(b)"
+            title: "Monitoring and control"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for 
+              monitoring and control of process parameters for validated processes 
+              to ensure specified requirements continue to be met.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - process_monitoring_procedures
+              - control_charts
+              - parameter_records
+              
+          - id: "820.75(c)"
+            title: "Changes"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for changes 
+              to validated processes. Such changes shall be reviewed and evaluated 
+              and, where appropriate, requalification and revalidation shall be 
+              performed. These activities shall be documented.
+            agents: [architect, operator]
+            finding_patterns: ["ARCHITECT-001", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - change_control_procedures
+              - revalidation_records
+
+  # ---------------------------------------------------------------------------
+  # SUBPART H - ACCEPTANCE ACTIVITIES
+  # ---------------------------------------------------------------------------
+  - id: H
+    name: "Acceptance Activities"
+    description: "Receiving, in-process, and final acceptance requirements"
+    sections:
+      - id: "820.80"
+        title: "Receiving, in-process, and finished device acceptance"
+        subsections:
+          - id: "820.80(a)"
+            title: "General"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for 
+              acceptance activities. Acceptance activities include inspections, 
+              tests, or other verification activities.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - acceptance_procedures
+              - inspection_instructions
+              
+          - id: "820.80(b)"
+            title: "Receiving acceptance activities"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for 
+              acceptance of incoming product. Incoming product shall be inspected, 
+              tested, or otherwise verified as conforming to specified requirements. 
+              Acceptance or rejection shall be documented.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - receiving_inspection_procedures
+              - inspection_records
+              - COA_COC_records
+              
+          - id: "820.80(c)"
+            title: "In-process acceptance activities"
+            requirement: |
+              Each manufacturer shall establish and maintain acceptance procedures, 
+              where appropriate, to ensure in-process product conforms to specified 
+              requirements. Such procedures shall ensure in-process product is 
+              controlled until required inspection and tests or other verification 
+              activities have been completed.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: false
+            evidence_types:
+              - in_process_inspection_procedures
+              - in_process_records
+              
+          - id: "820.80(d)"
+            title: "Final acceptance activities"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for finished 
+              device acceptance to ensure each production run, lot, or batch conforms 
+              to acceptance criteria. Finished devices shall be held in quarantine or 
+              otherwise adequately controlled until released. Finished devices shall 
+              not be released for distribution until: (1) activities required in DMR 
+              are completed, (2) associated data and documentation is reviewed, 
+              (3) authorization is signed and dated, and (4) authorization is documented.
+            agents: [sentinel, operator, architect]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - final_inspection_procedures
+              - release_authorization
+              - batch_records
+              
+          - id: "820.80(e)"
+            title: "Acceptance records"
+            requirement: |
+              Each manufacturer shall document acceptance activities required by this 
+              section. These records shall include: (1) acceptance activities 
+              performed, (2) dates acceptance activities performed, (3) results, 
+              (4) signature of individual(s) conducting acceptance activities, 
+              (5) where appropriate the equipment used. These records shall be 
+              part of DHR.
+            agents: [herald, sentinel]
+            finding_patterns: ["HERALD-001", "SENTINEL-002"]
+            critical: true
+            evidence_types:
+              - acceptance_records
+              - DHR_records
+
+      - id: "820.86"
+        title: "Acceptance status"
+        requirement: |
+          Each manufacturer shall identify by suitable means the acceptance status 
+          of product, to indicate conformance or nonconformance of product with 
+          acceptance criteria. The identification of acceptance status shall be 
+          maintained throughout manufacturing, packaging, labeling, installation, 
+          and servicing of product to ensure only product that has passed the 
+          required acceptance activities is distributed, used, or installed.
+        agents: [operator, sentinel]
+        finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+        critical: true
+        evidence_types:
+          - status_identification_procedures
+          - labeling_records
+
+  # ---------------------------------------------------------------------------
+  # SUBPART I - NONCONFORMING PRODUCT
+  # ---------------------------------------------------------------------------
+  - id: I
+    name: "Nonconforming Product"
+    description: "Control of nonconforming product"
+    sections:
+      - id: "820.90"
+        title: "Nonconforming product"
+        subsections:
+          - id: "820.90(a)"
+            title: "Control of nonconforming product"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures to control 
+              product that does not conform to specified requirements. Procedures 
+              shall address identification, documentation, evaluation, segregation, 
+              and disposition of nonconforming product. Evaluation of nonconformance 
+              shall include determination of the need for investigation of the 
+              nonconformance and notification of persons or organizations responsible 
+              for the nonconformance. Evaluation and investigation shall be documented.
+            agents: [sentinel, operator, architect]
+            finding_patterns: ["SENTINEL-003", "OPERATOR-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - nonconforming_product_procedure
+              - NCR_records
+              - disposition_records
+              
+          - id: "820.90(b)"
+            title: "Nonconformity review and disposition"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for defining 
+              responsibility for review and authority for disposition of nonconforming 
+              product. Procedures shall provide for rework, by means of procedure that 
+              has been documented and that does not adversely affect product. Rework 
+              and reevaluation activities, including determination that rework does 
+              not adversely affect product, shall be documented in DHR.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-003", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - review_authority_matrix
+              - rework_procedures
+              - rework_records
+
+  # ---------------------------------------------------------------------------
+  # SUBPART J - CORRECTIVE AND PREVENTIVE ACTION
+  # ---------------------------------------------------------------------------
+  - id: J
+    name: "Corrective and Preventive Action"
+    description: "CAPA requirements for quality system effectiveness"
+    sections:
+      - id: "820.100"
+        title: "Corrective and preventive action"
+        subsections:
+          - id: "820.100(a)"
+            title: "CAPA procedures"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for 
+              implementing corrective and preventive action.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+            critical: true
+            
+          - id: "820.100(a)(1)"
+            title: "Analyzing quality data"
+            requirement: |
+              Analyzing processes, work operations, concessions, quality audit 
+              reports, quality records, service records, complaints, returned 
+              product, and other sources of quality data to identify existing 
+              and potential causes of nonconforming product, or other quality problems.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - data_analysis_procedures
+              - trend_analysis_reports
+              
+          - id: "820.100(a)(2)"
+            title: "Investigating nonconformance"
+            requirement: |
+              Investigating the cause of nonconformities relating to product, 
+              processes, and the quality system.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - investigation_procedures
+              - root_cause_analysis
+              
+          - id: "820.100(a)(3)"
+            title: "Identifying corrective actions"
+            requirement: |
+              Identifying the action(s) needed to correct and prevent recurrence 
+              of nonconforming product and other quality problems.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - corrective_action_records
+              - action_plans
+              
+          - id: "820.100(a)(4)"
+            title: "Verifying effectiveness"
+            requirement: |
+              Verifying or validating the corrective and preventive action to 
+              ensure such action is effective and does not adversely affect 
+              the finished device.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "SENTINEL-002", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - effectiveness_verification
+              - validation_records
+              
+          - id: "820.100(a)(5)"
+            title: "Implementing changes"
+            requirement: |
+              Implementing and recording changes in methods and procedures needed 
+              to correct and prevent identified quality problems.
+            agents: [sentinel, operator, architect]
+            finding_patterns: ["SENTINEL-003", "OPERATOR-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - change_implementation_records
+              - updated_procedures
+              
+          - id: "820.100(a)(6)"
+            title: "Disseminating information"
+            requirement: |
+              Ensuring that information related to quality problems or nonconforming 
+              product is disseminated to those directly responsible for assuring 
+              the quality of such product or the prevention of such problems.
+            agents: [herald, sentinel]
+            finding_patterns: ["HERALD-003", "SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - communication_records
+              - training_records
+              
+          - id: "820.100(a)(7)"
+            title: "Management review submission"
+            requirement: |
+              Submitting relevant information on identified quality problems, as 
+              well as corrective and preventive actions, for management review.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - management_review_inputs
+              - CAPA_summary_reports
+              
+          - id: "820.100(b)"
+            title: "Documentation"
+            requirement: |
+              All activities required under this section, and their results, 
+              shall be documented.
+            agents: [herald, sentinel]
+            finding_patterns: ["HERALD-001", "SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - CAPA_records
+              - investigation_reports
+
+  # ---------------------------------------------------------------------------
+  # SUBPART K - LABELING AND PACKAGING CONTROL
+  # ---------------------------------------------------------------------------
+  - id: K
+    name: "Labeling and Packaging Control"
+    description: "Requirements for device labeling and packaging"
+    sections:
+      - id: "820.120"
+        title: "Device labeling"
+        subsections:
+          - id: "820.120(a)"
+            title: "Label integrity"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures to control 
+              labeling activities. Labels shall be printed and applied so as to 
+              remain legible and affixed during customary conditions of processing, 
+              storage, handling, distribution, and where appropriate use.
+            agents: [operator, herald]
+            finding_patterns: ["OPERATOR-001", "HERALD-001"]
+            critical: true
+            evidence_types:
+              - labeling_procedures
+              - label_specifications
+              
+          - id: "820.120(b)"
+            title: "Labeling inspection"
+            requirement: |
+              Labeling shall not be released for storage or use until a designated 
+              individual(s) has examined labeling for accuracy including, where 
+              applicable: correct expiration date, control number, storage 
+              instructions, handling instructions, and any additional processing 
+              instructions. Release, including date and signature of individual(s) 
+              performing examination, shall be documented in DHR.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - label_inspection_records
+              - release_authorization
+              
+          - id: "820.120(c)"
+            title: "Labeling storage"
+            requirement: |
+              Each manufacturer shall store labeling in a manner that provides 
+              proper identification and is designed to prevent mixups.
+            agents: [operator]
+            finding_patterns: ["OPERATOR-001"]
+            critical: false
+            evidence_types:
+              - storage_procedures
+              
+          - id: "820.120(d)"
+            title: "Labeling operations"
+            requirement: |
+              Each manufacturer shall control labeling and packaging operations to 
+              prevent labeling mixups. Label and labeling used for each production 
+              unit, lot, or batch shall be documented in DHR.
+            agents: [operator, herald]
+            finding_patterns: ["OPERATOR-001", "HERALD-001"]
+            critical: true
+            evidence_types:
+              - labeling_operation_procedures
+              - DHR_records
+              
+          - id: "820.120(e)"
+            title: "Control number"
+            requirement: |
+              Where a control number is required by 820.65, that control number 
+              shall be on or shall accompany the device through distribution.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+            critical: true
+            evidence_types:
+              - traceability_records
+
+      - id: "820.130"
+        title: "Device packaging"
+        requirement: |
+          Each manufacturer shall ensure that device packaging and shipping 
+          containers are designed and constructed to protect the device from 
+          alteration or damage during the customary conditions of processing, 
+          storage, handling, and distribution.
+        agents: [operator, architect]
+        finding_patterns: ["OPERATOR-001", "ARCHITECT-001"]
+        critical: false
+        evidence_types:
+          - packaging_specifications
+          - packaging_validation
+
+  # ---------------------------------------------------------------------------
+  # SUBPART L - HANDLING, STORAGE, DISTRIBUTION, AND INSTALLATION
+  # ---------------------------------------------------------------------------
+  - id: L
+    name: "Handling, Storage, Distribution, and Installation"
+    description: "Requirements for product handling through installation"
+    sections:
+      - id: "820.140"
+        title: "Handling"
+        requirement: |
+          Each manufacturer shall establish and maintain procedures for handling 
+          product to prevent mixups, damage, deterioration, contamination, or 
+          other adverse effects.
+        agents: [operator]
+        finding_patterns: ["OPERATOR-001", "OPERATOR-002"]
+        critical: false
+        evidence_types:
+          - handling_procedures
+
+      - id: "820.150"
+        title: "Storage"
+        subsections:
+          - id: "820.150(a)"
+            title: "Storage procedures"
+            requirement: |
+              Each manufacturer shall establish and maintain procedures for control 
+              of storage areas and stock rooms for product to prevent mixups, damage, 
+              deterioration, contamination, or other adverse effects pending use or 
+              distribution and to ensure no obsolete, rejected, or deteriorated 
+              product is used or distributed.
+            agents: [operator]
+            finding_patterns: ["OPERATOR-001", "OPERATOR-002"]
+            critical: false
+            evidence_types:
+              - storage_procedures
+              - inventory_control
+              
+          - id: "820.150(b)"
+            title: "Storage assessment"
+            requirement: |
+              When necessary, appropriate methods shall be established to assess 
+              condition of product in storage.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-002", "OPERATOR-001"]
+            critical: false
+            evidence_types:
+              - storage_condition_assessments
+
+      - id: "820.160"
+        title: "Distribution"
+        requirement: |
+          Each manufacturer shall establish and maintain procedures for control 
+          and distribution of finished devices to ensure only those devices 
+          approved for release are distributed and that purchase orders are 
+          reviewed to ensure ambiguities and errors are resolved before devices 
+          are released for distribution. Where a device's fitness for use or 
+          quality deteriorates over time, procedures shall ensure that expired 
+          devices or devices deteriorated beyond acceptable fitness for use are 
+          not distributed. Each manufacturer shall maintain distribution records 
+          which include or refer to: name and address of initial consignee, 
+          identification and quantity of devices shipped, date shipped, and any 
+          control number(s) used.
+        agents: [operator, sentinel]
+        finding_patterns: ["OPERATOR-001", "SENTINEL-001"]
+        critical: true
+        evidence_types:
+          - distribution_procedures
+          - distribution_records
+          - expiration_date_controls
+
+      - id: "820.170"
+        title: "Installation"
+        subsections:
+          - id: "820.170(a)"
+            title: "Installation instructions"
+            requirement: |
+              Each manufacturer of a device requiring installation shall establish 
+              and maintain adequate installation and inspection instructions, and 
+              where appropriate test procedures. Instructions and procedures shall 
+              include directions for ensuring proper installation so that device 
+              will perform as intended after installation.
+            agents: [operator, herald]
+            finding_patterns: ["OPERATOR-001", "HERALD-001"]
+            critical: false
+            evidence_types:
+              - installation_instructions
+              - inspection_procedures
+              
+          - id: "820.170(b)"
+            title: "Installation records"
+            requirement: |
+              The manufacturer shall ensure that installation, inspection, and any 
+              required testing are performed in accordance with manufacturer's 
+              instructions by the manufacturer or the manufacturer's representative, 
+              and shall document inspection and any test results to demonstrate 
+              proper installation.
+            agents: [operator, sentinel]
+            finding_patterns: ["OPERATOR-001", "SENTINEL-002"]
+            critical: false
+            evidence_types:
+              - installation_records
+              - test_results
+
+  # ---------------------------------------------------------------------------
+  # SUBPART M - RECORDS
+  # ---------------------------------------------------------------------------
+  - id: M
+    name: "Records"
+    description: "Requirements for quality system records"
+    sections:
+      - id: "820.180"
+        title: "General requirements"
+        subsections:
+          - id: "820.180(a)"
+            title: "Confidentiality"
+            requirement: |
+              Records deemed confidential by manufacturer may be marked to aid 
+              FDA in determining whether information may be disclosed under 
+              public information regulation in part 20.
+            agents: [herald]
+            finding_patterns: ["HERALD-001"]
+            critical: false
+            
+          - id: "820.180(b)"
+            title: "Record retention period"
+            requirement: |
+              All records required by this part shall be retained for a period 
+              of time equivalent to the design and expected life of the device, 
+              but in no case less than 2 years from date of release for 
+              commercial distribution by manufacturer.
+            agents: [herald, architect]
+            finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - retention_schedule
+              - record_management_procedures
+              
+          - id: "820.180(c)"
+            title: "Exceptions"
+            requirement: |
+              This section does not apply to reports required by 820.20(c) 
+              Management review, 820.22 Quality audits, and supplier audit 
+              reports used to meet requirements of 820.50(a), but does apply 
+              to procedures established under these provisions.
+            agents: [architect]
+            finding_patterns: []
+            critical: false
+
+      - id: "820.181"
+        title: "Device master record"
+        requirement: |
+          Each manufacturer shall maintain device master records (DMR). Each 
+          manufacturer shall ensure that each DMR is prepared and approved in 
+          accordance with 820.40. DMR for each type of device shall include, 
+          or refer to location of: (a) device specifications including appropriate 
+          drawings, composition, formulation, component specifications, and 
+          software specifications, (b) production process specifications including 
+          appropriate equipment specifications, production methods, production 
+          procedures, and production environment specifications, (c) quality 
+          assurance procedures and specifications including acceptance criteria 
+          and quality assurance equipment to be used, (d) packaging and labeling 
+          specifications including methods and processes used, (e) installation, 
+          maintenance, and servicing procedures and methods.
+        agents: [herald, architect, operator]
+        finding_patterns: ["HERALD-001", "ARCHITECT-001", "OPERATOR-001"]
+        critical: true
+        evidence_types:
+          - device_master_record
+          - specifications
+          - drawings
+          - procedures
+
+      - id: "820.184"
+        title: "Device history record"
+        requirement: |
+          Each manufacturer shall maintain device history records (DHR). Each 
+          manufacturer shall establish and maintain procedures to ensure that 
+          DHRs for each batch, lot, or unit are maintained to demonstrate device 
+          is manufactured in accordance with DMR and requirements of this part. 
+          DHR shall include, or refer to location of: (a) dates of manufacture, 
+          (b) quantity manufactured, (c) quantity released for distribution, 
+          (d) acceptance records demonstrating device is manufactured in accordance 
+          with DMR, (e) primary identification label and labeling used for each 
+          production unit, (f) any unique device identifier (UDI) or universal 
+          product code (UPC), and any other device identification(s) and control 
+          number(s) used.
+        agents: [herald, operator]
+        finding_patterns: ["HERALD-001", "OPERATOR-001"]
+        critical: true
+        evidence_types:
+          - device_history_records
+          - batch_records
+          - lot_records
+
+      - id: "820.186"
+        title: "Quality system record"
+        requirement: |
+          Each manufacturer shall maintain a quality system record (QSR). The 
+          QSR shall include, or refer to location of, procedures and documentation 
+          of activities required by this part that are not specific to a particular 
+          type of device(s), including but not limited to the records required by 
+          820.20. Each manufacturer shall ensure that QSR is prepared and approved 
+          in accordance with 820.40.
+        agents: [herald, architect]
+        finding_patterns: ["HERALD-001", "ARCHITECT-001"]
+        critical: true
+        evidence_types:
+          - quality_system_record
+          - quality_manual
+          - procedures
+
+      - id: "820.198"
+        title: "Complaint files"
+        subsections:
+          - id: "820.198(a)"
+            title: "Complaint handling procedures"
+            requirement: |
+              Each manufacturer shall maintain complaint files. Each manufacturer 
+              shall establish and maintain procedures for receiving, reviewing, 
+              and evaluating complaints by a formally designated unit. Procedures 
+              shall ensure: (1) all complaints are processed in uniform and timely 
+              manner, (2) oral complaints are documented upon receipt, (3) complaints 
+              are evaluated to determine whether complaint represents an event 
+              required to be reported to FDA under part 803.
+            agents: [sentinel, operator]
+            finding_patterns: ["SENTINEL-003", "OPERATOR-001"]
+            critical: true
+            evidence_types:
+              - complaint_handling_procedure
+              - complaint_records
+              
+          - id: "820.198(b)"
+            title: "Investigation requirement"
+            requirement: |
+              Each manufacturer shall review and evaluate all complaints to 
+              determine whether an investigation is necessary. When no investigation 
+              is made, manufacturer shall maintain a record including reason no 
+              investigation was made and name of individual responsible for 
+              the decision.
+            agents: [sentinel]
+            finding_patterns: ["SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - investigation_decision_records
+              
+          - id: "820.198(c)"
+            title: "Investigation procedures"
+            requirement: |
+              Any complaint involving possible failure of device, labeling, or 
+              packaging to meet any of its specifications shall be reviewed, 
+              evaluated, and investigated, unless such investigation has already 
+              been performed for similar complaint and another investigation is 
+              not necessary.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - investigation_records
+              
+          - id: "820.198(d)"
+            title: "MDR-reportable complaints"
+            requirement: |
+              Any complaint that represents an event which must be reported to 
+              FDA under part 803 shall be promptly reviewed, evaluated, and 
+              investigated by designated individual(s) and shall be maintained 
+              in separate portion of complaint files or otherwise clearly identified. 
+              Records shall include determination of: (1) whether device failed to 
+              meet specifications, (2) whether device was being used for treatment 
+              or diagnosis, (3) relationship of device to reported incident or 
+              adverse event.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+            critical: true
+            evidence_types:
+              - MDR_complaint_records
+              - MDR_reports
+              
+          - id: "820.198(e)"
+            title: "Investigation records"
+            requirement: |
+              When an investigation is made, a record of investigation shall be 
+              maintained by formally designated unit. Record shall include: 
+              name of device, date complaint received, any UDI or UPC, any device 
+              identification(s) and control number(s) used, name, address, and 
+              phone number of complainant, nature and details of complaint, dates 
+              and results of investigation, any corrective action taken, any reply 
+              to complainant.
+            agents: [herald, sentinel]
+            finding_patterns: ["HERALD-001", "SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - investigation_records
+              - corrective_action_records
+              
+          - id: "820.198(f)"
+            title: "Failure to investigate"
+            requirement: |
+              When manufacturer's formally designated complaint unit is located 
+              at a site separate from manufacturing establishment, written 
+              procedure shall be established for transfer of complaint to 
+              manufacturing establishment for review and evaluation. If 
+              investigation is required, manufacturer shall ensure timely 
+              transfer of complaint.
+            agents: [herald, operator]
+            finding_patterns: ["HERALD-001", "OPERATOR-001"]
+            critical: false
+            evidence_types:
+              - transfer_procedures
+              
+          - id: "820.198(g)"
+            title: "Records accessibility"
+            requirement: |
+              If manufacturer's formally designated complaint unit is located 
+              outside of the United States, records required by this section 
+              shall be reasonably accessible in United States.
+            agents: [herald]
+            finding_patterns: ["HERALD-001"]
+            critical: false
+            evidence_types:
+              - accessibility_procedures
+
+  # ---------------------------------------------------------------------------
+  # SUBPART N - SERVICING
+  # ---------------------------------------------------------------------------
+  - id: N
+    name: "Servicing"
+    description: "Requirements for device servicing"
+    sections:
+      - id: "820.200"
+        title: "Servicing"
+        subsections:
+          - id: "820.200(a)"
+            title: "Service procedures"
+            requirement: |
+              Where servicing is a specified requirement, each manufacturer shall 
+              establish and maintain instructions and procedures for performing 
+              and verifying that servicing meets specified requirements.
+            agents: [operator, herald]
+            finding_patterns: ["OPERATOR-001", "HERALD-001"]
+            critical: false
+            evidence_types:
+              - service_procedures
+              - service_instructions
+              
+          - id: "820.200(b)"
+            title: "Service report analysis"
+            requirement: |
+              Each manufacturer shall analyze service reports with appropriate 
+              statistical methodology in accordance with 820.100.
+            agents: [sentinel, architect]
+            finding_patterns: ["SENTINEL-003", "ARCHITECT-001"]
+            critical: false
+            evidence_types:
+              - service_report_analysis
+              - trend_analysis
+              
+          - id: "820.200(c)"
+            title: "Service reports as complaints"
+            requirement: |
+              Each manufacturer who receives a service report that represents 
+              an event which must be reported to FDA under part 803 shall 
+              automatically consider report a complaint and shall process it 
+              in accordance with requirements of 820.198.
+            agents: [sentinel]
+            finding_patterns: ["SENTINEL-003"]
+            critical: true
+            evidence_types:
+              - service_complaint_records
+              
+          - id: "820.200(d)"
+            title: "Service records"
+            requirement: |
+              Service reports shall be documented and shall include: (1) name 
+              of device serviced, (2) any UDI or UPC and any other device 
+              identification(s) and control number(s) used, (3) date of service, 
+              (4) individual(s) servicing device, (5) service performed, and 
+              (6) test and inspection data.
+            agents: [herald, operator]
+            finding_patterns: ["HERALD-001", "OPERATOR-001"]
+            critical: false
+            evidence_types:
+              - service_records
+
+  # ---------------------------------------------------------------------------
+  # SUBPART O - STATISTICAL TECHNIQUES
+  # ---------------------------------------------------------------------------
+  - id: O
+    name: "Statistical Techniques"
+    description: "Requirements for statistical methods"
+    sections:
+      - id: "820.250"
+        title: "Statistical techniques"
+        subsections:
+          - id: "820.250(a)"
+            title: "Establishing techniques"
+            requirement: |
+              Where appropriate, each manufacturer shall establish and maintain 
+              procedures for identifying valid statistical techniques required 
+              for establishing, controlling, and verifying acceptability of 
+              process capability and product characteristics.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-002"]
+            critical: false
+            evidence_types:
+              - statistical_procedures
+              - capability_studies
+              
+          - id: "820.250(b)"
+            title: "Sampling plans"
+            requirement: |
+              Sampling plans, when used, shall be written and based on valid 
+              statistical rationale. Each manufacturer shall establish and 
+              maintain procedures to ensure sampling methods are adequate for 
+              their intended use and to ensure that when changes occur the 
+              sampling plans are reviewed.
+            agents: [architect, sentinel]
+            finding_patterns: ["ARCHITECT-001", "SENTINEL-002"]
+            critical: false
+            evidence_types:
+              - sampling_plans
+              - statistical_justification
+
+# =============================================================================
+# AGENT TO REQUIREMENT MAPPINGS
+# =============================================================================
+
+mappings:
+  # Guardian findings map to security-related 820 requirements
+  GUARDIAN-001:
+    title: "Secrets in Source Control"
+    controls:
+      - "820.30(g)"      # Design validation - software validation
+      - "820.70(i)"      # Automated processes - software validation
+    severity: critical
+    
+  GUARDIAN-002:
+    title: "Insecure Dependencies"
+    controls:
+      - "820.50(a)"      # Supplier evaluation
+      - "820.70(i)"      # Automated processes
+    severity: high
+    
+  GUARDIAN-003:
+    title: "Missing Authentication"
+    controls:
+      - "820.30(g)"      # Design validation
+      - "820.70(i)"      # Automated processes
+    severity: critical
+    
+  GUARDIAN-004:
+    title: "SQL Injection Vulnerability"
+    controls:
+      - "820.30(g)"      # Design validation
+      - "820.70(i)"      # Automated processes
+    severity: critical
+    
+  GUARDIAN-005:
+    title: "Cross-Site Scripting (XSS)"
+    controls:
+      - "820.30(g)"      # Design validation
+      - "820.70(i)"      # Automated processes
+    severity: high
+    
+  GUARDIAN-006:
+    title: "Insufficient Encryption"
+    controls:
+      - "820.30(g)"      # Design validation
+      - "820.70(i)"      # Automated processes
+    severity: high
+
+  # Sentinel findings map to monitoring/audit requirements
+  SENTINEL-001:
+    title: "Insufficient Logging"
+    controls:
+      - "820.180"        # General records requirements
+      - "820.184"        # Device history record
+      - "820.70(i)"      # Automated processes
+    severity: high
+    
+  SENTINEL-002:
+    title: "Missing Validation Evidence"
+    controls:
+      - "820.30(f)"      # Design verification
+      - "820.30(g)"      # Design validation
+      - "820.75"         # Process validation
+    severity: critical
+    
+  SENTINEL-003:
+    title: "CAPA Process Gaps"
+    controls:
+      - "820.100"        # CAPA
+      - "820.22"         # Quality audits
+      - "820.198"        # Complaint files
+    severity: high
+
+  # Architect findings map to design/documentation requirements
+  ARCHITECT-001:
+    title: "Missing Documentation"
+    controls:
+      - "820.30(j)"      # Design history file
+      - "820.40"         # Document controls
+      - "820.181"        # Device master record
+      - "820.186"        # Quality system record
+    severity: high
+    
+  ARCHITECT-002:
+    title: "Design Control Gaps"
+    controls:
+      - "820.30"         # All design controls
+    severity: critical
+    
+  ARCHITECT-003:
+    title: "Supplier Control Deficiency"
+    controls:
+      - "820.50"         # Purchasing controls
+    severity: medium
+    
+  ARCHITECT-004:
+    title: "Risk Management Gaps"
+    controls:
+      - "820.30(g)"      # Design validation - risk analysis
+      - "820.100"        # CAPA
+    severity: high
+
+  # Operator findings map to production/process requirements
+  OPERATOR-001:
+    title: "Process Control Deficiency"
+    controls:
+      - "820.70"         # Production and process controls
+      - "820.75"         # Process validation
+    severity: high
+    
+  OPERATOR-002:
+    title: "Environmental Control Issues"
+    controls:
+      - "820.70(c)"      # Environmental control
+      - "820.70(e)"      # Contamination control
+    severity: medium
+
+  # Herald findings map to labeling/documentation requirements
+  HERALD-001:
+    title: "Documentation Deficiency"
+    controls:
+      - "820.40"         # Document controls
+      - "820.180"        # Records requirements
+      - "820.181"        # Device master record
+    severity: medium
+    
+  HERALD-002:
+    title: "Labeling Issues"
+    controls:
+      - "820.120"        # Device labeling
+      - "820.130"        # Device packaging
+    severity: high
+    
+  HERALD-003:
+    title: "Training Documentation Gaps"
+    controls:
+      - "820.25(b)"      # Personnel training
+    severity: medium
+
+  # Navigator findings (limited relevance for 820)
+  NAVIGATOR-001:
+    title: "API Documentation Issues"
+    controls:
+      - "820.30(c)"      # Design input
+      - "820.181"        # Device master record
+    severity: low
+
+# =============================================================================
+# SCORING AND ASSESSMENT
+# =============================================================================
+
+scoring:
+  methodology: "FDA Form 483 / Warning Letter Risk Assessment"
+  
+  total_subparts: 15
+  total_sections: 33
+  total_subsections: 78
+  
+  critical_requirements:
+    - "820.5"            # Quality system
+    - "820.20(a)"        # Quality policy
+    - "820.20(b)"        # Organization
+    - "820.20(c)"        # Management review
+    - "820.22"           # Quality audits
+    - "820.25(b)"        # Training
+    - "820.30"           # Design controls (all)
+    - "820.40"           # Document controls
+    - "820.50(a)"        # Supplier evaluation
+    - "820.65"           # Traceability
+    - "820.70(a)"        # Production controls
+    - "820.70(i)"        # Automated processes
+    - "820.75"           # Process validation
+    - "820.80(d)"        # Final acceptance
+    - "820.90"           # Nonconforming product
+    - "820.100"          # CAPA
+    - "820.120"          # Device labeling
+    - "820.160"          # Distribution
+    - "820.181"          # Device master record
+    - "820.184"          # Device history record
+    - "820.198"          # Complaint files
+    
+  common_483_observations:
+    - category: "CAPA"
+      frequency: "Most common"
+      sections: ["820.100"]
+      
+    - category: "Design Controls"
+      frequency: "Very common"
+      sections: ["820.30"]
+      
+    - category: "Complaint Handling"
+      frequency: "Common"
+      sections: ["820.198"]
+      
+    - category: "Production and Process Controls"
+      frequency: "Common"
+      sections: ["820.70", "820.75"]
+      
+    - category: "Document Controls"
+      frequency: "Common"
+      sections: ["820.40"]
+
+assessment:
+  type: "FDA Inspection"
+  frequency: "Risk-based (typically every 2-3 years for established manufacturers)"
+  inspection_types:
+    - pre_approval_inspection
+    - routine_surveillance
+    - for_cause_inspection
+    - compliance_follow_up
+  regulatory_actions:
+    - form_483_observations
+    - warning_letter
+    - consent_decree
+    - seizure
+    - injunction
+    - criminal_prosecution
+
+# =============================================================================
+# RELATED REGULATIONS
+# =============================================================================
+
+related_regulations:
+  - id: "21_cfr_11"
+    name: "Electronic Records; Electronic Signatures"
+    relationship: "Electronic records and signatures used to meet 820 requirements"
+    
+  - id: "21_cfr_803"
+    name: "Medical Device Reporting"
+    relationship: "Complaint handling and MDR requirements"
+    
+  - id: "21_cfr_806"
+    name: "Medical Devices; Reports of Corrections and Removals"
+    relationship: "Corrections and removals from CAPA activities"
+    
+  - id: "21_cfr_821"
+    name: "Medical Device Tracking Requirements"
+    relationship: "Tracking requirements for certain devices"
+    
+  - id: "21_cfr_830"
+    name: "Unique Device Identification"
+    relationship: "UDI requirements referenced in records sections"
+    
+  - id: "iso_13485"
+    name: "ISO 13485:2016 Medical Devices QMS"
+    relationship: "Harmonized standard (QMSR effective Feb 2, 2026)"
+
+# =============================================================================
+# METADATA
+# =============================================================================
+
+metadata:
+  pack_version: "1.0.0"
+  created_date: "2026-02-02"
+  created_by: "Code Conclave"
+  last_modified: "2026-02-02"
+  
+  sources:
+    - "21 CFR Part 820 (eCFR)"
+    - "FDA Quality System Regulation Preamble (61 FR 52654)"
+    - "FDA QSIT Guide"
+    - "FDA CAPA Guidance"
+    - "FDA Design Controls Guidance"
+    
+  notes:
+    - "QMSR transition: ISO 13485:2016 incorporated by reference effective Feb 2, 2026"
+    - "Design controls apply to Class II/III and specific Class I devices"
+    - "Life-sustaining/supporting and implantable devices have additional traceability requirements"
+    - "Software validation requirements apply under 820.30(g) and 820.70(i)"
